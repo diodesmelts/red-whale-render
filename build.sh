@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status
+set -ex  # Exit immediately if a command exits with a non-zero status and print commands
 
 echo "Starting build process..."
 
@@ -7,22 +7,22 @@ echo "Starting build process..."
 echo "Installing dependencies..."
 npm install
 
-# Create separate directory for the build
-echo "Creating build directory structure..."
-mkdir -p build_temp
+# Prepare the output directory
+echo "Preparing output directory..."
+rm -rf dist
+mkdir -p dist/public
 
-# Build the frontend first
+# Use compiled JS approach to avoid TypeScript transform issues
+echo "Transpiling TypeScript files with tsc..."
+npx tsc --project tsconfig.json --outDir dist/tmp
+
+# Build the frontend with Vite
 echo "Building frontend with Vite..."
-npx vite build --outDir build_temp/public
+VITE_API_URL=${RENDER_EXTERNAL_URL} npx vite build --outDir dist/public
 
-# Build the server separately
-echo "Building server with esbuild..."
-npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=build_temp
-
-# Move everything to dist
-echo "Moving built files to dist..."
-mkdir -p dist
-cp -r build_temp/public dist/
-cp build_temp/index.js dist/
+# Move server files
+echo "Moving server files..."
+cp -r dist/tmp/server/* dist/
+rm -rf dist/tmp
 
 echo "Build completed successfully!"
