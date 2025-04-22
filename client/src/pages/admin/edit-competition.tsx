@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Competition, insertCompetitionSchema } from "@shared/schema";
 import { COMPETITION_CATEGORIES } from "@/lib/constants";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -263,17 +264,12 @@ export default function EditCompetition() {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="URL to competition image" 
-                          {...field}
-                          value={field.value || ""}
+                        <ImageUpload 
+                          onImageUploaded={field.onChange}
+                          existingImageUrl={field.value}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Provide a direct URL to an image for this competition
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
