@@ -1,0 +1,35 @@
+Red Whale Competitions - App Overview 
+Red Whale Competitions is a dynamic platform that helps users discover, enter, and track online competitions across various platforms. Here's a comprehensive overview of the application's features and functionality: 
+
+Core Features
+1. Competition Discovery
+Users can browse through curated competitions across various categories (Family, Appliances, Cash, etc.)
+Each competition displays key information like prize value, entry deadline, and organizer
+Filtering system allows users to find competitions by category, platform, or entry type
+2. Competition Entry Management
+Users can track which competitions they've entered through their personal dashboard
+The platform shows entry progress for multi-step competitions
+Countdown timers show when competitions will close and be drawn
+3. User Authentication System
+Secure login and registration with appropriate validation
+Age verification during registration process
+Profile customization with mascot selection instead of traditional avatars
+4. Payment Processing
+Integration with Stripe for secure payment processing
+Support for multiple payment methods including Apple Pay
+Ticket-based purchase model for competition entries
+5. Statistics and Tracking
+Personal statistics dashboard showing entries, active competitions, and wins
+Visualization of competition history and success rates
+
+6. Notification System
+In-app notification bell with unread indicators
+Customizable notification settings in the user profile
+Email notification options for important competition updates
+User Experience Design
+The application features a vibrant blue theme with category-specific color schemes:
+
+Family competitions use a yellow theme
+Appliances competitions use a pink theme
+Cash competitions use a green theme
+The interface includes animated elements like wiggle effects, pulse animations, shine effects, and glow effects on buttons to create an engaging experience. Competition cards are designed with dark backgrounds, blur effects, and gradient borders that appear on hover.
