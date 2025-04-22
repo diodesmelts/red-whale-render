@@ -126,8 +126,10 @@ export default function ListingsManagement() {
     (comp.brand && comp.brand.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  console.log("Competitions data:", competitions);
+
   return (
-    <div className="container py-10">
+    <div className="container mx-auto px-4 md:px-6 py-10 max-w-7xl">
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

@@ -36,7 +36,7 @@ function Router() {
       <Route path="/:rest*">
         {(params) => {
           // Don't render Layout for auth page
-          if (params.rest === "auth") return null;
+          if (params["rest*"] === "auth") return null;
           
           return (
             <Layout>
