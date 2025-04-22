@@ -18,6 +18,12 @@ import MyEntries from "@/pages/my-entries";
 import MyWins from "@/pages/my-wins";
 import ProfilePage from "@/pages/profile";
 
+// Admin Pages
+import AdminDashboard from "@/pages/admin/dashboard";
+import ListingsManagement from "@/pages/admin/listings-management";
+import CreateCompetition from "@/pages/admin/create-competition";
+import EditCompetition from "@/pages/admin/edit-competition";
+
 function Router() {
   return (
     <Switch>
@@ -29,6 +35,13 @@ function Router() {
       <ProtectedRoute path="/my-entries" component={MyEntries} />
       <ProtectedRoute path="/my-wins" component={MyWins} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
+      
+      {/* Admin Routes - protected and require admin role */}
+      <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
+      <ProtectedRoute path="/admin/listings" component={ListingsManagement} adminRequired={true} />
+      <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
+      <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
+      
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

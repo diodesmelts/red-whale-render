@@ -197,6 +197,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes
+  // Admin middleware to check if user is admin
+  const isAdmin = (req: any, res: any, next: any) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    next();
+  };
+
   // Admin promotion endpoint (for development only)
   app.post("/api/admin/promote-user", async (req, res) => {
     try {
@@ -216,6 +228,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error promoting user to admin:", error);
       return res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Admin - Create new competition
+  app.post("/api/admin/competitions", isAdmin, async (req, res) => {
+    try {
+      const competition = await storage.createCompetition(req.body);
+      res.status(201).json(competition);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Admin - Update competition
+  app.patch("/api/admin/competitions/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const competition = await storage.updateCompetition(id, req.body);
+      
+      if (!competition) {
+        return res.status(404).json({ message: "Competition not found" });
+      }
+      
+      res.json(competition);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Admin - Delete competition
+  app.delete("/api/admin/competitions/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const competition = await storage.getCompetition(id);
+      
+      if (!competition) {
+        return res.status(404).json({ message: "Competition not found" });
+      }
+      
+      // Check if tickets have been sold
+      if (competition.ticketsSold > 0) {
+        return res.status(400).json({ 
+          message: "Cannot delete competition with sold tickets" 
+        });
+      }
+      
+      const result = await storage.deleteCompetition(id);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Competition not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
   

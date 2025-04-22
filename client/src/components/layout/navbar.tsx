@@ -134,13 +134,13 @@ export function Navbar() {
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
                         {user.isAdmin && (
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.location.href = '/admin'}>
                             <Shield className="h-4 w-4 mr-2 text-purple-600" />
                             <span>Admin Dashboard</span>
                           </DropdownMenuItem>
                         )}
                         {user.isAdmin && (
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.location.href = '/admin/listings'}>
                             <ClipboardList className="h-4 w-4 mr-2 text-muted-foreground" />
                             <span>Listings Management</span>
                           </DropdownMenuItem>
@@ -250,9 +250,25 @@ export function Navbar() {
                         <i className="fas fa-award mr-2"></i> My Wins
                       </Link>
                       <div className="border-t border-border pt-4">
+                        {user.isAdmin && (
+                          <>
+                            <Link href="/admin" 
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex items-center text-lg font-medium text-purple-500">
+                              <Shield className="h-5 w-5 mr-2" />
+                              Admin Dashboard
+                            </Link>
+                            <Link href="/admin/listings" 
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex items-center text-lg font-medium mt-4">
+                              <ClipboardList className="h-5 w-5 mr-2 text-muted-foreground" />
+                              Listings Management
+                            </Link>
+                          </>
+                        )}
                         <Link href="/profile" 
                           onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center text-lg font-medium">
+                          className="flex items-center text-lg font-medium mt-4">
                           <User className="h-5 w-5 mr-2 text-primary" />
                           My Profile
                         </Link>
