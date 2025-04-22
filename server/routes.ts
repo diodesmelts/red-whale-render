@@ -54,6 +54,11 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Seed the admin user in the database (if it doesn't exist)
+  if (dataStorage instanceof Object && typeof (dataStorage as any).seedAdminUser === 'function') {
+    await (dataStorage as any).seedAdminUser();
+  }
+  
   // Set up authentication routes
   setupAuth(app);
   

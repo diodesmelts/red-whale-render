@@ -395,4 +395,272 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Implementation of storage interface using a PostgreSQL database
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.SessionStore;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      tableName: 'session',
+      createTableIfMissing: true
+    });
+  }
+
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+    return user;
+  }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    return user;
+  }
+
+  async createUser(userData: Omit<InsertUser, "confirmPassword" | "agreeToTerms">): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userData,
+        mascot: userData.mascot ?? 'blue-whale',
+        isAdmin: false,
+        notificationSettings: userData.notificationSettings ?? { email: true, inApp: true }
+      })
+      .returning();
+    return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+  
+  async promoteToAdmin(id: number): Promise<User | undefined> {
+    return this.updateUser(id, { isAdmin: true });
+  }
+
+  // Competition operations
+  async getCompetition(id: number): Promise<Competition | undefined> {
+    const [competition] = await db
+      .select()
+      .from(competitions)
+      .where(eq(competitions.id, id))
+      .limit(1);
+    return competition;
+  }
+  
+  async listCompetitions(options: { 
+    category?: string, 
+    limit?: number, 
+    offset?: number,
+    isLive?: boolean,
+    isFeatured?: boolean,
+    sortBy?: 'newest' | 'endingSoon' | 'popular'
+  } = {}): Promise<Competition[]> {
+    let query = db.select().from(competitions);
+    
+    // Build the where conditions
+    const conditions = [];
+    
+    if (options.category) {
+      conditions.push(eq(competitions.category, options.category));
+    }
+    
+    if (options.isLive !== undefined) {
+      conditions.push(eq(competitions.isLive, options.isLive));
+    }
+    
+    if (options.isFeatured !== undefined) {
+      conditions.push(eq(competitions.isFeatured, options.isFeatured));
+    }
+    
+    // Apply all conditions if any
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+    
+    // Apply sorting
+    if (options.sortBy) {
+      switch (options.sortBy) {
+        case 'newest':
+          query = query.orderBy(desc(competitions.createdAt));
+          break;
+        case 'endingSoon':
+          query = query.orderBy(asc(competitions.drawDate));
+          break;
+        case 'popular':
+          query = query.orderBy(desc(competitions.ticketsSold));
+          break;
+      }
+    }
+    
+    // Apply pagination
+    if (options.offset !== undefined) {
+      query = query.offset(options.offset);
+    }
+    
+    if (options.limit !== undefined) {
+      query = query.limit(options.limit);
+    }
+    
+    return query;
+  }
+  
+  async createCompetition(competitionData: InsertCompetition): Promise<Competition> {
+    const [competition] = await db
+      .insert(competitions)
+      .values({
+        ...competitionData,
+        ticketsSold: 0
+      })
+      .returning();
+    return competition;
+  }
+  
+  async updateCompetition(id: number, competitionData: Partial<Competition>): Promise<Competition | undefined> {
+    const [updatedCompetition] = await db
+      .update(competitions)
+      .set(competitionData)
+      .where(eq(competitions.id, id))
+      .returning();
+    return updatedCompetition;
+  }
+  
+  async deleteCompetition(id: number): Promise<boolean> {
+    // Check if there are any entries for this competition
+    const competitionEntries = await this.getEntriesByCompetition(id);
+    if (competitionEntries.length > 0) {
+      return false;
+    }
+    
+    // Delete the competition
+    const deleted = await db.delete(competitions).where(eq(competitions.id, id));
+    return deleted.count > 0;
+  }
+  
+  // Entry operations
+  async createEntry(entryData: InsertEntry): Promise<Entry> {
+    // Start a transaction
+    const [entry] = await db.transaction(async (tx) => {
+      // Insert the entry
+      const [entry] = await tx
+        .insert(entries)
+        .values(entryData)
+        .returning();
+        
+      // Update the competition's tickets sold count
+      await tx
+        .update(competitions)
+        .set({
+          ticketsSold: sql`${competitions.ticketsSold} + ${entryData.ticketCount}`
+        })
+        .where(eq(competitions.id, entryData.competitionId));
+        
+      return [entry];
+    });
+    
+    return entry;
+  }
+  
+  async getEntries(userId: number): Promise<Entry[]> {
+    return db
+      .select()
+      .from(entries)
+      .where(eq(entries.userId, userId));
+  }
+  
+  async getEntriesByCompetition(competitionId: number): Promise<Entry[]> {
+    return db
+      .select()
+      .from(entries)
+      .where(eq(entries.competitionId, competitionId));
+  }
+  
+  async updateEntryPaymentStatus(id: number, status: string, paymentId?: string): Promise<Entry | undefined> {
+    const updateData: Partial<Entry> = { paymentStatus: status };
+    if (paymentId) {
+      updateData.stripePaymentId = paymentId;
+    }
+    
+    const [updatedEntry] = await db
+      .update(entries)
+      .set(updateData)
+      .where(eq(entries.id, id))
+      .returning();
+    return updatedEntry;
+  }
+  
+  // Winner operations
+  async createWinner(winnerData: InsertWinner): Promise<Winner> {
+    const [winner] = await db
+      .insert(winners)
+      .values({
+        ...winnerData,
+        claimStatus: 'pending'
+      })
+      .returning();
+    return winner;
+  }
+  
+  async getWinners(userId: number): Promise<Winner[]> {
+    return db
+      .select()
+      .from(winners)
+      .where(eq(winners.userId, userId));
+  }
+  
+  async getWinnersByCompetition(competitionId: number): Promise<Winner[]> {
+    return db
+      .select()
+      .from(winners)
+      .where(eq(winners.competitionId, competitionId));
+  }
+  
+  async updateWinnerClaimStatus(id: number, status: string): Promise<Winner | undefined> {
+    const [updatedWinner] = await db
+      .update(winners)
+      .set({ claimStatus: status })
+      .where(eq(winners.id, id))
+      .returning();
+    return updatedWinner;
+  }
+
+  // Method to seed the admin user if it doesn't exist
+  async seedAdminUser() {
+    // Check if admin user exists
+    const adminUser = await this.getUserByUsername("admin");
+    if (!adminUser) {
+      // Create admin user
+      await db.insert(users).values({
+        username: "admin",
+        email: "admin@bluewhalecompetitions.com", 
+        password: "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5", // Password: Admin123!
+        displayName: "Admin User",
+        mascot: "blue-whale",
+        isAdmin: true,
+        notificationSettings: { email: true, inApp: true }
+      });
+    }
+  }
+}
+
+// Switch from MemStorage to DatabaseStorage for persistence
+export const storage = new DatabaseStorage();
