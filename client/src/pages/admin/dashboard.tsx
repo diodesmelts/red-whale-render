@@ -44,7 +44,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="container py-10">
+    <div className="container mx-auto px-4 md:px-6 py-10 max-w-7xl">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div>
