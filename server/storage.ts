@@ -1,8 +1,13 @@
 import { users, type User, type InsertUser, competitions, type Competition, type InsertCompetition, entries, type Entry, type InsertEntry, winners, type Winner, type InsertWinner } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, asc, lte, gte, and, or, sql } from "drizzle-orm";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
 const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
 // modify the interface with any CRUD methods
 // you might need
