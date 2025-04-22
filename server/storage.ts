@@ -78,7 +78,7 @@ export class MemStorage implements IStorage {
       id: this.userCurrentId++,
       username: "admin",
       email: "admin@bluewhalecompetitions.com",
-      password: "$2b$10$6KxbfK01xQJRl7aKIIU/q.I3fpVmMvqVoaV9C1k17w1qzA5.MZkYi", // Password: Admin123!
+      password: "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5", // Password: Admin123!
       displayName: "Admin User",
       mascot: "blue-whale",
       isAdmin: true,
