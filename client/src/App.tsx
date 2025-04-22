@@ -53,7 +53,15 @@ function Router() {
                 <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
                 <ProtectedRoute path="/admin/listings" component={ListingsManagement} adminRequired={true} />
                 <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
-                <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
+                <Route path="/admin/edit-competition/:id">
+                  {(params) => (
+                    <ProtectedRoute 
+                      path={`/admin/edit-competition/${params.id}`} 
+                      component={() => <EditCompetition id={params.id} />} 
+                      adminRequired={true} 
+                    />
+                  )}
+                </Route>
                 
                 {/* Fallback to 404 */}
                 <Route component={NotFound} />

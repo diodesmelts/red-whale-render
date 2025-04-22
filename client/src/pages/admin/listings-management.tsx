@@ -51,10 +51,14 @@ export default function ListingsManagement() {
   const [competitionToDelete, setCompetitionToDelete] = useState<Competition | null>(null);
 
   // Get competitions data
-  const { data: competitions = [], isLoading } = useQuery({
+  const { data: competitions = [], isLoading, error } = useQuery({
     queryKey: ['/api/competitions'],
-    queryFn: getQueryFn({ on401: "throw" }),
+    queryFn: getQueryFn({ on401: "returnNull" }),
   });
+  
+  console.log("Competitions:", competitions);
+  console.log("Loading:", isLoading);
+  console.log("Error:", error);
 
   // Toggle competition status mutation
   const toggleStatusMutation = useMutation({
