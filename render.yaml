@@ -2,11 +2,8 @@ services:
   - type: web
     name: blue-whale-competitions
     plan: starter
-    env: node
-    runtime: node
-    nodeVersion: 20.11.1
-    buildCommand: ./build.sh
-    startCommand: node server-entry.js
+    env: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production
