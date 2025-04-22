@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 47% 10%;
+  --foreground: 210 40% 98%;
+  --muted: 217 33% 18%;
+  --muted-foreground: 215 20% 75%;
+  --popover: 222 47% 10%;
+  --popover-foreground: 210 40% 98%;
+  --card: 222 47% 14%;
+  --card-foreground: 210 40% 98%;
+  --border: 217 33% 25%;
+  --input: 217 33% 25%;
+  --primary: 207 90% 54%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217 33% 18%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 217 33% 18%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 207 90% 54%;
+  --radius: 0.5rem;
+  
+  /* Category Colors */
+  --category-family: 45 100% 51%;
+  --category-appliances: 328 100% 63%;
+  --category-cash: 122 39% 49%;
+  
+  /* Chart Colors */
+  --chart-1: 207 90% 54%;
+  --chart-2: 328 100% 63%;
+  --chart-3: 45 100% 51%;
+  --chart-4: 122 39% 49%;
+  --chart-5: 270 50% 50%;
+  
+  /* Sidebar Colors */
+  --sidebar-background: 222 47% 8%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 207 90% 54%;
+  --sidebar-primary-foreground: 210 40% 98%;
+  --sidebar-accent: 217 33% 20%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 217 33% 25%;
+  --sidebar-ring: 207 90% 54%;
+}
+
+.text-category-family {
+  color: hsl(var(--category-family));
+}
+
+.text-category-appliances {
+  color: hsl(var(--category-appliances));
+}
+
+.text-category-cash {
+  color: hsl(var(--category-cash));
+}
+
+.bg-category-family {
+  background-color: hsl(var(--category-family));
+}
+
+.bg-category-appliances {
+  background-color: hsl(var(--category-appliances));
+}
+
+.bg-category-cash {
+  background-color: hsl(var(--category-cash));
+}
+
+.border-category-family {
+  border-color: hsl(var(--category-family));
+}
+
+.border-category-appliances {
+  border-color: hsl(var(--category-appliances));
+}
+
+.border-category-cash {
+  border-color: hsl(var(--category-cash));
+}
+
+/* Animation Utilities */
+.shine-btn {
+  background-size: 200% auto;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  transition: all 0.6s;
+}
+
+.shine-btn:hover::after {
+  left: 100%;
+}
+
+.animate-shine {
+  animation: shine 2s linear infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
+
+@keyframes shine {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Gradient Borders */
+.gradient-border {
+  position: relative;
+  z-index: 0;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  border-radius: 0.6rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gradient-border-blue::before {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.5));
+}
+
+.gradient-border-yellow::before {
+  background: linear-gradient(135deg, hsl(var(--category-family)), hsl(var(--category-family) / 0.5));
+}
+
+.gradient-border-pink::before {
+  background: linear-gradient(135deg, hsl(var(--category-appliances)), hsl(var(--category-appliances) / 0.5));
+}
+
+.gradient-border-green::before {
+  background: linear-gradient(135deg, hsl(var(--category-cash)), hsl(var(--category-cash) / 0.5));
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}
