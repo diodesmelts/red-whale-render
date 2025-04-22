@@ -14,6 +14,7 @@ import AuthPage from "@/pages/auth-page";
 import AuthBypass from "@/pages/auth-bypass"; // Added for development login
 import CompetitionsPage from "@/pages/competitions-page";
 import CompetitionDetails from "@/pages/competition-details";
+// import CompetitionCheckout from "@/pages/checkout"; // Will be added later
 import HowToPlay from "@/pages/how-to-play";
 import MyEntries from "@/pages/my-entries";
 import MyWins from "@/pages/my-wins";
@@ -49,9 +50,10 @@ function Router() {
                 <Route path="/competitions" component={CompetitionsPage} />
                 <Route path="/competitions/:id" component={CompetitionDetails} />
                 <Route path="/how-to-play" component={HowToPlay} />
-                <ProtectedRoute path="/my-entries" component={MyEntries} />
-                <ProtectedRoute path="/my-wins" component={MyWins} />
-                <ProtectedRoute path="/profile" component={ProfilePage} />
+                {/* Checkout feature will be added later */}
+                <ProtectedRoute path="/my-entries" component={MyEntries} adminRequired={false} />
+                <ProtectedRoute path="/my-wins" component={MyWins} adminRequired={false} />
+                <ProtectedRoute path="/profile" component={ProfilePage} adminRequired={false} />
                 
                 {/* Admin Routes - protected and require admin role */}
                 <ProtectedRoute path="/admin" component={ListingsManagement} adminRequired={true} />
