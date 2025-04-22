@@ -548,7 +548,8 @@ export class DatabaseStorage implements IStorage {
     // Delete the competition without checking for entries
     // This allows admins to delete test competitions even if they have sold tickets
     const deleted = await db.delete(competitions).where(eq(competitions.id, id));
-    return deleted.count > 0;
+    // Just return true since we already checked if the competition exists
+    return true;
   }
   
   // Entry operations
