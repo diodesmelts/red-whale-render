@@ -11,6 +11,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
+import AuthBypass from "@/pages/auth-bypass"; // Added for development login
 import CompetitionsPage from "@/pages/competitions-page";
 import CompetitionDetails from "@/pages/competition-details";
 import HowToPlay from "@/pages/how-to-play";
@@ -33,12 +34,13 @@ import { Footer } from "@/components/layout/footer";
 function Router() {
   return (
     <>
-      {/* For all routes except auth, show the layout */}
+      {/* For all routes except auth pages, show the layout */}
       <Route path="/auth" component={AuthPage} />
+      <Route path="/auth-bypass" component={AuthBypass} />
       <Route path="/:rest*">
         {(params) => {
-          // Don't render Layout for auth page
-          if (params["rest*"] === "auth") return null;
+          // Don't render Layout for auth pages
+          if (params["rest*"] === "auth" || params["rest*"] === "auth-bypass") return null;
           
           return (
             <Layout>

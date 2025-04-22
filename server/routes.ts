@@ -17,6 +17,15 @@ const stripe = process.env.STRIPE_SECRET_KEY
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+  
+  // Debug route to check user session
+  app.get("/api/debug/user", (req, res) => {
+    res.json({
+      isAuthenticated: req.isAuthenticated(),
+      user: req.isAuthenticated() ? req.user : null,
+      session: req.session
+    });
+  });
 
   // Competitions routes
   app.get("/api/competitions", async (req, res) => {

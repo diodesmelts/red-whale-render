@@ -2,6 +2,8 @@ import { users, type User, type InsertUser, competitions, type Competition, type
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
+// Remove the import of SessionStore which doesn't work well with session types
+
 const MemoryStore = createMemoryStore(session);
 
 // modify the interface with any CRUD methods
@@ -42,7 +44,7 @@ export interface IStorage {
   updateWinnerClaimStatus(id: number, status: string): Promise<Winner | undefined>;
 
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
 export class MemStorage implements IStorage {
@@ -56,7 +58,7 @@ export class MemStorage implements IStorage {
   entryCurrentId: number;
   winnerCurrentId: number;
   
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 
   constructor() {
     this.users = new Map();
@@ -69,6 +71,8 @@ export class MemStorage implements IStorage {
     this.entryCurrentId = 1;
     this.winnerCurrentId = 1;
     
+    // Create a simple memory store for sessions
+    const MemoryStore = createMemoryStore(session);
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // prune expired entries every 24h
     });
@@ -390,3 +394,33 @@ export class MemStorage implements IStorage {
 }
 
 export const storage = new MemStorage();
+
+// Initialize admin user for development
+if (process.env.NODE_ENV === 'development') {
+  (async () => {
+    try {
+      let adminUser = await storage.getUserByUsername("admin");
+      
+      if (!adminUser) {
+        console.log("Initializing admin user for development...");
+        adminUser = await storage.createUser({
+          username: "admin",
+          email: "admin@example.com",
+          password: "Jack123!",
+          displayName: "Admin User",
+          mascot: "blue-whale",
+          isAdmin: true,
+          notificationSettings: {
+            email: true,
+            inApp: true
+          }
+        });
+        console.log("Admin user created successfully:", { id: adminUser.id, username: adminUser.username });
+      } else {
+        console.log("Admin user already exists:", { id: adminUser.id, username: adminUser.username });
+      }
+    } catch (error) {
+      console.error("Failed to initialize admin user:", error);
+    }
+  })();
+}
