@@ -73,6 +73,21 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000 // prune expired entries every 24h
     });
     
+    // Create admin test account
+    const adminUser: User = {
+      id: this.userCurrentId++,
+      username: "admin",
+      email: "admin@bluewhalecompetitions.com",
+      password: "$2b$10$6KxbfK01xQJRl7aKIIU/q.I3fpVmMvqVoaV9C1k17w1qzA5.MZkYi", // Password: Admin123!
+      displayName: "Admin User",
+      mascot: "blue-whale",
+      isAdmin: true,
+      stripeCustomerId: null,
+      notificationSettings: { email: true, inApp: true },
+      createdAt: new Date()
+    };
+    this.users.set(adminUser.id, adminUser);
+    
     // Add sample competitions
     this.seedCompetitions();
   }
