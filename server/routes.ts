@@ -197,6 +197,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin promotion endpoint (for development only)
+  app.post("/api/admin/promote-user", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        return res.status(400).json({ message: "userId is required" });
+      }
+      
+      const updatedUser = await storage.promoteToAdmin(userId);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove password before sending response
+      const { password, ...userWithoutPassword } = updatedUser;
+      return res.status(200).json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error promoting user to admin:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
+  
   // Webhook to handle successful payments
   app.post("/api/payment-webhook", async (req, res) => {
     if (!stripe) {

@@ -115,6 +115,16 @@ export class MemStorage implements IStorage {
     this.users.set(id, updatedUser);
     return updatedUser;
   }
+  
+  // Method to promote a user to admin
+  async promoteToAdmin(id: number): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, isAdmin: true };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
 
   // Competition operations
   async getCompetition(id: number): Promise<Competition | undefined> {
