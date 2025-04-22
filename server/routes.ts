@@ -342,13 +342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Competition not found" });
       }
       
-      // Check if tickets have been sold
-      if (competition.ticketsSold > 0) {
-        return res.status(400).json({ 
-          message: "Cannot delete competition with sold tickets" 
-        });
-      }
-      
+      // Allow deleting any competition, even with sold tickets
       const result = await dataStorage.deleteCompetition(id);
       
       if (!result) {

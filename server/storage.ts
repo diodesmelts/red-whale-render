@@ -545,13 +545,8 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteCompetition(id: number): Promise<boolean> {
-    // Check if there are any entries for this competition
-    const competitionEntries = await this.getEntriesByCompetition(id);
-    if (competitionEntries.length > 0) {
-      return false;
-    }
-    
-    // Delete the competition
+    // Delete the competition without checking for entries
+    // This allows admins to delete test competitions even if they have sold tickets
     const deleted = await db.delete(competitions).where(eq(competitions.id, id));
     return deleted.count > 0;
   }
