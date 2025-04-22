@@ -1,13 +1,14 @@
 #!/bin/bash
+set -e  # Exit immediately if a command exits with a non-zero status
+
+echo "Starting build process..."
 
 # Install dependencies
+echo "Installing dependencies..."
 npm install
 
-# Build the frontend
-echo "Building Vite frontend..."
+# Build the application
+echo "Building the application..."
 npm run build
-
-# Make the script executable
-chmod +x build.sh
 
 echo "Build completed successfully!"
