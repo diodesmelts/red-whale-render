@@ -659,6 +659,73 @@ export class DatabaseStorage implements IStorage {
         notificationSettings: { email: true, inApp: true }
       });
     }
+    
+    // Also seed some sample competitions if needed
+    await this.seedSampleCompetitions();
+  }
+  
+  // Method to seed sample competitions if none exist
+  async seedSampleCompetitions() {
+    // Check if we have any competitions already
+    const existingCompetitions = await db.select().from(competitions);
+    if (existingCompetitions.length === 0) {
+      // No competitions yet, let's add some sample ones
+      const oneDay = 24 * 60 * 60 * 1000;
+      const now = new Date();
+      
+      const sampleCompetitions = [
+        {
+          title: "Ninja Air Fryer",
+          description: "Enter for your chance to win an air fryer.",
+          imageUrl: "https://images.unsplash.com/photo-1613825787641-2e6f3d85a6d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80",
+          category: "appliances",
+          prizeValue: 25000, // £250.00
+          ticketPrice: 100, // £1.00
+          maxTicketsPerUser: 10,
+          totalTickets: 1000,
+          ticketsSold: 50,
+          brand: "Ninja",
+          drawDate: new Date(now.getTime() + 5 * oneDay), // 5 days from now
+          isLive: true,
+          isFeatured: true
+        },
+        {
+          title: "Family Adventure Package",
+          description: "Win a family adventure package for four with all expenses paid.",
+          imageUrl: "https://images.unsplash.com/photo-1553174241-8e01301bd424?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80",
+          category: "family",
+          prizeValue: 100000, // £1,000.00
+          ticketPrice: 250, // £2.50
+          maxTicketsPerUser: 5,
+          totalTickets: 800,
+          ticketsSold: 200,
+          brand: null,
+          drawDate: new Date(now.getTime() + 10 * oneDay), // 10 days from now
+          isLive: true,
+          isFeatured: true
+        },
+        {
+          title: "PlayStation 5",
+          description: "Win the latest PlayStation console with two controllers and three games.",
+          imageUrl: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80",
+          category: "gaming",
+          prizeValue: 50000, // £500.00
+          ticketPrice: 150, // £1.50
+          maxTicketsPerUser: 8,
+          totalTickets: 1200,
+          ticketsSold: 600,
+          brand: "Sony",
+          drawDate: new Date(now.getTime() + 3 * oneDay), // 3 days from now
+          isLive: true,
+          isFeatured: false
+        }
+      ];
+      
+      // Insert the sample competitions
+      for (const comp of sampleCompetitions) {
+        await db.insert(competitions).values(comp);
+      }
+    }
   }
 }
 
