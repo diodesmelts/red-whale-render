@@ -30,18 +30,17 @@ import { Footer } from "@/components/layout/footer";
 
 function Router() {
   return (
-    <>
-      {/* For all routes except auth, show the layout */}
+    <Switch>
+      {/* Pages without standard layout */}
       <Route path="/auth" component={AuthPage} />
-      <Route path="/:rest*">
+      <Route path="/" component={HomePage} />
+      
+      {/* All other routes with standard layout */}
+      <Route path="/:rest+">
         {(params) => {
-          // Don't render Layout for auth page
-          if (params["rest*"] === "auth") return null;
-          
           return (
             <Layout>
               <Switch>
-                <Route path="/" component={HomePage} />
                 <Route path="/competitions" component={CompetitionsPage} />
                 <Route path="/competitions/:id" component={CompetitionDetails} />
                 <Route path="/how-to-play" component={HowToPlay} />
@@ -62,7 +61,7 @@ function Router() {
           );
         }}
       </Route>
-    </>
+    </Switch>
   );
 }
 
