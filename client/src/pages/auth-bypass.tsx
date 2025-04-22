@@ -29,12 +29,12 @@ export default function AuthBypass() {
         queryClient.setQueryData(['/api/user'], data.user);
         
         setStatus('success');
-        setMessage('Login successful! Redirecting...');
+        setMessage('Login successful! Redirecting to admin listings...');
         
-        // Redirect after a brief delay
+        // Redirect after a brief delay, directly to listings
         setTimeout(() => {
-          navigate('/admin');
-        }, 1500);
+          navigate('/admin/listings');
+        }, 1000);
       } catch (error) {
         console.error('Direct login error:', error);
         setStatus('error');
@@ -46,9 +46,9 @@ export default function AuthBypass() {
       loginAdmin();
     } else {
       setStatus('success');
-      setMessage('Already logged in! Redirecting...');
+      setMessage('Already logged in! Redirecting to admin listings...');
       setTimeout(() => {
-        navigate('/admin');
+        navigate('/admin/listings');
       }, 1000);
     }
   }, [navigate, user]);
