@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import { Layout } from "@/components/layout/layout";
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { 
@@ -91,9 +90,7 @@ export default function MyWins() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
+    <Layout>
       <section className="py-16 bg-background flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -217,9 +214,7 @@ export default function MyWins() {
           </div>
         </div>
       </section>
-      
-      <Footer />
-    </div>
+    </Layout>
   );
 }
 

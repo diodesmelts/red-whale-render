@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import { Layout } from "@/components/layout/layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
@@ -24,6 +23,7 @@ import {
   Switch,
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -222,9 +222,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-
+    <Layout>
       <section className="py-16 bg-background flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
@@ -552,7 +550,7 @@ export default function ProfilePage() {
                     <div>
                       <h3 className="font-semibold text-lg">{user.displayName || user.username}</h3>
                       <p className="text-muted-foreground text-sm">{user.email}</p>
-                      <p className="text-xs text-primary">Member since {new Date(user.createdAt).toLocaleDateString()}</p>
+                      <p className="text-xs text-primary">Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</p>
                     </div>
                   </div>
 
@@ -640,9 +638,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </Layout>
   );
 }
 
