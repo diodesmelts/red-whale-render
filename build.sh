@@ -12,17 +12,16 @@ echo "Preparing output directory..."
 rm -rf dist
 mkdir -p dist/public
 
-# Use compiled JS approach to avoid TypeScript transform issues
-echo "Transpiling TypeScript files with tsc..."
+# Compile server to CommonJS first
+echo "Compiling server to CommonJS..."
 npx tsc --project tsconfig.build.json
 
 # Build the frontend with Vite
 echo "Building frontend with Vite..."
-VITE_API_URL=${RENDER_EXTERNAL_URL} npx vite build --outDir dist/public
+npm run build
 
-# Move server files
-echo "Moving server files..."
-cp -r dist/tmp/server/* dist/
-rm -rf dist/tmp
+# Copy vite assets to public folder
+echo "Moving frontend assets..."
+cp -r dist/client/* dist/public/
 
 echo "Build completed successfully!"
