@@ -73,6 +73,20 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000 // prune expired entries every 24h
     });
     
+    // Add admin user (with hashPassword applied)
+    this.createUser({
+      username: "admin",
+      password: "7365c8f5e06e46fb8c7e30e5cc3af9bd0da20b0823ba268e96c59c6056d4b310dc1234fc99903b206e2cc69a21f1a086af24e1d7eb5f9c692aedbd9e71c4f47.1cf1e3df9dce45bbe9974f6c75d24874", // Jack123!
+      email: "bluewhale@bluewhalecompetitions.co.uk",
+      displayName: "Admin User",
+      mascot: "whale",
+      isAdmin: true,
+      notificationSettings: {
+        email: true,
+        inApp: true
+      }
+    });
+    
     // Add sample competitions
     this.seedCompetitions();
   }
@@ -101,7 +115,7 @@ export class MemStorage implements IStorage {
       ...userData, 
       id,
       mascot: userData.mascot ?? 'blue-whale',
-      isAdmin: false,
+      isAdmin: userData.isAdmin ?? false,
       notificationSettings: userData.notificationSettings ?? { email: true, inApp: true },
       createdAt: now
     };
