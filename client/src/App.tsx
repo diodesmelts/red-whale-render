@@ -19,10 +19,12 @@ import MyWins from "@/pages/my-wins";
 import ProfilePage from "@/pages/profile";
 
 // Admin Pages
-import AdminDashboard from "@/pages/admin/dashboard";
-import ListingsManagement from "@/pages/admin/listings-management";
-import CreateCompetition from "@/pages/admin/create-competition";
-import EditCompetition from "@/pages/admin/edit-competition";
+import { 
+  AdminDashboard,
+  ListingsManagement,
+  CreateCompetition,
+  EditCompetition
+} from "@/pages/admin";
 
 import { Layout } from "@/components/layout/layout";
 import { Navbar } from "@/components/layout/navbar";
