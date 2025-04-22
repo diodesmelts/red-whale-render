@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: blue-whale-api
+    env: node
+    runtime: node
+    nodeVersion: 20.11.1
+    buildCommand: npm install
+    startCommand: tsx server/api-only.ts
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
