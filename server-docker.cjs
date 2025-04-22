@@ -530,9 +530,15 @@ app.get('/old-landing', (req, res) => {
   `);
 });
 
-// Fallback to index.html for SPA for any other routes
+// Serve the SPA for any non-API routes (client-side routing)
 app.get('*', (req, res) => {
-  res.redirect('/');
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  
+  // Send the index.html for all other routes for client-side routing
+  res.sendFile(path.join(__dirname, 'dist', 'public', 'index.html'));
 });
 
 // Start server

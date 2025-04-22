@@ -1,15 +1,35 @@
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+# Copy package files for dependencies
+COPY package.json package-lock.json ./
+
+# Install all dependencies for building
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Build the frontend
+RUN npm run build
+
+# Start a new stage for the production image
 FROM node:20-slim
 
 WORKDIR /app
 
-# Copy custom package.json for Docker
+# Copy custom package.json for Docker (server only)
 COPY package.docker.json ./package.json
 
 # Install only the dependencies needed for production server
 RUN npm install
 
-# Copy source code
-COPY . .
+# Copy the built frontend from the builder stage
+COPY --from=builder /app/dist ./dist
+
+# Copy server files
+COPY server-docker.cjs .
 
 # Prepare the build directory
 RUN mkdir -p dist/public dist/server
