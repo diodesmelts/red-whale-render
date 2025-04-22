@@ -39,23 +39,43 @@ import {
   Eye, 
   Plus,
   Search,
-  ArrowUpDown,
-  ChevronLeft
+  ChevronLeft,
+  Loader2
 } from "lucide-react";
+
+// Simple type for competitions
+type CompetitionListItem = {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  brand?: string;
+  ticketPrice: number;
+  ticketsSold: number;
+  totalTickets: number;
+  drawDate: string;
+  isLive: boolean;
+  isFeatured: boolean;
+};
 
 export default function ListingsManagement() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [competitionToDelete, setCompetitionToDelete] = useState<Competition | null>(null);
+  const [competitionToDelete, setCompetitionToDelete] = useState<CompetitionListItem | null>(null);
 
   // Get competitions data
-  const { data: competitions = [], isLoading, error } = useQuery({
+  const { data: competitionsData, isLoading, error } = useQuery({
     queryKey: ['/api/competitions'],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
   
+  // Convert the unknown data to our competition type
+  const competitions: CompetitionListItem[] = Array.isArray(competitionsData) 
+    ? competitionsData
+    : [];
+
   console.log("Competitions:", competitions);
   console.log("Loading:", isLoading);
   console.log("Error:", error);
@@ -112,7 +132,7 @@ export default function ListingsManagement() {
   };
 
   // Handle delete competition
-  const handleDeleteClick = (competition: Competition) => {
+  const handleDeleteClick = (competition: CompetitionListItem) => {
     setCompetitionToDelete(competition);
     setDeleteDialogOpen(true);
   };
@@ -124,13 +144,29 @@ export default function ListingsManagement() {
   };
 
   // Filter competitions based on search query
-  const filteredCompetitions = competitions.filter((comp: Competition) => 
+  const filteredCompetitions = competitions.filter((comp) => 
     comp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     comp.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (comp.brand && comp.brand.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  console.log("Competitions data:", competitions);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <h2 className="text-2xl font-bold text-red-500">Error loading competitions</h2>
+        <p>{error.message}</p>
+        <Button onClick={() => navigate("/admin")}>Return to Dashboard</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 max-w-7xl">
@@ -195,7 +231,7 @@ export default function ListingsManagement() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredCompetitions.map((competition: Competition) => (
+                filteredCompetitions.map((competition) => (
                   <TableRow key={competition.id}>
                     <TableCell className="font-medium">
                       {competition.title}
@@ -206,17 +242,17 @@ export default function ListingsManagement() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <CategoryBadge category={competition.category} brand={competition.brand ?? undefined} />
+                      <CategoryBadge category={competition.category} brand={competition.brand} />
                     </TableCell>
                     <TableCell>{formatCurrency(competition.ticketPrice)}</TableCell>
                     <TableCell>
-                      {competition.ticketsSold} / {competition.totalTickets}
+                      {competition.ticketsSold || 0} / {competition.totalTickets}
                     </TableCell>
                     <TableCell>{formatDate(competition.drawDate)}</TableCell>
                     <TableCell className="text-center">
                       <Switch
-                        checked={competition.isLive}
-                        onCheckedChange={() => handleStatusToggle(competition.id, competition.isLive)}
+                        checked={!!competition.isLive}
+                        onCheckedChange={() => handleStatusToggle(competition.id, !!competition.isLive)}
                         aria-label="Toggle competition status"
                       />
                     </TableCell>
