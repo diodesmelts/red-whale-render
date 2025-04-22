@@ -124,50 +124,40 @@ export function setupAuth(app: Express) {
     try {
       console.log("Login attempt with data:", { username: req.body.username });
       
-      // Validate login request
+      // Validate request data
       const validatedData = loginSchema.parse(req.body);
       
       passport.authenticate("local", (err, user, info) => {
-        if (err) {
-          console.error("Authentication error:", err);
-          return next(err);
-        }
-        
+        if (err) return next(err);
         if (!user) {
-          console.log("Authentication failed:", info?.message || "Invalid username or password");
-          return res.status(401).json({ message: info?.message || "Invalid username or password" });
+          return res.status(401).json({ message: info?.message || "Invalid credentials" });
         }
         
-        console.log("User authenticated successfully:", { id: user.id, username: user.username });
-        
-        req.login(user, (loginErr) => {
-          if (loginErr) {
-            console.error("Login session error:", loginErr);
-            return next(loginErr);
-          }
+        req.login(user, (err) => {
+          if (err) return next(err);
           
-          console.log("Session created successfully, session ID:", req.sessionID);
+          console.log("Login successful for user:", user.username);
+          console.log("Session ID:", req.sessionID);
           
           // Remove password before sending to client
           const { password, ...userWithoutPassword } = user;
-          
-          // Add a custom header to confirm authentication
-          res.setHeader('X-Auth-Status', 'authenticated');
-          
           return res.status(200).json(userWithoutPassword);
         });
       })(req, res, next);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error("Validation error:", error.errors);
         return res.status(400).json({ message: error.errors });
       }
-      console.error("Unexpected error during login:", error);
       next(error);
     }
   });
 
   app.post("/api/logout", (req, res, next) => {
+    // Log info about the session before logout
+    console.log("Logout request received. Session ID:", req.sessionID);
+    console.log("Is authenticated:", req.isAuthenticated());
+    console.log("Session data:", req.session);
+    
     req.logout((err) => {
       if (err) return next(err);
       res.sendStatus(200);
@@ -180,34 +170,14 @@ export function setupAuth(app: Express) {
     console.log("Session data:", req.session);
     
     if (!req.isAuthenticated()) {
-      console.log("User not authenticated, returning 401");
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    console.log("User is authenticated, returning user data for:", req.user?.username);
-    
     // Remove password before sending to client
-    const { password, ...userWithoutPassword } = req.user!;
+    const { password, ...userWithoutPassword } = req.user;
     res.json(userWithoutPassword);
   });
-  
-  // Debug route to check session status
-  app.get("/api/debug/session", (req, res) => {
-    const cookies = req.headers.cookie;
-    const headers = {
-      'user-agent': req.headers['user-agent'],
-      'cookie': req.headers.cookie,
-    };
-    
-    res.json({
-      sessionID: req.sessionID,
-      isAuthenticated: req.isAuthenticated(),
-      cookies,
-      headers,
-      session: req.session
-    });
-  });
-  
+
   // Development-only route to directly login the admin user (for testing)
   // IMPORTANT: This should be removed in production!
   if (process.env.NODE_ENV === 'development') {
