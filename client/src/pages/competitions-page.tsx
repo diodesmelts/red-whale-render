@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { CompetitionCard } from "@/components/competition/competition-card";
 import { CompetitionFilter, FilterOptions } from "@/components/competition/competition-filter";
 import { Competition } from "@shared/schema";
@@ -44,9 +42,7 @@ export default function CompetitionsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
+    <div>
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -86,8 +82,6 @@ export default function CompetitionsPage() {
           )}
         </div>
       </section>
-      
-      <Footer />
     </div>
   );
 }
