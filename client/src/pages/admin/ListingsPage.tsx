@@ -66,11 +66,24 @@ export default function ListingsPage() {
   // Get competitions data
   const { data, isLoading, error } = useQuery({
     queryKey: ['/api/competitions'],
-    queryFn: getQueryFn({ on401: "returnNull" }),
+    queryFn: getQueryFn({ on401: "throw" }),
   });
   
-  // Convert the unknown data to our competition type
+  // Convert the unknown data to our competition type with better error handling
   const competitions: CompetitionItem[] = Array.isArray(data) ? data : [];
+  
+  // Log data for debugging
+  console.log("Competition data:", data);
+  
+  // Handle error display
+  if (error) {
+    console.error("Error loading competitions:", error);
+    toast({
+      title: "Error loading data",
+      description: "There was a problem loading competition listings.",
+      variant: "destructive",
+    });
+  }
 
   // Toggle competition status mutation
   const toggleStatusMutation = useMutation({

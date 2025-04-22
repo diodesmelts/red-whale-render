@@ -204,12 +204,21 @@ export class MemStorage implements IStorage {
   async createCompetition(competitionData: InsertCompetition): Promise<Competition> {
     const id = this.competitionCurrentId++;
     const now = new Date();
+    
+    // If ticketsSold is provided in the data (for seeding), use it, otherwise default to 0
+    const ticketsSold = ('ticketsSold' in competitionData) ? 
+      (competitionData as any).ticketsSold : 0;
+    
     const competition: Competition = {
       ...competitionData,
       id,
-      ticketsSold: 0,
-      createdAt: now
+      ticketsSold,
+      createdAt: now,
+      isLive: competitionData.isLive ?? true,
+      isFeatured: competitionData.isFeatured ?? false
     };
+    
+    console.log(`Creating competition: ${competition.title} (ID: ${id}), Tickets sold: ${ticketsSold}`);
     this.competitions.set(id, competition);
     return competition;
   }
@@ -317,6 +326,7 @@ export class MemStorage implements IStorage {
   
   // Seed method for demo competitions
   private seedCompetitions() {
+    console.log("Seeding competitions data...");
     const oneDay = 24 * 60 * 60 * 1000;
     const now = new Date();
     
@@ -385,11 +395,17 @@ export class MemStorage implements IStorage {
     
     // Add demo competitions to the map
     demoCompetitions.forEach(comp => {
-      this.createCompetition({
-        ...comp,
-        ticketsSold: 0 // ticketsSold will be set by createCompetition
-      });
+      try {
+        this.createCompetition({
+          ...comp
+          // Don't override ticketsSold - our updated createCompetition will handle this
+        });
+      } catch (error) {
+        console.error(`Error seeding competition '${comp.title}':`, error);
+      }
     });
+    
+    console.log(`Successfully seeded ${demoCompetitions.length} competitions`);
   }
 }
 
