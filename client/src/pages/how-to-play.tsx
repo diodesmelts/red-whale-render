@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { 
   Search, Ticket, LineChart, Trophy, 
   CreditCard, Timer, CheckCircle2, User, 
-  Mail, ExternalLink, DollarSign, ChevronRight 
+  Mail, ExternalLink, DollarSign, ChevronRight,
+  Bell, ShieldCheck
 } from "lucide-react";
 
 export default function HowToPlay() {
@@ -124,7 +125,7 @@ export default function HowToPlay() {
                 <CreditCard className="h-4 w-4 mr-2" /> Proceed to Payment
               </Button>
               <div className="flex items-center justify-center mt-4 text-xs text-muted-foreground">
-                <ShieldIcon className="h-3 w-3 mr-1 text-green-400" /> Secure payment via Stripe
+                <ShieldCheck className="h-3 w-3 mr-1 text-green-400" /> Secure payment via Stripe
               </div>
             </div>
             
