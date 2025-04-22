@@ -1,0 +1,14 @@
+{
+  "name": "blue-whale-docker",
+  "version": "1.0.0",
+  "description": "Docker deployment package for Blue Whale Competitions",
+  "main": "server-docker.cjs",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server-docker.cjs"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3"
+  }
+}
