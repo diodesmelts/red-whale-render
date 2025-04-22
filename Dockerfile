@@ -11,11 +11,14 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build frontend
+# Build the application
 RUN npm run build
+
+# Create a special server script
+RUN echo "import './dist/server/index.js';" > server-start.mjs
 
 # Expose port
 EXPOSE 10000
 
-# Use node to run the server
-CMD ["node", "server-entry.js"]
+# Use node to run the server with ES modules
+CMD ["node", "server-start.mjs"]

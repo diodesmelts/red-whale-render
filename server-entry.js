@@ -1,3 +1,3 @@
-// Simple server entry point for production in CommonJS format
+// Simple server entry point for production in ES modules format
 // This is used by Render to start the server
-require('./dist/server/index.js');
+import './dist/server/index.js';
