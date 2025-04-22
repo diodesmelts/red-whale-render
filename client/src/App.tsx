@@ -31,35 +31,33 @@ import { Footer } from "@/components/layout/footer";
 function Router() {
   return (
     <Switch>
-      {/* Pages without standard layout */}
+      {/* Auth page without layout */}
       <Route path="/auth" component={AuthPage} />
-      <Route path="/" component={HomePage} />
       
-      {/* All other routes with standard layout */}
-      <Route path="/:rest+">
-        {(params) => {
-          return (
-            <Layout>
-              <Switch>
-                <Route path="/competitions" component={CompetitionsPage} />
-                <Route path="/competitions/:id" component={CompetitionDetails} />
-                <Route path="/how-to-play" component={HowToPlay} />
-                <ProtectedRoute path="/my-entries" component={MyEntries} />
-                <ProtectedRoute path="/my-wins" component={MyWins} />
-                <ProtectedRoute path="/profile" component={ProfilePage} />
-                
-                {/* Admin Routes - protected and require admin role */}
-                <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
-                <ProtectedRoute path="/admin/listings" component={ListingsManagement} adminRequired={true} />
-                <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
-                <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
-                
-                {/* Fallback to 404 */}
-                <Route component={NotFound} />
-              </Switch>
-            </Layout>
-          );
-        }}
+      {/* All other routes with layout */}
+      <Route>
+        {() => (
+          <Layout>
+            <Switch>
+              <Route path="/" component={HomePage} />
+              <Route path="/competitions" component={CompetitionsPage} />
+              <Route path="/competitions/:id" component={CompetitionDetails} />
+              <Route path="/how-to-play" component={HowToPlay} />
+              <ProtectedRoute path="/my-entries" component={MyEntries} />
+              <ProtectedRoute path="/my-wins" component={MyWins} />
+              <ProtectedRoute path="/profile" component={ProfilePage} />
+              
+              {/* Admin Routes - protected and require admin role */}
+              <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
+              <ProtectedRoute path="/admin/listings" component={ListingsManagement} adminRequired={true} />
+              <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
+              <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
+              
+              {/* Fallback to 404 */}
+              <Route component={NotFound} />
+            </Switch>
+          </Layout>
+        )}
       </Route>
     </Switch>
   );
