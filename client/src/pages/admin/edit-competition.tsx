@@ -48,14 +48,10 @@ const formSchema = insertCompetitionSchema.extend({
 // Get the type from the schema
 type FormValues = z.infer<typeof formSchema>;
 
-interface EditCompetitionProps {
-  id?: string;
-}
-
-export default function EditCompetition({ id: propId }: EditCompetitionProps) {
+export default function EditCompetition() {
   const [location, navigate] = useLocation();
   const params = useParams<{ id: string }>();
-  const id = parseInt(propId || params.id || "0");
+  const id = parseInt(params.id);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 

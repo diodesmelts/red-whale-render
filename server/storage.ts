@@ -2,8 +2,6 @@ import { users, type User, type InsertUser, competitions, type Competition, type
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
-// Remove the import of SessionStore which doesn't work well with session types
-
 const MemoryStore = createMemoryStore(session);
 
 // modify the interface with any CRUD methods
@@ -44,7 +42,7 @@ export interface IStorage {
   updateWinnerClaimStatus(id: number, status: string): Promise<Winner | undefined>;
 
   // Session store
-  sessionStore: any;
+  sessionStore: session.SessionStore;
 }
 
 export class MemStorage implements IStorage {
@@ -58,7 +56,7 @@ export class MemStorage implements IStorage {
   entryCurrentId: number;
   winnerCurrentId: number;
   
-  sessionStore: any;
+  sessionStore: session.SessionStore;
 
   constructor() {
     this.users = new Map();
@@ -71,24 +69,8 @@ export class MemStorage implements IStorage {
     this.entryCurrentId = 1;
     this.winnerCurrentId = 1;
     
-    // Create a simple memory store for sessions
-    const MemoryStore = createMemoryStore(session);
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // prune expired entries every 24h
-    });
-    
-    // Add admin user (with simple password for development)
-    this.createUser({
-      username: "admin",
-      password: "Jack123!", // Plain text for development
-      email: "bluewhale@bluewhalecompetitions.co.uk",
-      displayName: "Admin User",
-      mascot: "whale",
-      isAdmin: true,
-      notificationSettings: {
-        email: true,
-        inApp: true
-      }
     });
     
     // Add sample competitions
@@ -119,7 +101,7 @@ export class MemStorage implements IStorage {
       ...userData, 
       id,
       mascot: userData.mascot ?? 'blue-whale',
-      isAdmin: userData.isAdmin ?? false,
+      isAdmin: false,
       notificationSettings: userData.notificationSettings ?? { email: true, inApp: true },
       createdAt: now
     };
@@ -204,21 +186,12 @@ export class MemStorage implements IStorage {
   async createCompetition(competitionData: InsertCompetition): Promise<Competition> {
     const id = this.competitionCurrentId++;
     const now = new Date();
-    
-    // If ticketsSold is provided in the data (for seeding), use it, otherwise default to 0
-    const ticketsSold = ('ticketsSold' in competitionData) ? 
-      (competitionData as any).ticketsSold : 0;
-    
     const competition: Competition = {
       ...competitionData,
       id,
-      ticketsSold,
-      createdAt: now,
-      isLive: competitionData.isLive ?? true,
-      isFeatured: competitionData.isFeatured ?? false
+      ticketsSold: 0,
+      createdAt: now
     };
-    
-    console.log(`Creating competition: ${competition.title} (ID: ${id}), Tickets sold: ${ticketsSold}`);
     this.competitions.set(id, competition);
     return competition;
   }
@@ -326,7 +299,6 @@ export class MemStorage implements IStorage {
   
   // Seed method for demo competitions
   private seedCompetitions() {
-    console.log("Seeding competitions data...");
     const oneDay = 24 * 60 * 60 * 1000;
     const now = new Date();
     
@@ -395,45 +367,12 @@ export class MemStorage implements IStorage {
     
     // Add demo competitions to the map
     demoCompetitions.forEach(comp => {
-      try {
-        this.createCompetition({
-          ...comp
-          // Don't override ticketsSold - our updated createCompetition will handle this
-        });
-      } catch (error) {
-        console.error(`Error seeding competition '${comp.title}':`, error);
-      }
+      this.createCompetition({
+        ...comp,
+        ticketsSold: 0 // ticketsSold will be set by createCompetition
+      });
     });
-    
-    console.log(`Successfully seeded ${demoCompetitions.length} competitions`);
   }
 }
 
 export const storage = new MemStorage();
-
-// Initialize admin user for development regardless of environment
-(async () => {
-  try {
-    let adminUser = await storage.getUserByUsername("admin");
-    
-    if (!adminUser) {
-      // Create admin user with a pre-hashed password
-      console.log("Creating admin user for development/testing");
-      adminUser = await storage.createUser({
-        username: "admin",
-        email: "admin@example.com",
-        // This is "Jack123!" hashed with scrypt
-        password: "$2b$10$1Hl8vhQiDyNB7JOR91S3iOj0d/tLONqgYrHQkFpJHaBrk4wNrmbTm",
-        displayName: "Admin User",
-        mascot: "whale",
-        isAdmin: true,
-        notificationSettings: { email: true, inApp: true },
-      });
-      console.log("Admin user created successfully:", { id: adminUser.id, username: adminUser.username });
-    } else {
-      console.log("Admin user already exists:", { id: adminUser.id, username: adminUser.username });
-    }
-  } catch (error) {
-    console.error("Failed to initialize admin user:", error);
-  }
-})();

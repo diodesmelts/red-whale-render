@@ -22,18 +22,15 @@ export function ProtectedRoute({
       ) : !user ? (
         <Redirect to="/auth" />
       ) : adminRequired && !user.isAdmin ? (
-        <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-          <ShieldAlert className="h-16 w-16 text-red-500" />
-          <h1 className="text-2xl font-bold">Admin Access Required</h1>
-          <p className="text-muted-foreground">
-            You need admin privileges to access this page.
+        <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 text-center">
+          <ShieldAlert className="h-16 w-16 text-destructive" />
+          <h1 className="text-3xl font-bold">Access Denied</h1>
+          <p className="text-muted-foreground max-w-md">
+            You need administrator privileges to access this page.
           </p>
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded mt-4"
-          >
-            Return Home
-          </button>
+          <a href="/" className="text-primary hover:underline mt-4">
+            Return to Home
+          </a>
         </div>
       ) : (
         <Component />

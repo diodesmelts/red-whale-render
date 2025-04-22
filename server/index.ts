@@ -3,39 +3,6 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
-
-// Set up CORS middleware
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  
-  // Only set Access-Control-Allow-Origin when origin is present
-  // This is critical for cookies to work properly
-  if (origin) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  
-  // Allow credentials (cookies)
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Allow these headers
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Auth-Status');
-  
-  // Allow these methods
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  // Log request details for debugging
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`${req.method} ${req.path} - Origin: ${origin || 'none'}`);
-  }
-  
-  next();
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

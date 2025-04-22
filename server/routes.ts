@@ -17,68 +17,6 @@ const stripe = process.env.STRIPE_SECRET_KEY
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
-  
-  // Debug route to check user session
-  app.get("/api/debug/user", (req, res) => {
-    res.json({
-      isAuthenticated: req.isAuthenticated(),
-      user: req.isAuthenticated() ? req.user : null,
-      session: req.session
-    });
-  });
-  
-  // Development only: Direct admin login 
-  app.get("/api/dev/login-admin", async (req, res) => {
-    try {
-      console.log("Development admin login request received");
-      
-      // Find the admin user
-      const adminUser = await storage.getUserByUsername("admin");
-      
-      if (!adminUser) {
-        console.log("Admin user not found, creating one");
-        // Create admin user if it doesn't exist
-        const admin = await storage.createUser({
-          username: "admin",
-          email: "admin@example.com",
-          password: "$2b$10$1Hl8vhQiDyNB7JOR91S3iOj0d/tLONqgYrHQkFpJHaBrk4wNrmbTm", // "Jack123!" hashed
-          displayName: "Admin User",
-          mascot: "whale",
-          isAdmin: true,
-          notificationSettings: { email: true, inApp: true },
-        });
-        
-        // Log the admin user in
-        req.login(admin, err => {
-          if (err) {
-            console.error("Error during login:", err);
-            return res.status(500).json({ message: "Login error", error: err.message });
-          }
-          console.log("Admin user created and logged in:", admin.username);
-          return res.json({ 
-            message: "Admin user created and logged in",
-            user: { ...admin, password: undefined } 
-          });
-        });
-      } else {
-        // Log the admin user in
-        req.login(adminUser, err => {
-          if (err) {
-            console.error("Error during login:", err);
-            return res.status(500).json({ message: "Login error", error: err.message });
-          }
-          console.log("Admin user logged in:", adminUser.username);
-          return res.json({ 
-            message: "Admin user logged in",
-            user: { ...adminUser, password: undefined } 
-          });
-        });
-      }
-    } catch (error: any) {
-      console.error("Admin login error:", error);
-      res.status(500).json({ message: error.message });
-    }
-  });
 
   // Competitions routes
   app.get("/api/competitions", async (req, res) => {

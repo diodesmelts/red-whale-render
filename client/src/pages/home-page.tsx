@@ -8,89 +8,13 @@ import { Competition } from "@shared/schema";
 import { Search, ClipboardList, ChevronRight } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
-// Mock competitions for development - used as fallback when API fails
-const mockCompetitions: Competition[] = [
-  {
-    id: 1,
-    title: "Ninja Air Fryer",
-    description: "Win the latest model Ninja Air Fryer with dual drawers and digital display.",
-    imageUrl: "https://placehold.co/400x300/2a3035/e0e0e0/png?text=Ninja+Air+Fryer",
-    category: "Home",
-    brand: "Ninja",
-    prizeValue: 199.99,
-    ticketPrice: 1.99,
-    maxTicketsPerUser: 10,
-    totalTickets: 500,
-    ticketsSold: 50,
-    drawDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    isLive: true,
-    isFeatured: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 2,
-    title: "£5,000 Cash Prize",
-    description: "Win £5,000 cash deposited directly to your bank account!",
-    imageUrl: "https://placehold.co/400x300/2a3035/e0e0e0/png?text=Cash+Prize",
-    category: "Cash",
-    prizeValue: 5000,
-    ticketPrice: 4.99,
-    maxTicketsPerUser: 50,
-    totalTickets: 2000,
-    ticketsSold: 875,
-    drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    isLive: true,
-    isFeatured: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 3,
-    title: "Dyson Vacuum Cleaner",
-    description: "Win a Dyson V12 Detect Slim cordless vacuum cleaner.",
-    imageUrl: "https://placehold.co/400x300/2a3035/e0e0e0/png?text=Dyson+Vacuum",
-    category: "Home",
-    brand: "Dyson",
-    prizeValue: 599.99,
-    ticketPrice: 2.99,
-    maxTicketsPerUser: 20,
-    totalTickets: 1000,
-    ticketsSold: 365,
-    drawDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
-    isLive: true,
-    isFeatured: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 4,
-    title: "Family Adventure Package",
-    description: "Win a family adventure package including theme park tickets and accommodation.",
-    imageUrl: "https://placehold.co/400x300/2a3035/e0e0e0/png?text=Adventure+Package",
-    category: "Experience",
-    prizeValue: 799.99,
-    ticketPrice: 3.99,
-    maxTicketsPerUser: 15,
-    totalTickets: 1200,
-    ticketsSold: 380,
-    drawDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-    isLive: true,
-    isFeatured: true,
-    createdAt: new Date().toISOString()
-  }
-];
-
 export default function HomePage() {
-  // Try to get competitions from API, but use mock data if it fails
   const { data: featuredCompetitions, isLoading } = useQuery<Competition[]>({
     queryKey: ["/api/competitions", { featured: true }],
     queryFn: async () => {
-      try {
-        const res = await fetch("/api/competitions?featured=true&live=true");
-        if (!res.ok) return mockCompetitions;
-        return res.json();
-      } catch (error) {
-        console.error("Failed to fetch competitions:", error);
-        return mockCompetitions;
-      }
+      const res = await fetch("/api/competitions?featured=true&live=true");
+      if (!res.ok) throw new Error("Failed to fetch competitions");
+      return res.json();
     }
   });
 

@@ -11,7 +11,6 @@ import { ProtectedRoute } from "./lib/protected-route";
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
-import AuthBypass from "@/pages/auth-bypass"; // Added for development login
 import CompetitionsPage from "@/pages/competitions-page";
 import CompetitionDetails from "@/pages/competition-details";
 import HowToPlay from "@/pages/how-to-play";
@@ -20,12 +19,10 @@ import MyWins from "@/pages/my-wins";
 import ProfilePage from "@/pages/profile";
 
 // Admin Pages
-import { 
-  AdminDashboard,
-  ListingsManagement,
-  CreateCompetition,
-  EditCompetition
-} from "@/pages/admin";
+import AdminDashboard from "@/pages/admin/dashboard";
+import ListingsManagement from "@/pages/admin/listings-management";
+import CreateCompetition from "@/pages/admin/create-competition";
+import EditCompetition from "@/pages/admin/edit-competition";
 
 import { Layout } from "@/components/layout/layout";
 import { Navbar } from "@/components/layout/navbar";
@@ -34,13 +31,12 @@ import { Footer } from "@/components/layout/footer";
 function Router() {
   return (
     <>
-      {/* For all routes except auth pages, show the layout */}
+      {/* For all routes except auth, show the layout */}
       <Route path="/auth" component={AuthPage} />
-      <Route path="/auth-bypass" component={AuthBypass} />
       <Route path="/:rest*">
         {(params) => {
-          // Don't render Layout for auth pages
-          if (params["rest*"] === "auth" || params["rest*"] === "auth-bypass") return null;
+          // Don't render Layout for auth page
+          if (params["rest*"] === "auth") return null;
           
           return (
             <Layout>
@@ -54,19 +50,10 @@ function Router() {
                 <ProtectedRoute path="/profile" component={ProfilePage} />
                 
                 {/* Admin Routes - protected and require admin role */}
-                <ProtectedRoute path="/admin" component={ListingsManagement} adminRequired={true} />
-                <ProtectedRoute path="/admin/dashboard" component={AdminDashboard} adminRequired={true} />
+                <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
                 <ProtectedRoute path="/admin/listings" component={ListingsManagement} adminRequired={true} />
                 <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
-                <Route path="/admin/edit-competition/:id">
-                  {(params) => (
-                    <ProtectedRoute 
-                      path={`/admin/edit-competition/${params.id}`} 
-                      component={() => <EditCompetition id={params.id} />} 
-                      adminRequired={true} 
-                    />
-                  )}
-                </Route>
+                <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
                 
                 {/* Fallback to 404 */}
                 <Route component={NotFound} />
