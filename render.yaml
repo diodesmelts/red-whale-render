@@ -1,19 +1,16 @@
 services:
   - type: web
     name: blue-whale-competitions
-    plan: starter
     env: docker
-    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: SESSION_SECRET
         generateValue: true
-      - key: VITE_STRIPE_PUBLIC_KEY
-        sync: false
       - key: STRIPE_SECRET_KEY
-        sync: false
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /
+        sync: false # Will be manually set
+      - key: VITE_STRIPE_PUBLIC_KEY
+        sync: false # Will be manually set
