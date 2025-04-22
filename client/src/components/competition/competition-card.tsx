@@ -100,9 +100,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
       
       <div className="p-4">
         <Link href={`/competitions/${competition.id}`}>
-          <a>
-            <h3 className="text-lg font-semibold text-foreground mb-1">{competition.title}</h3>
-          </a>
+          <h3 className="text-lg font-semibold text-foreground mb-1 cursor-pointer">{competition.title}</h3>
         </Link>
         
         <div className="flex justify-between items-center mb-3">
@@ -119,14 +117,14 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         </div>
         
         <Link href={`/competitions/${competition.id}`}>
-          <a className={cn(
-            "block w-full px-4 py-2 text-white text-center rounded-md font-medium transform transition-all duration-150",
+          <div className={cn(
+            "block w-full px-4 py-2 text-white text-center rounded-md font-medium transform transition-all duration-150 cursor-pointer",
             getButtonColorClass(),
             "relative overflow-hidden group"
           )}>
             <div className="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-300"></div>
             <Ticket className="h-4 w-4 inline mr-1" /> GET TICKETS
-          </a>
+          </div>
         </Link>
       </div>
     </motion.div>
