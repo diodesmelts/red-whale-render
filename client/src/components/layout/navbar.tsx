@@ -22,24 +22,7 @@ import {
 
 export function Navbar() {
   const [location] = useLocation();
-  // Mock user data for development display
-  const mockUser = {
-    id: 1,
-    username: "admin",
-    email: "admin@example.com",
-    displayName: "Admin User",
-    isAdmin: true,
-    mascot: "rabbit",
-    createdAt: new Date().toISOString(),
-    notificationSettings: {
-      email: true,
-      inApp: true
-    }
-  };
-  
-  // Use mock user if auth fails
-  const { user: authUser, logoutMutation } = useAuth();
-  const user = authUser || mockUser; // Use mock user as fallback
+  const { user, logoutMutation } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {

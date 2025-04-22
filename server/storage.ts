@@ -411,32 +411,29 @@ export class MemStorage implements IStorage {
 
 export const storage = new MemStorage();
 
-// Initialize admin user for development
-if (process.env.NODE_ENV === 'development') {
-  (async () => {
-    try {
-      let adminUser = await storage.getUserByUsername("admin");
-      
-      if (!adminUser) {
-        console.log("Initializing admin user for development...");
-        adminUser = await storage.createUser({
-          username: "admin",
-          email: "admin@example.com",
-          password: "Jack123!",
-          displayName: "Admin User",
-          mascot: "blue-whale",
-          isAdmin: true,
-          notificationSettings: {
-            email: true,
-            inApp: true
-          }
-        });
-        console.log("Admin user created successfully:", { id: adminUser.id, username: adminUser.username });
-      } else {
-        console.log("Admin user already exists:", { id: adminUser.id, username: adminUser.username });
-      }
-    } catch (error) {
-      console.error("Failed to initialize admin user:", error);
+// Initialize admin user for development regardless of environment
+(async () => {
+  try {
+    let adminUser = await storage.getUserByUsername("admin");
+    
+    if (!adminUser) {
+      // Create admin user with a pre-hashed password
+      console.log("Creating admin user for development/testing");
+      adminUser = await storage.createUser({
+        username: "admin",
+        email: "admin@example.com",
+        // This is "Jack123!" hashed with scrypt
+        password: "$2b$10$1Hl8vhQiDyNB7JOR91S3iOj0d/tLONqgYrHQkFpJHaBrk4wNrmbTm",
+        displayName: "Admin User",
+        mascot: "whale",
+        isAdmin: true,
+        notificationSettings: { email: true, inApp: true },
+      });
+      console.log("Admin user created successfully:", { id: adminUser.id, username: adminUser.username });
+    } else {
+      console.log("Admin user already exists:", { id: adminUser.id, username: adminUser.username });
     }
-  })();
-}
+  } catch (error) {
+    console.error("Failed to initialize admin user:", error);
+  }
+})();
