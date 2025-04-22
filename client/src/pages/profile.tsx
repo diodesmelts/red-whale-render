@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Layout } from "@/components/layout/layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
@@ -222,73 +221,72 @@ export default function ProfilePage() {
   }
 
   return (
-    <Layout>
-      <section className="py-16 bg-background flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <div className="inline-block rounded-full bg-primary/20 p-3 mb-2">
-              <User className="h-8 w-8 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Manage your personal information, notification preferences, and security settings
-            </p>
+    <section className="py-16 bg-background flex-grow">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8">
+          <div className="inline-block rounded-full bg-primary/20 p-3 mb-2">
+            <User className="h-8 w-8 text-primary" />
           </div>
+          <h1 className="text-3xl font-bold mb-2">My Profile</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Manage your personal information, notification preferences, and security settings
+          </p>
+        </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Main content */}
-            <div className="w-full lg:w-2/3">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-8">
-                  <TabsTrigger value="profile">
-                    <User className="h-4 w-4 mr-2" /> Profile
-                  </TabsTrigger>
-                  <TabsTrigger value="notifications">
-                    <Bell className="h-4 w-4 mr-2" /> Notifications
-                  </TabsTrigger>
-                  <TabsTrigger value="security">
-                    <Settings className="h-4 w-4 mr-2" /> Security
-                  </TabsTrigger>
-                </TabsList>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main content */}
+          <div className="w-full lg:w-2/3">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-8">
+                <TabsTrigger value="profile">
+                  <User className="h-4 w-4 mr-2" /> Profile
+                </TabsTrigger>
+                <TabsTrigger value="notifications">
+                  <Bell className="h-4 w-4 mr-2" /> Notifications
+                </TabsTrigger>
+                <TabsTrigger value="security">
+                  <Settings className="h-4 w-4 mr-2" /> Security
+                </TabsTrigger>
+              </TabsList>
 
-                <TabsContent value="profile">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Personal Information</CardTitle>
-                      <CardDescription>
-                        Update your personal details and preferences
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Form {...profileForm}>
-                        <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-                          <FormField
-                            control={profileForm.control}
-                            name="displayName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Display Name</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Your display name" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+              <TabsContent value="profile">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Personal Information</CardTitle>
+                    <CardDescription>
+                      Update your personal details and preferences
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...profileForm}>
+                      <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+                        <FormField
+                          control={profileForm.control}
+                          name="displayName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Display Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Your display name" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                          <FormField
-                            control={profileForm.control}
-                            name="email"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Email Address</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="your.email@example.com" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                        <FormField
+                          control={profileForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email Address</FormLabel>
+                              <FormControl>
+                                <Input placeholder="your.email@example.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
                           <FormField
                             control={profileForm.control}
@@ -638,7 +636,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </section>
-    </Layout>
   );
 }
 
