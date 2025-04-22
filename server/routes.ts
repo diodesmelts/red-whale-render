@@ -1,10 +1,14 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage as dataStorage } from "./storage";
 import { setupAuth } from "./auth";
 import Stripe from "stripe";
 import { z } from "zod";
 import { insertEntrySchema } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Missing Stripe secret key. Payment functionality will not work.');
@@ -14,9 +18,72 @@ const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" })
   : undefined;
 
+// Configure multer for file uploads
+const uploadsDir = './uploads';
+// Ensure uploads directory exists
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const fileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
+  // Accept only image files
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed'), false);
+  }
+};
+
+const upload = multer({ 
+  storage, 
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
+  },
+  fileFilter
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+  
+  // Serve uploaded files statically
+  app.use('/uploads', express.static('uploads'));
+  
+  // Image upload endpoint
+  app.post('/api/upload', isAuthenticated, upload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+      
+      const filePath = `/${req.file.path}`; // Path relative to server root
+      return res.status(200).json({ 
+        url: filePath,
+        message: 'File uploaded successfully' 
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Middleware to check if user is authenticated
+  function isAuthenticated(req: any, res: any, next: any) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 
   // Competitions routes
   app.get("/api/competitions", async (req, res) => {
