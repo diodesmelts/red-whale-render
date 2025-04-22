@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: blue-whale-competitions
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: VITE_STRIPE_PUBLIC_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /
