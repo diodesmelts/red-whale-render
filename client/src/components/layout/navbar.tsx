@@ -145,12 +145,10 @@ export function Navbar() {
                             <span>Listings Management</span>
                           </DropdownMenuItem>
                         )}
-                        <Link href="/profile">
-                          <DropdownMenuItem>
-                            <User className="h-4 w-4 mr-2 text-primary" />
-                            <span>My Profile</span>
-                          </DropdownMenuItem>
-                        </Link>
+                        <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+                          <User className="h-4 w-4 mr-2 text-primary" />
+                          <span>My Profile</span>
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Wallet className="h-4 w-4 mr-2 text-green-500" />
                           <span>My Balance</span>
@@ -170,16 +168,12 @@ export function Navbar() {
                 </>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <Link href="/auth">
-                    <Button variant="outline" size="sm">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/auth?tab=register">
-                    <Button size="sm">
-                      Register
-                    </Button>
-                  </Link>
+                  <Button variant="outline" size="sm" onClick={() => window.location.href = '/auth'}>
+                    Login
+                  </Button>
+                  <Button size="sm" onClick={() => window.location.href = '/auth?tab=register'}>
+                    Register
+                  </Button>
                 </div>
               )}
             </div>

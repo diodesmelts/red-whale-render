@@ -1,5 +1,17 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// Get the API URL based on environment
+export const getApiBaseUrl = () => {
+  // In production, use a specific API URL
+  if (import.meta.env.MODE === 'production') {
+    // Use environment variable if provided (for Vercel deployment)
+    return import.meta.env.VITE_API_URL || 'https://blue-whale-api.onrender.com';
+  }
+  
+  // In development, use the local server
+  return '';
+};
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -12,7 +24,10 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  // Add the API base URL if provided and the URL doesn't already have http
+  const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
+  
+  const res = await fetch(apiUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +44,11 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const queryUrl = queryKey[0] as string;
+    // Add the API base URL if provided and the URL doesn't already have http
+    const apiUrl = !queryUrl.startsWith('http') ? `${getApiBaseUrl()}${queryUrl}` : queryUrl;
+    
+    const res = await fetch(apiUrl, {
       credentials: "include",
     });
 
