@@ -43,72 +43,54 @@ export function Navbar() {
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <Link href="/">
-                  <a className={cn(
-                    "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
-                    location === "/" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
-                  )}>
-                    <i className="fas fa-home mr-1"></i> Home
-                  </a>
+                <Link href="/" className={cn(
+                  "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                  location === "/" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                )}>
+                  <i className="fas fa-home mr-1"></i> Home
                 </Link>
                 <div className="relative group">
-                  <Link href="/competitions">
-                    <a className={cn(
-                      "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150 flex items-center",
-                      location.includes("/competitions") ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
-                    )}>
-                      <i className="fas fa-trophy mr-1"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
-                    </a>
+                  <Link href="/competitions" className={cn(
+                    "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150 flex items-center",
+                    location.includes("/competitions") ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                  )}>
+                    <i className="fas fa-trophy mr-1"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
                   </Link>
                   <div className="hidden group-hover:block absolute left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-10">
-                    <Link href="/competitions">
-                      <a className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                        All Competitions
-                      </a>
+                    <Link href="/competitions" className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
+                      All Competitions
                     </Link>
                     <div className="border-t border-border my-1"></div>
-                    <Link href="/competitions?category=family">
-                      <a className="block px-4 py-2 text-sm text-yellow-400 hover:bg-accent hover:text-accent-foreground">
-                        <span className="w-2 h-2 inline-block bg-yellow-400 rounded-full mr-2"></span> Family
-                      </a>
+                    <Link href="/competitions?category=family" className="block px-4 py-2 text-sm text-yellow-400 hover:bg-accent hover:text-accent-foreground">
+                      <span className="w-2 h-2 inline-block bg-yellow-400 rounded-full mr-2"></span> Family
                     </Link>
-                    <Link href="/competitions?category=appliances">
-                      <a className="block px-4 py-2 text-sm text-pink-400 hover:bg-accent hover:text-accent-foreground">
-                        <span className="w-2 h-2 inline-block bg-pink-400 rounded-full mr-2"></span> Appliances
-                      </a>
+                    <Link href="/competitions?category=appliances" className="block px-4 py-2 text-sm text-pink-400 hover:bg-accent hover:text-accent-foreground">
+                      <span className="w-2 h-2 inline-block bg-pink-400 rounded-full mr-2"></span> Appliances
                     </Link>
-                    <Link href="/competitions?category=cash">
-                      <a className="block px-4 py-2 text-sm text-green-400 hover:bg-accent hover:text-accent-foreground">
-                        <span className="w-2 h-2 inline-block bg-green-400 rounded-full mr-2"></span> Cash
-                      </a>
+                    <Link href="/competitions?category=cash" className="block px-4 py-2 text-sm text-green-400 hover:bg-accent hover:text-accent-foreground">
+                      <span className="w-2 h-2 inline-block bg-green-400 rounded-full mr-2"></span> Cash
                     </Link>
                   </div>
                 </div>
-                <Link href="/how-to-play">
-                  <a className={cn(
-                    "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
-                    location === "/how-to-play" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
-                  )}>
-                    <i className="fas fa-question-circle mr-1"></i> How to Play
-                  </a>
+                <Link href="/how-to-play" className={cn(
+                  "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                  location === "/how-to-play" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                )}>
+                  <i className="fas fa-question-circle mr-1"></i> How to Play
                 </Link>
                 {user && (
                   <>
-                    <Link href="/my-entries">
-                      <a className={cn(
-                        "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
-                        location === "/my-entries" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
-                      )}>
-                        <i className="fas fa-clipboard-list mr-1"></i> My Entries
-                      </a>
+                    <Link href="/my-entries" className={cn(
+                      "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                      location === "/my-entries" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                    )}>
+                      <i className="fas fa-clipboard-list mr-1"></i> My Entries
                     </Link>
-                    <Link href="/my-wins">
-                      <a className={cn(
-                        "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
-                        location === "/my-wins" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
-                      )}>
-                        <i className="fas fa-award mr-1"></i> My Wins
-                      </a>
+                    <Link href="/my-wins" className={cn(
+                      "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                      location === "/my-wins" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                    )}>
+                      <i className="fas fa-award mr-1"></i> My Wins
                     </Link>
                   </>
                 )}
@@ -211,74 +193,74 @@ export function Navbar() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[80%]">
                 <div className="flex flex-col space-y-6 mt-6">
-                  <Link href="/" onClick={() => setIsMenuOpen(false)}>
-                    <a className={cn(
+                  <Link href="/" 
+                    onClick={() => setIsMenuOpen(false)}
+                    className={cn(
                       "flex items-center text-lg font-medium",
                       location === "/" ? "text-primary" : "text-foreground"
                     )}>
-                      <i className="fas fa-home mr-2"></i> Home
-                    </a>
+                    <i className="fas fa-home mr-2"></i> Home
                   </Link>
-                  <Link href="/competitions" onClick={() => setIsMenuOpen(false)}>
-                    <a className={cn(
+                  <Link href="/competitions" 
+                    onClick={() => setIsMenuOpen(false)}
+                    className={cn(
                       "flex items-center text-lg font-medium",
                       location.includes("/competitions") ? "text-primary" : "text-foreground"
                     )}>
-                      <i className="fas fa-trophy mr-2"></i> Competitions
-                    </a>
+                    <i className="fas fa-trophy mr-2"></i> Competitions
                   </Link>
                   <div className="pl-5 space-y-3">
-                    <Link href="/competitions?category=family" onClick={() => setIsMenuOpen(false)}>
-                      <a className="flex items-center text-yellow-400">
-                        <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-                        Family
-                      </a>
+                    <Link href="/competitions?category=family" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center text-yellow-400">
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                      Family
                     </Link>
-                    <Link href="/competitions?category=appliances" onClick={() => setIsMenuOpen(false)}>
-                      <a className="flex items-center text-pink-400">
-                        <span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>
-                        Appliances
-                      </a>
+                    <Link href="/competitions?category=appliances" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center text-pink-400">
+                      <span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>
+                      Appliances
                     </Link>
-                    <Link href="/competitions?category=cash" onClick={() => setIsMenuOpen(false)}>
-                      <a className="flex items-center text-green-400">
-                        <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                        Cash
-                      </a>
+                    <Link href="/competitions?category=cash" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center text-green-400">
+                      <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                      Cash
                     </Link>
                   </div>
-                  <Link href="/how-to-play" onClick={() => setIsMenuOpen(false)}>
-                    <a className={cn(
+                  <Link href="/how-to-play" 
+                    onClick={() => setIsMenuOpen(false)}
+                    className={cn(
                       "flex items-center text-lg font-medium",
                       location === "/how-to-play" ? "text-primary" : "text-foreground"
                     )}>
-                      <i className="fas fa-question-circle mr-2"></i> How to Play
-                    </a>
+                    <i className="fas fa-question-circle mr-2"></i> How to Play
                   </Link>
                   {user ? (
                     <>
-                      <Link href="/my-entries" onClick={() => setIsMenuOpen(false)}>
-                        <a className={cn(
+                      <Link href="/my-entries" 
+                        onClick={() => setIsMenuOpen(false)}
+                        className={cn(
                           "flex items-center text-lg font-medium",
                           location === "/my-entries" ? "text-primary" : "text-foreground"
                         )}>
-                          <i className="fas fa-clipboard-list mr-2"></i> My Entries
-                        </a>
+                        <i className="fas fa-clipboard-list mr-2"></i> My Entries
                       </Link>
-                      <Link href="/my-wins" onClick={() => setIsMenuOpen(false)}>
-                        <a className={cn(
+                      <Link href="/my-wins" 
+                        onClick={() => setIsMenuOpen(false)}
+                        className={cn(
                           "flex items-center text-lg font-medium",
                           location === "/my-wins" ? "text-primary" : "text-foreground"
                         )}>
-                          <i className="fas fa-award mr-2"></i> My Wins
-                        </a>
+                        <i className="fas fa-award mr-2"></i> My Wins
                       </Link>
                       <div className="border-t border-border pt-4">
-                        <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
-                          <a className="flex items-center text-lg font-medium">
-                            <User className="h-5 w-5 mr-2 text-primary" />
-                            My Profile
-                          </a>
+                        <Link href="/profile" 
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center text-lg font-medium">
+                          <User className="h-5 w-5 mr-2 text-primary" />
+                          My Profile
                         </Link>
                         <button 
                           onClick={() => { 
