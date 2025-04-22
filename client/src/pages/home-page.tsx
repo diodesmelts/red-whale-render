@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { CompetitionCard } from "@/components/competition/competition-card";
 import { Competition } from "@shared/schema";
@@ -19,9 +17,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
+    <div>
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-b from-background to-background/70 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -170,8 +166,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-      <Footer />
     </div>
   );
 }
