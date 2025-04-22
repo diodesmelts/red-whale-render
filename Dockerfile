@@ -30,5 +30,5 @@ RUN find dist -type f | sort || true
 # Expose port
 EXPOSE 10000
 
-# Use the simpler server script for Docker
-CMD ["node", "server-docker.js"]
+# Use the simpler server script for Docker with explicit CommonJS extension
+CMD ["node", "server-docker.cjs"]
