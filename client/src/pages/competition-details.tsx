@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { Competition } from "@shared/schema";
 import { CountdownTimer } from "@/components/competition/countdown-timer";
 import { CategoryBadge } from "@/components/competition/category-badge";
@@ -140,45 +138,34 @@ export default function CompetitionDetails() {
   
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-grow flex items-center justify-center">
-          <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full"></div>
-        </div>
-        <Footer />
+      <div className="flex-grow flex items-center justify-center">
+        <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full"></div>
       </div>
     );
   }
   
   if (!competition) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-grow flex items-center justify-center flex-col p-6">
-          <h2 className="text-2xl font-bold mb-4">Competition Not Found</h2>
-          <p className="text-muted-foreground mb-6">The competition you're looking for doesn't exist or has been removed.</p>
-          <Link href="/competitions">
-            <Button>Browse All Competitions</Button>
-          </Link>
-        </div>
-        <Footer />
+      <div className="flex-grow flex items-center justify-center flex-col p-6">
+        <h2 className="text-2xl font-bold mb-4">Competition Not Found</h2>
+        <p className="text-muted-foreground mb-6">The competition you're looking for doesn't exist or has been removed.</p>
+        <Link href="/competitions">
+          <Button>Browse All Competitions</Button>
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <section className="py-16 flex-grow bg-background">
+    <section className="py-16 flex-grow bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left column */}
             <div className="w-full lg:w-2/3">
               <Link href="/competitions">
-                <a className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
+                <div className="inline-flex items-center text-primary hover:text-primary/80 mb-6 cursor-pointer">
                   <ChevronLeft className="mr-2 h-4 w-4" /> Back to Competitions
-                </a>
+                </div>
               </Link>
               
               <div className="bg-card rounded-lg overflow-hidden shadow-lg border border-border">
@@ -391,8 +378,5 @@ export default function CompetitionDetails() {
           </div>
         </div>
       </section>
-      
-      <Footer />
-    </div>
   );
 }
