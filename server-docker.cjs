@@ -160,11 +160,20 @@ app.get('/api/user', (req, res) => {
   res.status(401).json({ message: "Unauthorized" });
 });
 
+// Build the frontend
+console.log('Copying Vite-built frontend assets in Docker...');
+
 // Serve static files from dist/public
 app.use(express.static(path.join(__dirname, 'dist', 'public')));
 
-// Return JSON for root path too for SPA clients
+// Serve the Vite built frontend for all client routes
 app.get('/', (req, res) => {
+  // Serve the index.html for the SPA
+  res.sendFile(path.join(__dirname, 'dist', 'public', 'index.html'));
+});
+
+// Just keeping the route history for reference
+app.get('/old-landing', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
