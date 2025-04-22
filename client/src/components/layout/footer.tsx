@@ -35,31 +35,23 @@ export function Footer() {
             <h3 className="text-foreground font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/">
-                  <a className="text-muted-foreground hover:text-primary transition-colors">
-                    Home
-                  </a>
+                <Link href="/" className="text-muted-foreground hover:text-primary transition-colors">
+                  Home
                 </Link>
               </li>
               <li>
-                <Link href="/competitions">
-                  <a className="text-muted-foreground hover:text-primary transition-colors">
-                    All Competitions
-                  </a>
+                <Link href="/competitions" className="text-muted-foreground hover:text-primary transition-colors">
+                  All Competitions
                 </Link>
               </li>
               <li>
-                <Link href="/how-to-play">
-                  <a className="text-muted-foreground hover:text-primary transition-colors">
-                    How to Play
-                  </a>
+                <Link href="/how-to-play" className="text-muted-foreground hover:text-primary transition-colors">
+                  How to Play
                 </Link>
               </li>
               <li>
-                <Link href="/my-wins">
-                  <a className="text-muted-foreground hover:text-primary transition-colors">
-                    Winners
-                  </a>
+                <Link href="/my-wins" className="text-muted-foreground hover:text-primary transition-colors">
+                  Winners
                 </Link>
               </li>
               <li>
@@ -74,35 +66,29 @@ export function Footer() {
             <h3 className="text-foreground font-semibold text-lg mb-4">Categories</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/competitions?category=family">
-                  <a className="text-muted-foreground hover:text-yellow-400 transition-colors">
-                    <span className="w-2 h-2 inline-block bg-yellow-400 rounded-full mr-2"></span> Family
-                  </a>
+                <Link href="/competitions?category=family" className="text-muted-foreground hover:text-yellow-400 transition-colors">
+                  <span className="w-2 h-2 inline-block bg-yellow-400 rounded-full mr-2"></span> Family
                 </Link>
               </li>
               <li>
-                <Link href="/competitions?category=appliances">
-                  <a className="text-muted-foreground hover:text-pink-400 transition-colors">
-                    <span className="w-2 h-2 inline-block bg-pink-400 rounded-full mr-2"></span> Appliances
-                  </a>
+                <Link href="/competitions?category=appliances" className="text-muted-foreground hover:text-pink-400 transition-colors">
+                  <span className="w-2 h-2 inline-block bg-pink-400 rounded-full mr-2"></span> Appliances
                 </Link>
               </li>
               <li>
-                <Link href="/competitions?category=cash">
-                  <a className="text-muted-foreground hover:text-green-400 transition-colors">
-                    <span className="w-2 h-2 inline-block bg-green-400 rounded-full mr-2"></span> Cash
-                  </a>
+                <Link href="/competitions?category=cash" className="text-muted-foreground hover:text-green-400 transition-colors">
+                  <span className="w-2 h-2 inline-block bg-green-400 rounded-full mr-2"></span> Cash
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/competitions?category=electronics" className="text-muted-foreground hover:text-primary transition-colors">
                   <span className="w-2 h-2 inline-block bg-primary rounded-full mr-2"></span> Electronics
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-purple-500 transition-colors">
+                <Link href="/competitions?category=travel" className="text-muted-foreground hover:text-purple-500 transition-colors">
                   <span className="w-2 h-2 inline-block bg-purple-500 rounded-full mr-2"></span> Travel
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
