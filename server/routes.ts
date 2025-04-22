@@ -25,7 +25,7 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
+const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadsDir);
   },
@@ -46,7 +46,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
 };
 
 const upload = multer({ 
-  storage, 
+  storage: multerStorage, 
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB max file size
   },
@@ -90,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { category, limit, offset, live, featured, sortBy } = req.query;
       
-      const competitions = await storage.listCompetitions({
+      const competitions = await dataStorage.listCompetitions({
         category: category as string | undefined,
         limit: limit ? parseInt(limit as string) : undefined,
         offset: offset ? parseInt(offset as string) : undefined,
@@ -108,7 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/competitions/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const competition = await storage.getCompetition(id);
+      const competition = await dataStorage.getCompetition(id);
       
       if (!competition) {
         return res.status(404).json({ message: "Competition not found" });
@@ -130,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertEntrySchema.parse(req.body);
       
       // Verify competition exists and has tickets available
-      const competition = await storage.getCompetition(validatedData.competitionId);
+      const competition = await dataStorage.getCompetition(validatedData.competitionId);
       if (!competition) {
         return res.status(404).json({ message: "Competition not found" });
       }
@@ -145,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user has exceeded max tickets
-      const userEntries = await storage.getEntries(req.user!.id);
+      const userEntries = await dataStorage.getEntries(req.user!.id);
       const ticketsForThisCompetition = userEntries
         .filter(entry => entry.competitionId === validatedData.competitionId)
         .reduce((sum, entry) => sum + entry.ticketCount, 0);
@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create entry record
-      const entry = await storage.createEntry({
+      const entry = await dataStorage.createEntry({
         userId: req.user!.id,
         competitionId: validatedData.competitionId,
         ticketCount: validatedData.ticketCount,
@@ -180,12 +180,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const entries = await storage.getEntries(req.user!.id);
+      const entries = await dataStorage.getEntries(req.user!.id);
       
       // Fetch competitions for each entry
       const entriesWithDetails = await Promise.all(
         entries.map(async (entry) => {
-          const competition = await storage.getCompetition(entry.competitionId);
+          const competition = await dataStorage.getCompetition(entry.competitionId);
           return {
             ...entry,
             competition: competition
@@ -205,12 +205,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user?.id;
       
       if (userId) {
-        const winners = await storage.getWinners(userId);
+        const winners = await dataStorage.getWinners(userId);
         
         // Fetch competitions for each win
         const winsWithDetails = await Promise.all(
           winners.map(async (winner) => {
-            const competition = await storage.getCompetition(winner.competitionId);
+            const competition = await dataStorage.getCompetition(winner.competitionId);
             return {
               ...winner,
               competition: competition
@@ -242,7 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { amount, competitionId, ticketCount } = req.body;
       
       // Validate the competition exists
-      const competition = await storage.getCompetition(parseInt(competitionId));
+      const competition = await dataStorage.getCompetition(parseInt(competitionId));
       if (!competition) {
         return res.status(404).json({ message: "Competition not found" });
       }
@@ -284,7 +284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "userId is required" });
       }
       
-      const updatedUser = await storage.promoteToAdmin(userId);
+      const updatedUser = await dataStorage.promoteToAdmin(userId);
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -301,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin - Create new competition
   app.post("/api/admin/competitions", isAdmin, async (req, res) => {
     try {
-      const competition = await storage.createCompetition(req.body);
+      const competition = await dataStorage.createCompetition(req.body);
       res.status(201).json(competition);
     } catch (error: any) {
       if (error instanceof z.ZodError) {
@@ -315,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/admin/competitions/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const competition = await storage.updateCompetition(id, req.body);
+      const competition = await dataStorage.updateCompetition(id, req.body);
       
       if (!competition) {
         return res.status(404).json({ message: "Competition not found" });
@@ -331,7 +331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/admin/competitions/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const competition = await storage.getCompetition(id);
+      const competition = await dataStorage.getCompetition(id);
       
       if (!competition) {
         return res.status(404).json({ message: "Competition not found" });
@@ -344,7 +344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const result = await storage.deleteCompetition(id);
+      const result = await dataStorage.deleteCompetition(id);
       
       if (!result) {
         return res.status(404).json({ message: "Competition not found" });
@@ -382,7 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { competitionId, ticketCount, userId } = paymentIntent.metadata;
       
       // Find any pending entries matching this payment
-      const userEntries = await storage.getEntries(parseInt(userId));
+      const userEntries = await dataStorage.getEntries(parseInt(userId));
       const pendingEntry = userEntries.find(
         entry => entry.competitionId === parseInt(competitionId) && 
                 entry.paymentStatus === "pending"
@@ -390,7 +390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (pendingEntry) {
         // Update the entry to completed
-        await storage.updateEntryPaymentStatus(
+        await dataStorage.updateEntryPaymentStatus(
           pendingEntry.id, 
           "completed", 
           paymentIntent.id
