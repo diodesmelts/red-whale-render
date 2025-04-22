@@ -13,6 +13,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: Omit<InsertUser, "confirmPassword" | "agreeToTerms">): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  promoteToAdmin(id: number): Promise<User | undefined>;
   
   // Competition operations
   getCompetition(id: number): Promise<Competition | undefined>;
