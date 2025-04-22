@@ -14,7 +14,7 @@ mkdir -p dist/public
 
 # Use compiled JS approach to avoid TypeScript transform issues
 echo "Transpiling TypeScript files with tsc..."
-npx tsc --project tsconfig.json --outDir dist/tmp
+npx tsc --project tsconfig.build.json
 
 # Build the frontend with Vite
 echo "Building frontend with Vite..."

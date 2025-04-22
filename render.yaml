@@ -6,7 +6,7 @@ services:
     runtime: node
     nodeVersion: 20.11.1
     buildCommand: ./build.sh
-    startCommand: node dist/index.js
+    startCommand: node server-entry.js
     envVars:
       - key: NODE_ENV
         value: production
