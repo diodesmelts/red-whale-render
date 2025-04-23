@@ -26,7 +26,7 @@ export function HeroBanner() {
 
   return (
     <section 
-      className={`relative py-20 overflow-hidden ${
+      className={`relative py-32 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"
@@ -40,23 +40,23 @@ export function HeroBanner() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center">
-          <h1 className="text-4xl md:text-6xl font-bold">
+        <div className="text-center py-8">
+          <h1 className="text-5xl md:text-7xl font-bold">
             <span className="text-primary">Competition</span>Time
           </h1>
-          <p className="mt-3 max-w-md mx-auto text-muted-foreground sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+          <p className="mt-6 max-w-md mx-auto text-muted-foreground sm:text-xl md:mt-8 md:text-2xl md:max-w-4xl">
             Your premier destination for discovering, participating in, and winning exclusive competitions across multiple platforms.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <div className="mt-10 flex flex-wrap justify-center gap-6">
             <Link href="/competitions">
-              <Button size="lg" className="group relative overflow-hidden">
+              <Button size="lg" className="group relative overflow-hidden px-8 py-6 text-lg">
                 <div className="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
-                <Search className="mr-2 h-5 w-5" /> View Competitions
+                <Search className="mr-3 h-6 w-6" /> View Competitions
               </Button>
             </Link>
             <Link href="/my-entries">
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
-                <ClipboardList className="mr-2 h-5 w-5" /> My Entries
+              <Button size="lg" variant="outline" className="border-primary border-2 text-primary hover:bg-primary/10 px-8 py-6 text-lg">
+                <ClipboardList className="mr-3 h-6 w-6" /> My Entries
               </Button>
             </Link>
           </div>
