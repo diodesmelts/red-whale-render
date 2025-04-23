@@ -78,7 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           platform: process.platform,
           nodeVersion: process.version,
           uptime: process.uptime(),
-          hostname: require('os').hostname(),
+          memory: process.memoryUsage().rss / 1024 / 1024 + 'MB',
         },
         config: {
           apiUrl: process.env.API_URL || 'not set',

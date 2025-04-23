@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SiteConfig } from "@shared/schema";
 import { Loader2, Save } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ApiDiagnostics } from "@/components/admin/api-diagnostics";
 
 export default function AdminSettings() {
   const [activeTab, setActiveTab] = useState("branding");
@@ -116,9 +117,10 @@ export default function AdminSettings() {
             </div>
           ) : (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="branding">Branding</TabsTrigger>
                 <TabsTrigger value="content">Content</TabsTrigger>
+                <TabsTrigger value="diagnostics">Diagnostics</TabsTrigger>
               </TabsList>
               
               <TabsContent value="branding" className="space-y-4">
