@@ -100,7 +100,20 @@ export async function apiRequest(
 ): Promise<Response> {
   try {
     // Add the API base URL if provided and the URL doesn't already have http
-    const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
+    // Special handling for URLs that already include /api
+    let apiUrl;
+    if (url.startsWith('http')) {
+      apiUrl = url;
+    } else {
+      const baseUrl = getApiBaseUrl();
+      // Prevent double /api prefix issues in production
+      if (baseUrl === '/api' && url.startsWith('/api/')) {
+        // Strip the leading /api from the url to avoid duplication
+        apiUrl = url;
+      } else {
+        apiUrl = `${baseUrl}${url}`;
+      }
+    }
     
     console.log(`🚀 API Request: ${method} ${apiUrl}`);
     if (data) {
@@ -141,7 +154,20 @@ export async function apiRequest(
       // Special case for the "requested resource was not found" error
       if (error.message.includes('not found') || error.message.includes('Failed to fetch')) {
         // Create a very detailed diagnostic report
-        const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
+        // Use the same URL logic as above for consistent reporting
+        let apiUrl;
+        if (url.startsWith('http')) {
+          apiUrl = url;
+        } else {
+          const baseUrl = getApiBaseUrl();
+          // Prevent double /api prefix issues in production
+          if (baseUrl === '/api' && url.startsWith('/api/')) {
+            // Strip the leading /api from the url to avoid duplication
+            apiUrl = url;
+          } else {
+            apiUrl = `${baseUrl}${url}`;
+          }
+        }
         const domain = window.location.hostname;
         const isProduction = import.meta.env.MODE === 'production';
         const origin = window.location.origin;
@@ -215,7 +241,20 @@ export const getQueryFn: <T>(options: {
     try {
       const queryUrl = queryKey[0] as string;
       // Add the API base URL if provided and the URL doesn't already have http
-      const apiUrl = !queryUrl.startsWith('http') ? `${getApiBaseUrl()}${queryUrl}` : queryUrl;
+      // Special handling for URLs that already include /api
+      let apiUrl;
+      if (queryUrl.startsWith('http')) {
+        apiUrl = queryUrl;
+      } else {
+        const baseUrl = getApiBaseUrl();
+        // Prevent double /api prefix issues in production
+        if (baseUrl === '/api' && queryUrl.startsWith('/api/')) {
+          // Strip the leading /api from the url to avoid duplication
+          apiUrl = queryUrl;
+        } else {
+          apiUrl = `${baseUrl}${queryUrl}`;
+        }
+      }
       
       console.log(`🔍 Query request: GET ${apiUrl}`);
       
@@ -252,7 +291,20 @@ export const getQueryFn: <T>(options: {
         // Enhance error reporting for both "not found" and network errors
         if (error.message.includes('not found') || error.message.includes('Failed to fetch')) {
           const queryUrl = queryKey[0] as string;
-          const apiUrl = !queryUrl.startsWith('http') ? `${getApiBaseUrl()}${queryUrl}` : queryUrl;
+          // Use the same URL logic as above for consistent reporting
+          let apiUrl;
+          if (queryUrl.startsWith('http')) {
+            apiUrl = queryUrl;
+          } else {
+            const baseUrl = getApiBaseUrl();
+            // Prevent double /api prefix issues in production
+            if (baseUrl === '/api' && queryUrl.startsWith('/api/')) {
+              // Strip the leading /api from the url to avoid duplication
+              apiUrl = queryUrl;
+            } else {
+              apiUrl = `${baseUrl}${queryUrl}`;
+            }
+          }
           const domain = window.location.hostname;
           const isProduction = import.meta.env.MODE === 'production';
           const origin = window.location.origin;
