@@ -176,9 +176,9 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardFooter>
               <Button asChild variant="outline" className="w-full">
-                <Link href="/profile">
+                <Link href="/admin/settings">
                   <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  Site Settings
                 </Link>
               </Button>
             </CardFooter>

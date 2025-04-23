@@ -25,7 +25,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/competitions", icon: Award, label: "Competitions" },
     { href: "/admin/entries", icon: Ticket, label: "Entries" },
     { href: "/admin/users", icon: Users, label: "Users" },
-    { href: "/admin/site-config", icon: Settings, label: "Site Config" },
+    { href: "/admin/settings", icon: Settings, label: "Settings" },
   ];
 
   const handleLogout = () => {
