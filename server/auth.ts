@@ -232,17 +232,21 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/register", async (req, res, next) => {
-    console.log("🔹 Registration request received:", {
-      ip: req.ip,
-      headers: {
-        origin: req.headers.origin,
-        referer: req.headers.referer,
-        host: req.headers.host,
-        'user-agent': req.headers['user-agent'],
-        'content-type': req.headers['content-type'],
-      },
-      body: { ...req.body, password: "[REDACTED]" }
-    });
+    // Extreme logging for Render - this will log to stdout
+    console.log("=====================================================");
+    console.log("🔴 REGISTRATION ATTEMPT AT " + new Date().toISOString());
+    console.log("=====================================================");
+    console.log("🔹 Registration request received:");
+    console.log("IP:", req.ip);
+    console.log("Origin:", req.headers.origin || "Not provided");
+    console.log("Referer:", req.headers.referer || "Not provided"); 
+    console.log("Host:", req.headers.host || "Not provided");
+    console.log("User-Agent:", req.headers['user-agent'] || "Not provided");
+    console.log("Content-Type:", req.headers['content-type'] || "Not provided");
+    console.log("Username:", req.body.username || "Not provided");
+    console.log("Email:", req.body.email || "Not provided");
+    console.log("Environment:", process.env.NODE_ENV || "Not set");
+    console.log("=====================================================");
     
     try {
       // Validate request data using Zod schema
