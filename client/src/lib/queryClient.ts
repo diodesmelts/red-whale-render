@@ -11,28 +11,80 @@ export const getApiBaseUrl = () => {
   // Production domain detection - in production we're likely on the main domain
   const isProduction = import.meta.env.MODE === 'production';
   const hostname = window.location.hostname;
+  const origin = window.location.origin;
+  
+  console.log(`🔌 API URL Determination:`, {
+    mode: import.meta.env.MODE,
+    isProduction,
+    hostname,
+    origin,
+    protocol: window.location.protocol,
+    port: window.location.port
+  });
   
   // Check if we're on the production domain
-  if (isProduction && (hostname === 'bluewhalecompetitions.co.uk' || hostname === 'www.bluewhalecompetitions.co.uk')) {
-    console.log('🔌 Production environment detected - using /api prefix');
-    // In production, we need to be explicit about the /api prefix
+  if (isProduction) {
+    // For Render.com deployment
+    if (hostname.includes('onrender.com')) {
+      console.log('🔌 Render.com production environment detected - using /api prefix');
+      return '/api';
+    }
+    
+    // For official domain
+    if (hostname === 'bluewhalecompetitions.co.uk' || hostname === 'www.bluewhalecompetitions.co.uk') {
+      console.log('🔌 Production environment detected on official domain - using /api prefix');
+      return '/api';
+    }
+    
+    console.log('🔌 Production environment on unknown domain detected - using /api prefix');
     return '/api';
   }
   
   // Single service architecture - API is always same origin (empty string)
-  console.log('🔌 Using API on same origin');
+  console.log('🔌 Development environment - using API on same origin (empty prefix)');
   return '';
 };
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
+    const url = res.url;
     
-    // Provide more user-friendly error messages
+    // Log additional diagnostic information for the 404 error
+    if (res.status === 404) {
+      const isProduction = import.meta.env.MODE === 'production';
+      const hostname = window.location.hostname;
+      const origin = window.location.origin;
+      
+      console.error('404 ERROR DIAGNOSTIC:', {
+        resourceUrl: url,
+        hostname,
+        origin,
+        mode: import.meta.env.MODE,
+        apiBaseUrl: getApiBaseUrl(),
+        responseText: text,
+        requestMethod: res.type,
+        headers: Array.from(res.headers.entries()),
+        timestamp: new Date().toISOString()
+      });
+      
+      // Special handling for authentication-related endpoints
+      if (url.includes('/api/login') || url.includes('/api/user') || url.includes('/api/register')) {
+        console.error(`AUTHENTICATION ENDPOINT 404 ERROR: The ${url.includes('/api/login') ? 'login' : url.includes('/api/user') ? 'user' : 'registration'} endpoint could not be found`);
+        console.error('This typically happens when:');
+        console.error('1. The API routes are not correctly registered');
+        console.error('2. The server is not handling the route properly');
+        console.error('3. There might be path prefix issues in the API URL construction');
+        
+        throw new Error(`The ${url.includes('/api/login') ? 'login' : url.includes('/api/user') ? 'user' : 'registration'} endpoint was not found on the server. This is likely a configuration issue - please contact support.`);
+      }
+      
+      throw new Error("The requested resource was not found. This might be a server configuration issue.");
+    }
+    
+    // Provide more user-friendly error messages for other status codes
     if (res.status === 401) {
       throw new Error("Invalid username or password. Please try again.");
-    } else if (res.status === 404) {
-      throw new Error("The requested resource was not found.");
     } else if (res.status >= 500) {
       throw new Error("Server error. Please try again later.");
     } else {
@@ -86,35 +138,67 @@ export async function apiRequest(
     console.error('API request failed:', error);
     
     if (error instanceof Error) {
-      if (error.message.includes('Failed to fetch')) {
-        console.error('Network error details:', {
+      // Special case for the "requested resource was not found" error
+      if (error.message.includes('not found') || error.message.includes('Failed to fetch')) {
+        // Create a very detailed diagnostic report
+        const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
+        const domain = window.location.hostname;
+        const isProduction = import.meta.env.MODE === 'production';
+        const origin = window.location.origin;
+        const pathname = window.location.pathname;
+        
+        console.error('🔍 DETAILED ERROR DIAGNOSTIC:', {
+          errorMessage: error.message,
           url,
-          apiUrl: !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url,
-          mode: import.meta.env.MODE
+          apiUrl,
+          origin,
+          pathname,
+          domain,
+          mode: import.meta.env.MODE,
+          apiBaseUrl: getApiBaseUrl(),
+          networkStatus: window.navigator.onLine ? 'Online' : 'Offline',
+          userAgent: window.navigator.userAgent,
+          timestamp: new Date().toISOString(),
+          endpoint: url
         });
         
         // Provide specific and helpful error messages by endpoint
-        if (url === '/api/login') {
-          throw new Error('Invalid username or password. Please try again.');
-        } else if (url === '/api/register') {
-          // Provide a much more detailed error message for registration failures
-          const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
-          const domain = window.location.hostname;
-          const isProduction = import.meta.env.MODE === 'production';
+        if (url.includes('/api/login')) {
+          console.error('LOGIN ENDPOINT ERROR: The login endpoint could not be found or is not responding correctly.');
+          console.error('This typically happens when:');
+          console.error('1. The API server is down');
+          console.error('2. The endpoint path is incorrect');
+          console.error('3. CORS is blocking the request');
+          console.error('4. Network connectivity issues');
+          console.error(`Current API Base URL: ${getApiBaseUrl()}`);
+          console.error(`Full URL attempted: ${apiUrl}`);
           
-          throw new Error(`Registration failed - the server may be temporarily unavailable. 
+          throw new Error(`Login failed - the server returned "resource not found". 
           
 Technical details:
 - Network: ${window.navigator.onLine ? 'Online' : 'Offline'} 
 - Domain: ${domain}
-- API URL: ${apiUrl}
+- API URL attempted: ${apiUrl}
 - Environment: ${isProduction ? 'Production' : 'Development'}
 
-This issue is being investigated. Please try again later or contact support at admin@bluewhalecompetitions.com if the problem persists.`);
-        } else if (url.includes('/api/test-register')) {
-          throw new Error('Registration test failed - unable to reach our servers. This is likely due to a CORS or cookie restriction.');
+This is likely a server configuration issue. Please contact support.`);
+        } else if (url.includes('/api/register')) {
+          // Provide a much more detailed error message for registration failures
+          console.error('REGISTRATION ENDPOINT ERROR: The registration endpoint could not be found or is not responding correctly.');
+          
+          throw new Error(`Registration failed - the server returned "resource not found". 
+          
+Technical details:
+- Network: ${window.navigator.onLine ? 'Online' : 'Offline'} 
+- Domain: ${domain}
+- API URL attempted: ${apiUrl}
+- Environment: ${isProduction ? 'Production' : 'Development'}
+- Error: ${error.message}
+
+This issue is being investigated. Please try again later or contact support.`);
         } else {
-          throw new Error('Connection error. Please check your internet connection and try again.');
+          console.error(`ENDPOINT ERROR (${url}): The requested endpoint could not be found or is not responding correctly.`);
+          throw new Error(`Connection error: ${error.message}. Please check your internet connection and try again.`);
         }
       }
     }
@@ -165,14 +249,59 @@ export const getQueryFn: <T>(options: {
       console.error('Query error:', error);
       
       if (error instanceof Error) {
-        if (error.message.includes('Failed to fetch')) {
-          console.error('Network error details:', {
+        // Enhance error reporting for both "not found" and network errors
+        if (error.message.includes('not found') || error.message.includes('Failed to fetch')) {
+          const queryUrl = queryKey[0] as string;
+          const apiUrl = !queryUrl.startsWith('http') ? `${getApiBaseUrl()}${queryUrl}` : queryUrl;
+          const domain = window.location.hostname;
+          const isProduction = import.meta.env.MODE === 'production';
+          const origin = window.location.origin;
+          const pathname = window.location.pathname;
+          
+          console.error('🔍 DETAILED QUERY ERROR DIAGNOSTIC:', {
+            errorMessage: error.message,
             queryKey,
-            apiBaseUrl: getApiBaseUrl(),
+            apiUrl,
+            origin,
+            pathname,
+            domain,
             mode: import.meta.env.MODE,
-            hostname: window.location.hostname
+            apiBaseUrl: getApiBaseUrl(),
+            networkStatus: window.navigator.onLine ? 'Online' : 'Offline',
+            userAgent: window.navigator.userAgent,
+            timestamp: new Date().toISOString()
           });
-          throw new Error('Connection error. Please check your internet connection and try again.');
+          
+          if (queryUrl.includes('/api/user')) {
+            console.error('USER ENDPOINT ERROR: The user endpoint could not be found or is not responding correctly');
+            console.error('This typically happens when:');
+            console.error('1. Authentication is misconfigured');
+            console.error('2. Session store is not working correctly');
+            console.error('3. Wrong API URL configuration');
+            console.error(`Current API Base URL: ${getApiBaseUrl()}`);
+            console.error(`Full URL attempted: ${apiUrl}`);
+            
+            // For user endpoint issues, return null instead of throwing
+            // This way the app can still function in unauthenticated mode
+            if (unauthorizedBehavior === "returnNull") {
+              console.warn('Returning null for user endpoint error due to returnNull configuration');
+              return null;
+            }
+            
+            throw new Error(`Authentication check failed - server returned "resource not found".
+            
+Technical details:
+- Network: ${window.navigator.onLine ? 'Online' : 'Offline'} 
+- Domain: ${domain}
+- API URL attempted: ${apiUrl}
+- Environment: ${isProduction ? 'Production' : 'Development'}
+
+This is likely a server configuration issue. Please contact support.`);
+          }
+          
+          // General error for other endpoints
+          console.error(`QUERY ENDPOINT ERROR (${queryUrl}): The requested endpoint could not be found or is not responding correctly.`);
+          throw new Error(`Resource not found error: ${error.message}. This might be due to a server configuration issue.`);
         }
       }
       throw error;
