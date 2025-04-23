@@ -10,9 +10,9 @@ interface LogoProps {
 
 export function Logo({ size = "md", className }: LogoProps) {
   const sizeClass = {
-    sm: "h-8",
-    md: "h-10",
-    lg: "h-12",
+    sm: "h-10",
+    md: "h-14",
+    lg: "h-20",
   };
 
   // Query for the custom logo
@@ -45,8 +45,8 @@ export function Logo({ size = "md", className }: LogoProps) {
       </div>
       {!customLogoUrl && (
         <div>
-          <span className="text-primary font-bold text-xl">Blue Whale</span>
-          <span className="text-white text-xs block -mt-1">Competitions</span>
+          <span className="text-primary font-bold text-2xl">Blue Whale</span>
+          <span className="text-white text-sm block -mt-1">Competitions</span>
         </div>
       )}
     </div>
