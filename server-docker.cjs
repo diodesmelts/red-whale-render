@@ -9,12 +9,7 @@ const fs = require('fs');
 // Create Express app
 const app = express();
 
-// Set up session
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret',
-  resave: false,
-  saveUninitialized: false
-}));
+// We'll set up the session later with the PgSessionStore
 
 // Parse JSON requests
 app.use(express.json());
@@ -155,9 +150,297 @@ app.get('/api/competitions', async (req, res) => {
   }
 });
 
-// User API (unauthorized for now)
+// Authentication and user APIs
+const crypto = require('crypto');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const connectPgSimple = require('connect-pg-simple');
+
+// Configure session store
+const PgSessionStore = connectPgSimple(session);
+const sessionStore = new PgSessionStore({
+  pool,
+  tableName: 'session', // Use the default table name
+  createTableIfMissing: true
+});
+
+// Update session configuration
+app.use(session({
+  store: sessionStore,
+  secret: process.env.SESSION_SECRET || 'dev-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    secure: process.env.NODE_ENV === 'production', // Only secure in production
+    sameSite: 'lax',
+    path: "/",
+    httpOnly: true,
+  },
+  name: "bw.sid"
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Utility functions for password handling
+async function hashPassword(password) {
+  return new Promise((resolve, reject) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(`${derivedKey.toString('hex')}.${salt}`);
+    });
+  });
+}
+
+async function comparePasswords(supplied, stored) {
+  return new Promise((resolve, reject) => {
+    const [hashed, salt] = stored.split('.');
+    crypto.scrypt(supplied, salt, 64, (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(crypto.timingSafeEqual(
+        Buffer.from(hashed, 'hex'),
+        derivedKey
+      ));
+    });
+  });
+}
+
+// Set up passport local strategy
+passport.use(new LocalStrategy(async (username, password, done) => {
+  try {
+    // Query the database for the user
+    const { rows } = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
+    
+    const user = rows[0];
+    if (!user) {
+      return done(null, false, { message: "Invalid username or password" });
+    }
+    
+    const passwordValid = await comparePasswords(password, user.password);
+    if (!passwordValid) {
+      return done(null, false, { message: "Invalid username or password" });
+    }
+    
+    return done(null, user);
+  } catch (error) {
+    return done(error);
+  }
+}));
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM users WHERE id = $1',
+      [id]
+    );
+    const user = rows[0];
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
+
+// Create users table if it doesn't exist
+async function ensureUsersTable() {
+  try {
+    const client = await pool.connect();
+    
+    // Check if users table exists, create if it doesn't
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(100) NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        display_name VARCHAR(100),
+        mascot VARCHAR(100),
+        notification_settings JSONB DEFAULT '{}',
+        is_admin BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+    `);
+    
+    // Check if we have an admin user, create if we don't
+    const { rows } = await client.query(
+      'SELECT COUNT(*) FROM users WHERE is_admin = TRUE'
+    );
+    
+    if (parseInt(rows[0].count) === 0) {
+      console.log('Creating admin user...');
+      const hashedPassword = await hashPassword('Admin123!');
+      await client.query(`
+        INSERT INTO users (
+          username, email, password, display_name, 
+          mascot, is_admin
+        ) VALUES (
+          'admin', 'admin@bluewhalecompetitions.com', $1, 
+          'Admin', 'whale', TRUE
+        )
+      `, [hashedPassword]);
+    }
+    
+    client.release();
+    return true;
+  } catch (error) {
+    console.error('Error setting up users table:', error);
+    return false;
+  }
+}
+
+// Initialize users table
+ensureUsersTable().catch(console.error);
+
+// Registration endpoint
+app.post('/api/register', async (req, res) => {
+  try {
+    console.log('Registration request:', { 
+      ...req.body, 
+      password: req.body.password ? '[REDACTED]' : undefined 
+    });
+    
+    // Validate required fields
+    if (!req.body.username || !req.body.email || !req.body.password) {
+      return res.status(400).json({ 
+        message: "Username, email, and password are required" 
+      });
+    }
+    
+    // Check if username already exists
+    const userCheck = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [req.body.username]
+    );
+    
+    if (userCheck.rows.length > 0) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+    
+    // Check if email already exists
+    const emailCheck = await pool.query(
+      'SELECT * FROM users WHERE email = $1',
+      [req.body.email]
+    );
+    
+    if (emailCheck.rows.length > 0) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+    
+    // Hash password
+    const hashedPassword = await hashPassword(req.body.password);
+    
+    // Insert new user
+    const result = await pool.query(`
+      INSERT INTO users (
+        username, email, password, display_name,
+        mascot, notification_settings, is_admin
+      ) VALUES ($1, $2, $3, $4, $5, $6, FALSE)
+      RETURNING id, username, email, display_name, mascot, 
+        notification_settings, is_admin, created_at
+    `, [
+      req.body.username,
+      req.body.email,
+      hashedPassword,
+      req.body.displayName || req.body.username,
+      req.body.mascot || 'whale',
+      req.body.notificationSettings || '{}'
+    ]);
+    
+    const newUser = result.rows[0];
+    
+    // Log the user in
+    req.login(newUser, (err) => {
+      if (err) {
+        console.error('Login error after registration:', err);
+        return res.status(500).json({ message: "Error logging in after registration" });
+      }
+      
+      // Return user data (without password)
+      return res.status(201).json(newUser);
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: "Server error during registration" });
+  }
+});
+
+// Login endpoint
+app.post('/api/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    
+    if (!user) {
+      return res.status(401).json({ 
+        message: info?.message || "Invalid username or password" 
+      });
+    }
+    
+    req.login(user, (loginErr) => {
+      if (loginErr) {
+        return next(loginErr);
+      }
+      
+      // Don't send the password back to the client
+      const { password, ...userWithoutPassword } = user;
+      return res.status(200).json(userWithoutPassword);
+    });
+  })(req, res, next);
+});
+
+// Logout endpoint
+app.post('/api/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.status(500).json({ message: "Error during logout" });
+    }
+    res.sendStatus(200);
+  });
+});
+
+// Current user endpoint
 app.get('/api/user', (req, res) => {
-  res.status(401).json({ message: "Unauthorized" });
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
+  // Don't send the password back to the client
+  const { password, ...userWithoutPassword } = req.user;
+  res.json(userWithoutPassword);
+});
+
+// Registration diagnostics endpoint
+app.get('/api/register-diagnostics', (req, res) => {
+  const diagnostics = {
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    session: {
+      exists: !!req.session,
+      id: req.sessionID || 'no-session',
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false
+    },
+    server: {
+      hostname: req.hostname,
+      headers: req.headers
+    }
+  };
+  
+  res.json({
+    status: 'success',
+    message: 'Registration diagnostics',
+    diagnostics
+  });
 });
 
 // Build the frontend
