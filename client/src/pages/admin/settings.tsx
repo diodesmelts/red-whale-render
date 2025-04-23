@@ -227,6 +227,61 @@ export default function AdminSettings() {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              <TabsContent value="diagnostics" className="space-y-4">
+                <div className="grid gap-6">
+                  <div>
+                    <h2 className="text-2xl font-bold tracking-tight">API Diagnostics</h2>
+                    <p className="text-muted-foreground mt-1">
+                      Tools for diagnosing connectivity and authentication issues in production
+                    </p>
+                  </div>
+                  
+                  <ApiDiagnostics />
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Environment Information</CardTitle>
+                      <CardDescription>
+                        System environment details for debugging
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                          <div className="font-medium">Build Environment:</div>
+                          <div>{process.env.NODE_ENV || 'development'}</div>
+                          
+                          <div className="font-medium">App Version:</div>
+                          <div>1.0.0</div>
+                          
+                          <div className="font-medium">Deployment Type:</div>
+                          <div>{window.location.hostname.includes('replit') ? 'Development (Replit)' : 
+                                window.location.hostname.includes('render') ? 'Production (Render)' : 
+                                'Custom Domain'}</div>
+                          
+                          <div className="font-medium">Current URL:</div>
+                          <div className="break-all">{window.location.href}</div>
+                          
+                          <div className="font-medium">API Base URL:</div>
+                          <div className="break-all">{getApiBaseUrl() || 'Same origin'}</div>
+                          
+                          <div className="font-medium">Cookie Domain:</div>
+                          <div>{document.cookie.includes('domain=') ? 
+                              document.cookie.split('domain=')[1]?.split(';')[0] || 'Not found' : 
+                              'Not set'}</div>
+                          
+                          <div className="font-medium">Cross-Origin:</div>
+                          <div>{getApiBaseUrl() ? 'Yes' : 'No'}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <p className="text-xs text-muted-foreground">This information is helpful for diagnosing cross-domain authentication issues.</p>
+                    </CardFooter>
+                  </Card>
+                </div>
+              </TabsContent>
             </Tabs>
           )}
         </div>
