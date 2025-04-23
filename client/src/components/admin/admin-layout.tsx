@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { BarChart, Home, Package, Settings, Users } from "lucide-react";
+import { BarChart, Home, Package, Settings, Users, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 
