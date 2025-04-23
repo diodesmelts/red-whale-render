@@ -39,6 +39,11 @@ export async function apiRequest(
     // Add the API base URL if provided and the URL doesn't already have http
     const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
     
+    console.log(`🚀 API Request: ${method} ${apiUrl}`);
+    if (data) {
+      console.log('Request data:', { ...data, password: data && 'password' in (data as any) ? 'REDACTED' : undefined });
+    }
+    
     const res = await fetch(apiUrl, {
       method,
       headers: data ? { "Content-Type": "application/json" } : {},
@@ -46,12 +51,37 @@ export async function apiRequest(
       credentials: "include",
     });
 
-    await throwIfResNotOk(res);
+    console.log(`📥 API Response: ${res.status} ${res.statusText}`);
+    
+    if (!res.ok) {
+      const responseText = await res.text();
+      console.error(`❌ API Error: ${res.status} ${res.statusText}`, responseText);
+      
+      // Format a user-friendly error message
+      if (res.status === 401) {
+        throw new Error("Invalid username or password. Please try again.");
+      } else if (res.status === 404) {
+        throw new Error("The requested resource was not found.");
+      } else if (res.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      } else {
+        throw new Error(`${res.status}: ${responseText || res.statusText}`);
+      }
+    }
+    
     return res;
   } catch (error) {
     // Handle network errors (Failed to fetch)
+    console.error('API request failed:', error);
+    
     if (error instanceof Error) {
       if (error.message.includes('Failed to fetch')) {
+        console.error('Network error details:', {
+          url,
+          apiUrl: !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url,
+          mode: import.meta.env.MODE
+        });
+        
         if (url === '/api/login') {
           throw new Error('Invalid username or password. Please try again.');
         } else {

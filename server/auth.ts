@@ -86,43 +86,78 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/register", async (req, res, next) => {
+    console.log("🔹 Registration request received:", {
+      ip: req.ip,
+      headers: {
+        origin: req.headers.origin,
+        referer: req.headers.referer,
+        host: req.headers.host,
+        'user-agent': req.headers['user-agent'],
+        'content-type': req.headers['content-type'],
+      },
+      body: { ...req.body, password: "[REDACTED]" }
+    });
+    
     try {
       // Validate request data using Zod schema
+      console.log("⚙️ Validating registration data");
       const validatedData = insertUserSchema.parse(req.body);
+      console.log("✅ Validation successful");
       
       // Check if username already exists
+      console.log("🔍 Checking if username exists:", validatedData.username);
       const existingUsername = await storage.getUserByUsername(validatedData.username);
       if (existingUsername) {
+        console.log("❌ Username already exists");
         return res.status(400).json({ message: "Username already exists" });
       }
       
       // Check if email already exists
+      console.log("🔍 Checking if email exists:", validatedData.email);
       const existingEmail = await storage.getUserByEmail(validatedData.email);
       if (existingEmail) {
+        console.log("❌ Email already exists");
         return res.status(400).json({ message: "Email already exists" });
       }
       
       // Hash password and create user
+      console.log("🔒 Hashing password");
+      const hashedPassword = await hashPassword(validatedData.password);
+      console.log("👤 Creating new user");
       const user = await storage.createUser({
         username: validatedData.username,
         email: validatedData.email,
-        password: await hashPassword(validatedData.password),
+        password: hashedPassword,
         displayName: validatedData.displayName,
         mascot: validatedData.mascot,
         notificationSettings: validatedData.notificationSettings,
         isAdmin: false
       });
+      console.log("✅ User created successfully", { id: user.id, username: user.username });
       
       // Remove password before sending to client
       const { password, ...userWithoutPassword } = user;
       
       // Log the user in
+      console.log("🔑 Attempting to log in new user via req.login");
       req.login(user, (err) => {
-        if (err) return next(err);
+        if (err) {
+          console.error("❌ Login error after registration:", err);
+          return next(err);
+        }
+        console.log("✅ User logged in successfully");
+        console.log("📦 Session info:", {
+          sessionID: req.sessionID,
+          sessionCookie: req.session?.cookie,
+          isAuthenticated: req.isAuthenticated()
+        });
         res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
+      console.error("❌ Registration error:", error);
+      
       if (error instanceof z.ZodError) {
+        console.error("❌ Validation error details:", JSON.stringify(error.errors));
         return res.status(400).json({ message: error.errors });
       }
       next(error);
@@ -130,18 +165,51 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    console.log("🔹 Login request received:", {
+      ip: req.ip,
+      headers: {
+        origin: req.headers.origin,
+        referer: req.headers.referer,
+        host: req.headers.host,
+        'user-agent': req.headers['user-agent'],
+        'content-type': req.headers['content-type'],
+      },
+      body: { ...req.body, password: "[REDACTED]" }
+    });
+    
     try {
       // Validate login request
+      console.log("⚙️ Validating login data");
       const validatedData = loginSchema.parse(req.body);
+      console.log("✅ Login data validation passed");
       
+      console.log("🔑 Authenticating user:", validatedData.username);
       passport.authenticate("local", (err, user, info) => {
-        if (err) return next(err);
+        if (err) {
+          console.error("❌ Authentication error:", err);
+          return next(err);
+        }
+        
         if (!user) {
+          console.log("❌ Authentication failed:", info?.message || "Invalid username or password");
           return res.status(401).json({ message: info?.message || "Invalid username or password" });
         }
         
+        console.log("✅ Authentication successful for user:", user.username);
+        console.log("🔑 Attempting to establish session via req.login");
+        
         req.login(user, (loginErr) => {
-          if (loginErr) return next(loginErr);
+          if (loginErr) {
+            console.error("❌ Login error:", loginErr);
+            return next(loginErr);
+          }
+          
+          console.log("✅ Login successful, session established");
+          console.log("📦 Session info:", {
+            sessionID: req.sessionID,
+            sessionCookie: req.session?.cookie,
+            isAuthenticated: req.isAuthenticated()
+          });
           
           // Remove password before sending to client
           const { password, ...userWithoutPassword } = user;
@@ -149,7 +217,10 @@ export function setupAuth(app: Express) {
         });
       })(req, res, next);
     } catch (error) {
+      console.error("❌ Login error:", error);
+      
       if (error instanceof z.ZodError) {
+        console.error("❌ Validation error details:", JSON.stringify(error.errors));
         return res.status(400).json({ message: error.errors });
       }
       next(error);
