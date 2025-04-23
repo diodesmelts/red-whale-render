@@ -1,13 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getApiBaseUrl } from "@/lib/queryClient";
 
 export default function TestRegister() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Environment info to display in the results
+  const [envInfo, setEnvInfo] = useState<{
+    apiBaseUrl: string;
+    appMode: string;
+    hostname: string;
+    isProduction: boolean;
+  }>({
+    apiBaseUrl: '',
+    appMode: '',
+    hostname: '',
+    isProduction: false
+  });
+
+  // Collect environment information on component mount
+  useEffect(() => {
+    setEnvInfo({
+      apiBaseUrl: getApiBaseUrl(),
+      appMode: import.meta.env.MODE,
+      hostname: window.location.hostname,
+      isProduction: import.meta.env.MODE === 'production'
+    });
+  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +52,18 @@ export default function TestRegister() {
     };
     
     try {
-      console.log('Sending registration request with:', { ...userData, password: 'REDACTED', confirmPassword: 'REDACTED' });
+      // Get the API base URL using our improved function
+      const apiBaseUrl = getApiBaseUrl();
+      const registerUrl = `${apiBaseUrl}/register`; // Note: we're using /register, not /api/register because apiBaseUrl already has /api if needed
       
-      const response = await fetch('/api/register', {
+      console.log('Sending registration request with:', { 
+        ...userData, 
+        password: 'REDACTED', 
+        confirmPassword: 'REDACTED' 
+      });
+      console.log('Registration endpoint URL:', registerUrl);
+      
+      const response = await fetch(registerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

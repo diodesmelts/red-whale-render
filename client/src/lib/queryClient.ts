@@ -8,6 +8,17 @@ export const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
+  // Production domain detection - in production we're likely on the main domain
+  const isProduction = import.meta.env.MODE === 'production';
+  const hostname = window.location.hostname;
+  
+  // Check if we're on the production domain
+  if (isProduction && (hostname === 'bluewhalecompetitions.co.uk' || hostname === 'www.bluewhalecompetitions.co.uk')) {
+    console.log('🔌 Production environment detected - using /api prefix');
+    // In production, we need to be explicit about the /api prefix
+    return '/api';
+  }
+  
   // Single service architecture - API is always same origin (empty string)
   console.log('🔌 Using API on same origin');
   return '';
