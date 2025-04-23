@@ -97,21 +97,121 @@ export function setupAuth(app: Express) {
     name: "bluewhale.sid"
   };
 
+  // Enhanced diagnostics for session setup
   app.set("trust proxy", 1);
+  
+  // Log session setup - this will be visible in the Render logs
+  console.log(`\n🍪 SETTING UP SESSION AND PASSPORT [${new Date().toISOString()}]`);
+  console.log('==================================================');
+  console.log('Session settings:', {
+    name: sessionSettings.name,
+    resave: sessionSettings.resave,
+    saveUninitialized: sessionSettings.saveUninitialized,
+    cookie: {
+      maxAge: sessionSettings.cookie?.maxAge,
+      secure: sessionSettings.cookie?.secure,
+      sameSite: sessionSettings.cookie?.sameSite,
+      domain: sessionSettings.cookie?.domain,
+      path: sessionSettings.cookie?.path,
+      httpOnly: sessionSettings.cookie?.httpOnly
+    },
+    environment: process.env.NODE_ENV,
+    cookieDomain: process.env.COOKIE_DOMAIN,
+    frontendUrl: process.env.FRONTEND_URL,
+    apiUrl: process.env.API_URL
+  });
+  
+  // Create middleware for session diagnostics
+  const sessionDiagnostics = (req: any, res: any, next: any) => {
+    const sessionId = req.sessionID;
+    if (!req._logged_session_info && sessionId) {
+      req._logged_session_info = true;
+      console.log(`\n📦 NEW SESSION CREATED [${new Date().toISOString()}]:`);
+      console.log('==================================================');
+      console.log('Session info:', {
+        id: sessionId,
+        cookie: req.session?.cookie,
+        headers: {
+          host: req.headers.host,
+          origin: req.headers.origin,
+          referer: req.headers.referer,
+          'user-agent': req.headers['user-agent']
+        }
+      });
+      console.log('==================================================\n');
+    }
+    next();
+  };
+  
   app.use(session(sessionSettings));
+  app.use(sessionDiagnostics);
   app.use(passport.initialize());
   app.use(passport.session());
+  
+  console.log('✅ Session and Passport initialized');
+  console.log('==================================================\n');
+  
+  // Add session error logger middleware
+  app.use((req, res, next) => {
+    // Track original URL for error diagnostics
+    req._originalUrl = req.originalUrl || req.url;
+    
+    // Catch and log session errors
+    const originalEnd = res.end;
+    res.end = function(...args: any[]) {
+      // Log 500 errors which might indicate session issues
+      if (res.statusCode >= 500) {
+        console.error(`\n❌ SERVER ERROR IN REQUEST [${new Date().toISOString()}]:`);
+        console.error('==================================================');
+        console.error(`Error ${res.statusCode} in ${req.method} ${req._originalUrl}`);
+        console.error('Request headers:', {
+          origin: req.headers.origin,
+          referer: req.headers.referer,
+          host: req.headers.host,
+          'user-agent': req.headers['user-agent'],
+          cookie: req.headers.cookie ? 'Present' : 'Not present',
+        });
+        console.error('Session info (if available):', {
+          exists: !!req.session,
+          id: req.sessionID || 'none',
+          authenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+        });
+        console.error('==================================================\n');
+      }
+      
+      return originalEnd.apply(res, args);
+    };
+    
+    next();
+  });
 
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        console.log(`\n🔑 LOGIN ATTEMPT DIAGNOSTICS [${new Date().toISOString()}]`);
+        console.log('==================================================');
+        console.log(`🔍 Attempting to authenticate user: ${username}`);
+        
         const user = await storage.getUserByUsername(username);
-        if (!user || !(await comparePasswords(password, user.password))) {
+        
+        if (!user) {
+          console.log(`❌ Authentication failed: User not found for username '${username}'`);
           return done(null, false, { message: "Invalid username or password" });
-        } else {
-          return done(null, user);
         }
+        
+        console.log(`✅ User found: ${username} (ID: ${user.id})`);
+        
+        const passwordValid = await comparePasswords(password, user.password);
+        if (!passwordValid) {
+          console.log(`❌ Authentication failed: Invalid password for user '${username}'`);
+          return done(null, false, { message: "Invalid username or password" });
+        }
+        
+        console.log(`✅ Password verification successful for user '${username}'`);
+        console.log('==================================================\n');
+        return done(null, user);
       } catch (error) {
+        console.error(`❌ Authentication error for username '${username}':`, error);
         return done(error);
       }
     }),
@@ -277,10 +377,62 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).json({ message: "Unauthorized" });
+    // Enhanced logging for authentication debugging in production
+    const requestInfo = {
+      path: req.path,
+      method: req.method,
+      ip: req.ip,
+      headers: {
+        origin: req.headers.origin,
+        referer: req.headers.referer,
+        host: req.headers.host,
+        'user-agent': req.headers['user-agent'],
+        'cookie': req.headers.cookie ? 'Present' : 'Not present',
+        'cookie-length': req.headers.cookie ? req.headers.cookie.length : 0,
+      },
+      session: {
+        exists: !!req.session,
+        id: req.sessionID,
+        authenticated: req.isAuthenticated(),
+        cookie: req.session?.cookie ? {
+          maxAge: req.session.cookie.maxAge,
+          originalMaxAge: req.session.cookie.originalMaxAge,
+          expires: req.session.cookie.expires,
+          secure: req.session.cookie.secure,
+          httpOnly: req.session.cookie.httpOnly,
+          domain: req.session.cookie.domain,
+          path: req.session.cookie.path,
+          sameSite: req.session.cookie.sameSite,
+        } : null
+      },
+      authInfo: {
+        isAuthenticated: req.isAuthenticated(),
+        passport: req.session?.passport,
+        user: req.user ? { id: req.user.id, username: req.user.username } : null
+      },
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        FRONTEND_URL: process.env.FRONTEND_URL,
+        COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
+        API_URL: process.env.API_URL,
+        SESSION_SECRET: process.env.SESSION_SECRET ? 'Set' : 'Not set'
+      }
+    };
+
+    // Log authentication request to server logs
+    console.log(`\n🔒 AUTH REQUEST DIAGNOSTICS [${new Date().toISOString()}]:`);
+    console.log('==================================================');
+    console.log(JSON.stringify(requestInfo, null, 2));
+    console.log('==================================================\n');
+
+    if (!req.isAuthenticated()) {
+      console.log('❌ Authentication failed: Not authenticated');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     
     // Remove password before sending to client
     const { password, ...userWithoutPassword } = req.user!;
+    console.log(`✅ Authentication successful for user: ${req.user!.username} (ID: ${req.user!.id})`);
     res.json(userWithoutPassword);
   });
 }
