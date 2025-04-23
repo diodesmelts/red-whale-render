@@ -80,6 +80,7 @@ export function setupAuth(app: Express) {
     sessionSecret: sessionSecret ? "[SET]" : "[NOT SET]"
   });
 
+  // Configure session settings for better cross-domain cookie handling
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
     resave: false,
@@ -87,14 +88,17 @@ export function setupAuth(app: Express) {
     store: storage.sessionStore,
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production", // Secure cookies in production
+      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax', // None for cross-origin in production
       domain: process.env.NODE_ENV === "production" ? cookieDomain : undefined,
       // Set path to root to ensure cookies are available for all paths
-      path: "/"
+      path: "/",
+      httpOnly: true // Cookie not accessible via JavaScript
     },
-    // Improve naming to avoid conflicts with other apps
-    name: "bluewhale.sid"
+    // Improved naming to avoid conflicts with other apps (prefixed and shortened)
+    name: "bw.sid", 
+    // Additional proxy trust config required for cross-domain cookies
+    proxy: process.env.NODE_ENV === "production"
   };
 
   // Enhanced diagnostics for session setup
