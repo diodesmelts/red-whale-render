@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils";
 
+import { useQuery } from "@tanstack/react-query";
+import { SiteConfig } from "@shared/schema";
+
 interface LogoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -12,15 +15,40 @@ export function Logo({ size = "md", className }: LogoProps) {
     lg: "h-12",
   };
 
+  // Query for the custom logo
+  const { data: logoConfig } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config/siteLogo"],
+    queryFn: async () => {
+      const res = await fetch("/api/site-config/siteLogo");
+      if (!res.ok) {
+        return null;
+      }
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  const customLogoUrl = logoConfig?.value;
+
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       <div className={cn("flex-shrink-0", sizeClass[size])}>
-        <LogoIcon className={cn(sizeClass[size], "w-auto")} />
+        {customLogoUrl ? (
+          <img 
+            src={customLogoUrl} 
+            alt="Blue Whale Competitions Logo" 
+            className={cn(sizeClass[size], "w-auto object-contain")}
+          />
+        ) : (
+          <LogoIcon className={cn(sizeClass[size], "w-auto")} />
+        )}
       </div>
-      <div>
-        <span className="text-primary font-bold text-xl">Blue Whale</span>
-        <span className="text-white text-xs block -mt-1">Competitions</span>
-      </div>
+      {!customLogoUrl && (
+        <div>
+          <span className="text-primary font-bold text-xl">Blue Whale</span>
+          <span className="text-white text-xs block -mt-1">Competitions</span>
+        </div>
+      )}
     </div>
   );
 }

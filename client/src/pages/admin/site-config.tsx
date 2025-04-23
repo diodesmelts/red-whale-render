@@ -32,8 +32,14 @@ export default function SiteConfigPage() {
   // Form state for hero banner
   const [heroBannerImage, setHeroBannerImage] = useState<string>("");
   
+  // Form state for logo
+  const [logoImage, setLogoImage] = useState<string>("");
+  
   // Get current hero banner value if exists
   const heroBannerConfig = siteConfigs?.find(config => config.key === "heroBanner");
+  
+  // Get current logo value if exists
+  const logoConfig = siteConfigs?.find(config => config.key === "siteLogo");
   
   // Update site configuration mutation
   const updateConfigMutation = useMutation({
@@ -69,9 +75,23 @@ export default function SiteConfigPage() {
     });
   };
 
-  // Handle image upload completion
-  const handleImageUploaded = (imageUrl: string) => {
+  // Handle hero banner image upload completion
+  const handleHeroBannerUploaded = (imageUrl: string) => {
     setHeroBannerImage(imageUrl);
+  };
+  
+  // Handle logo image upload completion
+  const handleLogoUploaded = (imageUrl: string) => {
+    setLogoImage(imageUrl);
+  };
+  
+  // Upload and save logo image
+  const handleSaveLogo = () => {
+    updateConfigMutation.mutate({
+      key: "siteLogo",
+      value: logoImage,
+      description: "Site logo image URL"
+    });
   };
 
   // Initialize hero banner image from config when data is loaded
@@ -79,7 +99,11 @@ export default function SiteConfigPage() {
     if (heroBannerConfig?.value) {
       setHeroBannerImage(heroBannerConfig.value);
     }
-  }, [heroBannerConfig]);
+    
+    if (logoConfig?.value) {
+      setLogoImage(logoConfig.value);
+    }
+  }, [heroBannerConfig, logoConfig]);
 
   return (
     <AdminLayout>
@@ -99,6 +123,7 @@ export default function SiteConfigPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-6">
               <TabsTrigger value="hero">Hero Banner</TabsTrigger>
+              <TabsTrigger value="logo">Site Logo</TabsTrigger>
               <TabsTrigger value="about">About Section</TabsTrigger>
               <TabsTrigger value="contact">Contact Info</TabsTrigger>
             </TabsList>
@@ -116,7 +141,7 @@ export default function SiteConfigPage() {
                     <div>
                       <Label htmlFor="hero-image">Hero Banner Image</Label>
                       <ImageUpload 
-                        onImageUploaded={handleImageUploaded}
+                        onImageUploaded={handleHeroBannerUploaded}
                         currentImageUrl={heroBannerImage}
                         className="mt-2"
                       />
@@ -130,6 +155,51 @@ export default function SiteConfigPage() {
                   <Button 
                     onClick={handleSaveHeroBanner}
                     disabled={updateConfigMutation.isPending || !heroBannerImage}
+                  >
+                    {updateConfigMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="logo">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Site Logo Settings</CardTitle>
+                  <CardDescription>
+                    Upload a custom logo image to replace the default SVG logo
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="logo-image">Custom Logo Image</Label>
+                      <ImageUpload 
+                        onImageUploaded={handleLogoUploaded}
+                        currentImageUrl={logoImage}
+                        className="mt-2"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Recommended size: 300x100px with transparent background (PNG). 
+                        Leave empty to use the default SVG logo.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex gap-2">
+                  <Button 
+                    onClick={handleSaveLogo}
+                    disabled={updateConfigMutation.isPending}
                   >
                     {updateConfigMutation.isPending ? (
                       <>
