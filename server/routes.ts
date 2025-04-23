@@ -47,6 +47,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await (dataStorage as any).seedAdminUser();
   }
   
+  // Enhanced health check with diagnostics - safe implementation
+  app.get('/api/health', (req, res) => {
+    try {
+      // Collect diagnostic information
+      const diagnostics = {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV,
+        headers: {
+          origin: req.headers.origin,
+          host: req.headers.host,
+          referer: req.headers.referer,
+          userAgent: req.headers['user-agent'],
+        },
+        session: {
+          exists: !!req.session,
+          id: req.sessionID || 'no-session-id',
+          // Safe check for authentication status
+          authenticated: typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : 'function-not-available',
+          // Safe extraction of cookie info
+          cookie: req.session?.cookie ? {
+            originalMaxAge: req.session.cookie.originalMaxAge,
+            secure: req.session.cookie.secure,
+            sameSite: req.session.cookie.sameSite,
+            domain: req.session.cookie.domain,
+          } : null
+        },
+        serverInfo: {
+          platform: process.platform,
+          nodeVersion: process.version,
+          uptime: process.uptime(),
+          hostname: require('os').hostname(),
+        },
+        config: {
+          apiUrl: process.env.API_URL || 'not set',
+          frontendUrl: process.env.FRONTEND_URL || 'not set',
+          cookieDomain: process.env.COOKIE_DOMAIN || 'not set',
+          environment: process.env.NODE_ENV || 'development',
+        }
+      };
+      
+      res.json(diagnostics);
+    } catch (error) {
+      // Fallback response if anything fails
+      res.json({
+        status: 'ok',
+        error: `Health check diagnostic error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date().toISOString(),
+        minimal: true
+      });
+    }
+  });
+  
   // Set up authentication routes
   setupAuth(app);
   
