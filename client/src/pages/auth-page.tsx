@@ -14,6 +14,7 @@ import { z } from "zod";
 import { loginSchema, insertUserSchema } from "@shared/schema";
 import { Trophy, ShieldCheck, Bell } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
+import { getApiBaseUrl, queryClient } from "../lib/queryClient";
 
 export default function AuthPage() {
   const [location, navigate] = useLocation();
@@ -86,19 +87,81 @@ export default function AuthPage() {
     setRegisterError(null);
     console.log("📝 Submitting registration form data:", { ...data, password: "REDACTED", confirmPassword: "REDACTED" });
     
+    // Add debug info panel to the page
+    const debugInfo = document.createElement('div');
+    debugInfo.className = 'fixed bottom-0 right-0 bg-black/80 text-white p-4 m-4 rounded shadow-lg z-50 max-w-lg max-h-80 overflow-auto';
+    debugInfo.innerHTML = `
+      <h3 class="font-bold mb-2">Registration Debug Info</h3>
+      <p class="text-xs">Username: ${data.username}</p>
+      <p class="text-xs">Email: ${data.email}</p>
+      <p class="text-xs">Display Name: ${data.displayName || 'Not provided'}</p>
+      <p class="text-xs">Mascot: ${data.mascot}</p>
+      <p class="text-xs">Terms Agreed: ${data.agreeToTerms}</p>
+      <p class="text-xs mb-2">Password: REDACTED</p>
+      <p class="text-xs mb-2">Environment: ${import.meta.env.MODE}</p>
+      <p class="text-xs mb-2">API Base URL: ${getApiBaseUrl()}</p>
+      <p class="text-xs">Registration Endpoint: ${getApiBaseUrl()}/api/register</p>
+      <pre class="text-xs mt-2" id="debug-results">Submitting registration...</pre>
+      <button class="bg-red-500 text-white px-2 py-1 text-xs mt-2 rounded" id="close-debug">Close</button>
+    `;
+    document.body.appendChild(debugInfo);
+    
+    document.getElementById('close-debug')?.addEventListener('click', () => {
+      document.body.removeChild(debugInfo);
+    });
+    
+    const updateDebug = (message: string) => {
+      const debugResults = document.getElementById('debug-results');
+      if (debugResults) {
+        debugResults.textContent = message;
+      }
+    };
+    
     try {
-      registerMutation.mutate(data, {
-        onError: (error) => {
-          console.error("❌ Registration failed:", error);
-          setRegisterError(error.message);
+      // Directly use fetch for more control over the process
+      const apiUrl = `${getApiBaseUrl()}/api/register`;
+      updateDebug(`Sending request to ${apiUrl}...`);
+      
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        onSuccess: (user) => {
-          console.log("✅ Registration successful. User:", user);
-          navigate("/");
+        body: JSON.stringify(data),
+        credentials: 'include'
+      })
+      .then(async response => {
+        const responseText = await response.text();
+        updateDebug(`Response status: ${response.status} ${response.statusText}\nBody: ${responseText}`);
+        
+        if (!response.ok) {
+          throw new Error(`Registration failed (${response.status}): ${responseText || response.statusText}`);
         }
+        
+        try {
+          // Try to parse the response as JSON
+          const userData = JSON.parse(responseText);
+          console.log("✅ Registration successful. User:", userData);
+          
+          // Update auth context
+          queryClient.setQueryData(["/api/user"], userData);
+          
+          // Navigate to home
+          navigate("/");
+          
+        } catch (parseError) {
+          throw new Error(`Failed to parse server response: ${responseText}`);
+        }
+      })
+      .catch(error => {
+        console.error("❌ Registration fetch error:", error);
+        updateDebug(`Error: ${error.message}`);
+        setRegisterError(error.message);
       });
+      
     } catch (error) {
-      console.error("⚠️ Exception during registration mutation:", error);
+      console.error("⚠️ Exception during registration:", error);
+      updateDebug(`Exception: ${error instanceof Error ? error.message : String(error)}`);
       setRegisterError(error instanceof Error ? error.message : "An unknown error occurred");
     }
   };
