@@ -32,6 +32,16 @@ async function comparePasswords(supplied: string, stored: string) {
 export function setupAuth(app: Express) {
   const sessionSecret = process.env.SESSION_SECRET || "red-whale-competitions-secret";
   
+  // Determine the domain for cookies in production
+  let cookieDomain;
+  if (process.env.NODE_ENV === "production") {
+    // Use environment variable if defined, otherwise try to detect from request origin
+    cookieDomain = process.env.COOKIE_DOMAIN || 
+                  (process.env.FRONTEND_URL && process.env.FRONTEND_URL.includes('bluewhalecompetitions.co.uk') 
+                    ? '.bluewhalecompetitions.co.uk' 
+                    : '.onrender.com');
+  }
+
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
     resave: false,
@@ -39,7 +49,9 @@ export function setupAuth(app: Express) {
     store: storage.sessionStore,
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      secure: process.env.NODE_ENV === "production"
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+      domain: process.env.NODE_ENV === "production" ? cookieDomain : undefined
     }
   };
 
