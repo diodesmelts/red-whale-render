@@ -4,7 +4,7 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 export const getApiBaseUrl = () => {
   // In production, use a specific API URL
   if (import.meta.env.MODE === 'production') {
-    // Use environment variable if provided (for Vercel deployment)
+    // Use environment variable if provided or our known Render URL
     return import.meta.env.VITE_API_URL || 'https://blue-whale-api.onrender.com';
   }
   
