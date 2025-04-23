@@ -19,6 +19,7 @@ import HowToPlay from "@/pages/how-to-play";
 import MyEntries from "@/pages/my-entries";
 import MyWins from "@/pages/my-wins";
 import ProfilePage from "@/pages/profile";
+import TestRegister from "@/pages/test-register";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/dashboard";
@@ -50,6 +51,7 @@ function Router() {
               <ProtectedRoute path="/my-entries" component={MyEntries} />
               <ProtectedRoute path="/my-wins" component={MyWins} />
               <ProtectedRoute path="/profile" component={ProfilePage} />
+              <Route path="/test-register" component={TestRegister} />
               
               {/* Admin Routes - protected and require admin role */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
