@@ -10,23 +10,50 @@ app.use(express.urlencoded({ extended: false }));
 
 // Setup CORS for separate frontend deployment
 app.use((req, res, next) => {
+  console.log("⚡ Processing request:", {
+    url: req.url,
+    method: req.method,
+    origin: req.headers.origin,
+    referer: req.headers.referer,
+    host: req.headers.host
+  });
+
   // Accept multiple allowed origins
   const allowedOrigins = [
     'https://redwhale.onrender.com', 
     'https://www.bluewhalecompetitions.co.uk',
-    'https://bluewhalecompetitions.co.uk'
+    'https://bluewhalecompetitions.co.uk',
+    'https://blue-whale.onrender.com',
+    'http://localhost:5000',
+    'http://localhost:3000'
   ];
   
   // Use configured frontend URL if set
   if (process.env.FRONTEND_URL) {
-    allowedOrigins.push(process.env.FRONTEND_URL);
+    const frontendUrl = process.env.FRONTEND_URL;
+    if (!allowedOrigins.includes(frontendUrl)) {
+      allowedOrigins.push(frontendUrl);
+      console.log(`Added FRONTEND_URL to allowed origins: ${frontendUrl}`);
+    }
   }
   
   const origin = req.headers.origin;
+  console.log(`🔒 Request origin: ${origin || 'none'}`);
+  console.log(`🔒 Allowed origins: ${allowedOrigins.join(', ')}`);
   
-  // Check if the request origin is in our allowed list
-  if (origin && allowedOrigins.includes(origin)) {
+  // In development, allow all origins
+  if (process.env.NODE_ENV !== "production") {
+    if (origin) {
+      res.header("Access-Control-Allow-Origin", origin);
+      console.log(`✅ Allowed origin (dev mode): ${origin}`);
+    }
+  } 
+  // In production, check against allowed list
+  else if (origin && allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
+    console.log(`✅ Allowed origin: ${origin}`);
+  } else if (origin) {
+    console.log(`❌ Blocked origin: ${origin}`);
   }
   
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
@@ -34,6 +61,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   
   if (req.method === "OPTIONS") {
+    console.log("✅ Responding to OPTIONS request");
     return res.sendStatus(200);
   }
   next();

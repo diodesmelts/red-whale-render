@@ -2,14 +2,40 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 // Get the API URL based on environment
 export const getApiBaseUrl = () => {
+  // Check for explicitly defined API URL in env
+  if (import.meta.env.VITE_API_URL) {
+    console.log(`🔌 Using API URL from environment: ${import.meta.env.VITE_API_URL}`);
+    return import.meta.env.VITE_API_URL;
+  }
+  
   // In production, use a specific API URL
   if (import.meta.env.MODE === 'production') {
-    // Hardcode the API URL for now to ensure we're connecting to the right place
-    // Use 'https://blue-whale-api.onrender.com' directly
+    // Use multiple potential API URLs with fallbacks
+    const apiUrls = [
+      'https://blue-whale-api.onrender.com',
+      'https://redwhale-api.onrender.com',
+      'https://api.bluewhalecompetitions.co.uk'
+    ];
+    
+    // If we're in bluewhalecompetitions.co.uk, prefer that API domain
+    if (window.location.hostname.includes('bluewhalecompetitions.co.uk')) {
+      console.log('🔌 Using bluewhalecompetitions.co.uk API');
+      return 'https://api.bluewhalecompetitions.co.uk';
+    }
+    
+    // If we're in render.com domain, prefer render.com API
+    if (window.location.hostname.includes('render.com')) {
+      console.log('🔌 Using Render API');
+      return 'https://blue-whale-api.onrender.com';
+    }
+    
+    // Default API URL
+    console.log('🔌 Using default production API: blue-whale-api.onrender.com');
     return 'https://blue-whale-api.onrender.com';
   }
   
-  // In development, use the local server
+  // In development, use the local server (empty string for same-origin)
+  console.log('🔌 Using development API (same origin)');
   return '';
 };
 
@@ -104,20 +130,47 @@ export const getQueryFn: <T>(options: {
       // Add the API base URL if provided and the URL doesn't already have http
       const apiUrl = !queryUrl.startsWith('http') ? `${getApiBaseUrl()}${queryUrl}` : queryUrl;
       
+      console.log(`🔍 Query request: GET ${apiUrl}`);
+      
       const res = await fetch(apiUrl, {
+        method: 'GET',
         credentials: "include",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors' // Explicitly set CORS mode
       });
+      
+      console.log(`📥 Query response: ${res.status} ${res.statusText}`);
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        console.log('🔒 Unauthorized but returning null as configured');
         return null;
       }
 
+      if (!res.ok) {
+        const responseText = await res.text();
+        console.error(`❌ Query error: ${res.status} ${res.statusText}`, responseText);
+      }
+
       await throwIfResNotOk(res);
-      return await res.json();
+      const data = await res.json();
+      return data;
     } catch (error) {
       // Handle network errors (Failed to fetch)
-      if (error instanceof Error && error.message.includes('Failed to fetch')) {
-        throw new Error('Connection error. Please check your internet connection and try again.');
+      console.error('Query error:', error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          console.error('Network error details:', {
+            queryKey,
+            apiBaseUrl: getApiBaseUrl(),
+            mode: import.meta.env.MODE,
+            hostname: window.location.hostname
+          });
+          throw new Error('Connection error. Please check your internet connection and try again.');
+        }
       }
       throw error;
     }

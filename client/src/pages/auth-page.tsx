@@ -84,14 +84,23 @@ export default function AuthPage() {
   // Handle register submission
   const onRegisterSubmit = (data: z.infer<typeof insertUserSchema>) => {
     setRegisterError(null);
-    registerMutation.mutate(data, {
-      onError: (error) => {
-        setRegisterError(error.message);
-      },
-      onSuccess: () => {
-        navigate("/");
-      }
-    });
+    console.log("📝 Submitting registration form data:", { ...data, password: "REDACTED", confirmPassword: "REDACTED" });
+    
+    try {
+      registerMutation.mutate(data, {
+        onError: (error) => {
+          console.error("❌ Registration failed:", error);
+          setRegisterError(error.message);
+        },
+        onSuccess: (user) => {
+          console.log("✅ Registration successful. User:", user);
+          navigate("/");
+        }
+      });
+    } catch (error) {
+      console.error("⚠️ Exception during registration mutation:", error);
+      setRegisterError(error instanceof Error ? error.message : "An unknown error occurred");
+    }
   };
   
   return (

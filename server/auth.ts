@@ -41,6 +41,13 @@ export function setupAuth(app: Express) {
                     ? '.bluewhalecompetitions.co.uk' 
                     : '.onrender.com');
   }
+  
+  console.log(`🍪 Session configuration:`, {
+    environment: process.env.NODE_ENV,
+    frontendUrl: process.env.FRONTEND_URL,
+    cookieDomain,
+    sessionSecret: sessionSecret ? "[SET]" : "[NOT SET]"
+  });
 
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
@@ -51,8 +58,12 @@ export function setupAuth(app: Express) {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
-      domain: process.env.NODE_ENV === "production" ? cookieDomain : undefined
-    }
+      domain: process.env.NODE_ENV === "production" ? cookieDomain : undefined,
+      // Set path to root to ensure cookies are available for all paths
+      path: "/"
+    },
+    // Improve naming to avoid conflicts with other apps
+    name: "bluewhale.sid"
   };
 
   app.set("trust proxy", 1);
