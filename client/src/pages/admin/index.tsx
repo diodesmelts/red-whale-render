@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Link } from 'wouter';
 import { BarChart, DollarSign, Package, Trophy, Users } from 'lucide-react';
@@ -32,12 +30,79 @@ export default function AdminDashboard() {
     return sum;
   }, 0);
 
-  const recentActivity = [
-    { action: "User Registration", user: "john_doe", time: "20 minutes ago" },
-    { action: "Competition Entry", user: "sarah85", competition: "Spring Holiday Bundle", time: "1 hour ago" },
-    { action: "Prize Claimed", user: "mark_wilson", competition: "Cash Prize Draw", time: "3 hours ago" },
-    { action: "New Competition", admin: "admin", competition: "Premium Tech Bundle", time: "5 hours ago" },
-  ];
+  // Get recent activity based on users and entries
+  const recentActivity = [];
+  
+  // Add recent users
+  const sortedUsers = [...users].sort((a, b) => 
+    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+  ).slice(0, 3);
+  
+  sortedUsers.forEach(user => {
+    recentActivity.push({ 
+      action: "User Registration", 
+      user: user.username, 
+      time: formatRelativeTime(new Date(user.createdAt || new Date()))
+    });
+  });
+  
+  // Add recent entries
+  const sortedEntries = [...entries].sort((a, b) => 
+    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+  ).slice(0, 3);
+  
+  sortedEntries.forEach(entry => {
+    const competition = competitions.find(c => c.id === entry.competitionId);
+    if (competition) {
+      const user = users.find(u => u.id === entry.userId);
+      recentActivity.push({ 
+        action: "Competition Entry", 
+        user: user?.username || `User #${entry.userId}`, 
+        competition: competition.title,
+        time: formatRelativeTime(new Date(entry.createdAt || new Date()))
+      });
+    }
+  });
+  
+  // Sort combined activity by most recent
+  recentActivity.sort((a, b) => {
+    const timeA = parseRelativeTime(a.time);
+    const timeB = parseRelativeTime(b.time);
+    return timeA - timeB;
+  });
+  
+  // Helper function to format relative time
+  function formatRelativeTime(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+  }
+  
+  // Helper function to parse relative time back to milliseconds for sorting
+  function parseRelativeTime(relativeTime: string): number {
+    if (relativeTime === "just now") return 0;
+    
+    const matches = relativeTime.match(/(\d+) (\w+) ago/);
+    if (!matches) return Number.MAX_SAFE_INTEGER;
+    
+    const [, valueStr, unit] = matches;
+    const value = parseInt(valueStr);
+    
+    if (unit.startsWith("minute")) return value * 60 * 1000;
+    if (unit.startsWith("hour")) return value * 60 * 60 * 1000;
+    if (unit.startsWith("day")) return value * 24 * 60 * 60 * 1000;
+    
+    return Number.MAX_SAFE_INTEGER;
+  }
 
   return (
     <AdminLayout>

@@ -98,6 +98,7 @@ export class MemStorage implements IStorage {
       displayName: "admin",
       mascot: "blue-whale",
       isAdmin: true,
+      isBanned: false,
       stripeCustomerId: null,
       notificationSettings: { email: true, inApp: true },
       createdAt: new Date()

@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   mascot: text("mascot").default("blue-whale"),
   stripeCustomerId: text("stripe_customer_id"),
   isAdmin: boolean("is_admin").default(false),
+  isBanned: boolean("is_banned").default(false),
   notificationSettings: json("notification_settings").$type<{
     email: boolean;
     inApp: boolean;
