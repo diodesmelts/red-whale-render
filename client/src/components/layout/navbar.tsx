@@ -42,9 +42,9 @@ export function Navbar() {
               </Link>
             </div>
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-6">
+              <div className="ml-10 flex items-center space-x-6">
                 <Link href="/" className={cn(
-                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
+                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
                   location === "/" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                 )}>
                   <i className="fas fa-home mr-2"></i> Home
@@ -73,7 +73,7 @@ export function Navbar() {
                   </div>
                 </div>
                 <Link href="/how-to-play" className={cn(
-                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
+                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
                   location === "/how-to-play" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                 )}>
                   <i className="fas fa-question-circle mr-2"></i> How to Play
@@ -81,13 +81,13 @@ export function Navbar() {
                 {user && (
                   <>
                     <Link href="/my-entries" className={cn(
-                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
+                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
                       location === "/my-entries" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                     )}>
                       <i className="fas fa-clipboard-list mr-2"></i> My Entries
                     </Link>
                     <Link href="/my-wins" className={cn(
-                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
+                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
                       location === "/my-wins" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                     )}>
                       <i className="fas fa-award mr-2"></i> My Wins
