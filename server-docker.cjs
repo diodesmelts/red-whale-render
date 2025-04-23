@@ -211,29 +211,40 @@ async function comparePasswords(supplied, stored) {
 // Set up passport local strategy
 passport.use(new LocalStrategy(async (username, password, done) => {
   try {
-    // Query the database for the user
-    const { rows } = await pool.query(
-      'SELECT * FROM users WHERE username = $1',
-      [username]
-    );
+    console.log(`🔍 Authenticating user: ${username}`);
+    
+    // Query the database for the user with properly named fields
+    const { rows } = await pool.query(`
+      SELECT id, username, email, password, display_name as "displayName", 
+      mascot, is_admin as "isAdmin", is_banned as "isBanned", 
+      notification_settings as "notificationSettings", created_at as "createdAt",
+      stripe_customer_id as "stripeCustomerId"
+      FROM users WHERE username = $1
+    `, [username]);
     
     const user = rows[0];
     if (!user) {
+      console.log(`❌ Authentication failed: User ${username} not found`);
       return done(null, false, { message: "Invalid username or password" });
     }
     
-    // Check if user is banned
-    if (user.is_banned) {
+    // Check if user is banned (using camelCase property)
+    if (user.isBanned) {
+      console.log(`❌ Authentication failed: User ${username} is banned`);
       return done(null, false, { message: "Your account has been banned. Please contact support." });
     }
     
+    // Compare passwords
     const passwordValid = await comparePasswords(password, user.password);
     if (!passwordValid) {
+      console.log(`❌ Authentication failed: Invalid password for ${username}`);
       return done(null, false, { message: "Invalid username or password" });
     }
     
+    console.log(`✅ Authentication successful for ${username} (isAdmin: ${user.isAdmin})`);
     return done(null, user);
   } catch (error) {
+    console.error('❌ Authentication error:', error);
     return done(error);
   }
 }));
@@ -244,13 +255,23 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const { rows } = await pool.query(
-      'SELECT * FROM users WHERE id = $1',
-      [id]
-    );
+    const { rows } = await pool.query(`
+      SELECT id, username, email, display_name as "displayName", 
+      mascot, is_admin as "isAdmin", is_banned as "isBanned", 
+      notification_settings as "notificationSettings", created_at as "createdAt",
+      stripe_customer_id as "stripeCustomerId", password
+      FROM users WHERE id = $1
+    `, [id]);
+    
+    if (rows.length === 0) {
+      return done(null, false);
+    }
+    
     const user = rows[0];
+    console.log('✅ User deserialized successfully:', { id: user.id, username: user.username, isAdmin: user.isAdmin });
     done(null, user);
   } catch (error) {
+    console.error('❌ Error deserializing user:', error);
     done(error);
   }
 });
@@ -418,12 +439,27 @@ app.post('/api/logout', (req, res) => {
 
 // Current user endpoint
 app.get('/api/user', (req, res) => {
+  console.log('🔒 Current user request received');
+  console.log('Session ID:', req.sessionID);
+  console.log('Is authenticated:', req.isAuthenticated());
+  
   if (!req.isAuthenticated()) {
+    console.log('❌ Unauthorized - user not authenticated');
     return res.status(401).json({ message: "Unauthorized" });
   }
   
+  console.log('✅ User is authenticated:', { id: req.user.id, username: req.user.username });
+  
   // Don't send the password back to the client
   const { password, ...userWithoutPassword } = req.user;
+  
+  // Make sure isAdmin is being properly sent to the client
+  console.log('Sending user data to client:', { 
+    id: userWithoutPassword.id, 
+    username: userWithoutPassword.username, 
+    isAdmin: userWithoutPassword.isAdmin 
+  });
+  
   res.json(userWithoutPassword);
 });
 
@@ -519,9 +555,15 @@ console.log('Copying Vite-built frontend assets in Docker...');
 // Serve static files from dist/public
 app.use(express.static(path.join(__dirname, 'dist', 'public')));
 
-// Serve the Vite built frontend for all client routes
-app.get('/', (req, res) => {
-  // Serve the index.html for the SPA
+// Serve the Vite built frontend for all client routes (catch-all route for SPA)
+app.get('*', (req, res, next) => {
+  // Skip API routes and other non-frontend routes
+  if (req.path.startsWith('/api/') || req.path.startsWith('/health') || req.path === '/favicon.ico') {
+    return next();
+  }
+  
+  console.log(`🌐 Serving SPA for client route: ${req.path}`);
+  // Serve the index.html for all client-side routes in the SPA
   res.sendFile(path.join(__dirname, 'dist', 'public', 'index.html'));
 });
 
