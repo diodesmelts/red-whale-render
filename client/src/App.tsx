@@ -23,6 +23,7 @@ import AdminDashboard from "@/pages/admin/dashboard";
 import ListingsManagement from "@/pages/admin/listings-management";
 import CreateCompetition from "@/pages/admin/create-competition";
 import EditCompetition from "@/pages/admin/edit-competition";
+import SiteConfigPage from "@/pages/admin/site-config";
 
 import { Layout } from "@/components/layout/layout";
 import { Navbar } from "@/components/layout/navbar";
@@ -52,6 +53,7 @@ function Router() {
               <ProtectedRoute path="/admin/listings" component={ListingsManagement} adminRequired={true} />
               <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
               <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
+              <ProtectedRoute path="/admin/site-config" component={SiteConfigPage} adminRequired={true} />
               
               {/* Fallback to 404 */}
               <Route component={NotFound} />
