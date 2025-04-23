@@ -4,12 +4,9 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 export const getApiBaseUrl = () => {
   // In production, use a specific API URL
   if (import.meta.env.MODE === 'production') {
-    // Use environment variable if provided or our known API URL
-    return import.meta.env.VITE_API_URL || 
-           // Check if we're on the custom domain
-           (window.location.hostname.includes('bluewhalecompetitions.co.uk') 
-             ? 'https://api.bluewhalecompetitions.co.uk' 
-             : 'https://blue-whale-api.onrender.com');
+    // Hardcode the API URL for now to ensure we're connecting to the right place
+    // Use 'https://blue-whale-api.onrender.com' directly
+    return 'https://blue-whale-api.onrender.com';
   }
   
   // In development, use the local server
