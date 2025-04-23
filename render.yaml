@@ -14,6 +14,7 @@ services:
         sync: false # Will be manually set
       - key: VITE_STRIPE_PUBLIC_KEY
         sync: false # Will be manually set
+      # Add SSL requirement to the database connection
       - key: DATABASE_URL
         fromDatabase:
           name: blue-whale-db

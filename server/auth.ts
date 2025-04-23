@@ -191,13 +191,5 @@ export function setupAuth(app: Express) {
     res.json(userWithoutPassword);
   });
 
-  // Health check endpoint to test auth status
-  app.get("/api/health", (req, res) => {
-    res.json({
-      status: "ok",
-      timestamp: new Date().toISOString(),
-      authenticated: req.isAuthenticated(),
-      environment: process.env.NODE_ENV || "development"
-    });
-  });
+  // Health check endpoint is now in routes.ts
 }
