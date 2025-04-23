@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupAuth } from "./auth";
 import cors from "cors";
 
 // Simple CORS configuration for a unified web service architecture
@@ -82,6 +83,12 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Set up authentication
+  console.log('🔐 Setting up authentication...');
+  setupAuth(app);
+  
+  // Then register all other routes
+  console.log('🌐 Registering API routes...');
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

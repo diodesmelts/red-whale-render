@@ -8,9 +8,11 @@ import { storage } from "./storage";
 import { User, insertUserSchema, loginSchema } from "@shared/schema";
 import { z } from "zod";
 
+// Add proper type declaration for Express User
 declare global {
   namespace Express {
-    interface User extends User {}
+    // Use our User type from schema but without password
+    interface User extends Omit<import("@shared/schema").User, "password"> {}
   }
 }
 

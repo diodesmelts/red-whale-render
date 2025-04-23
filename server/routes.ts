@@ -42,12 +42,16 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Set up authentication and auth routes
-  setupAuth(app);
+  // Note: Auth setup is now handled in index.ts or api-only.ts before calling this
+  // Don't set up auth again here to avoid duplicate routes
+  
+  // Add debug log for auth routes
+  console.log("🔍 Registering API routes...");
   
   // Seed the admin user in the database (if it doesn't exist)
   if (dataStorage instanceof Object && typeof (dataStorage as any).seedAdminUser === 'function') {
     await (dataStorage as any).seedAdminUser();
+    console.log("👤 Admin user seeding completed");
   }
   
   // Enhanced health check with diagnostics - safe implementation
