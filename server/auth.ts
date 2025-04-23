@@ -32,8 +32,12 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Simple session configuration - no cross-domain requirements
+  // Session configuration with cross-domain compatibility for production
   const sessionSecret = process.env.SESSION_SECRET || "blue-whale-competitions-secret";
+  console.log('🔑 Configuring session middleware with environment:');
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  console.log('- COOKIE_DOMAIN:', process.env.COOKIE_DOMAIN);
+  console.log('- FRONTEND_URL:', process.env.FRONTEND_URL);
   
   // Configure session settings
   const sessionSettings: session.SessionOptions = {
@@ -44,12 +48,21 @@ export function setupAuth(app: Express) {
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       secure: process.env.NODE_ENV === 'production', // Only secure in production
-      sameSite: 'lax', // Default for most use cases
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-domain in production
       path: "/",
       httpOnly: true,
+      domain: process.env.COOKIE_DOMAIN || undefined, // Set domain in production
     },
     name: "bw.sid"
   };
+  
+  console.log('✅ Session cookie configuration:', {
+    secure: sessionSettings.cookie?.secure,
+    sameSite: sessionSettings.cookie?.sameSite,
+    domain: sessionSettings.cookie?.domain,
+    path: sessionSettings.cookie?.path,
+    maxAge: sessionSettings.cookie?.maxAge
+  });
 
   // Trust proxy for production deploys
   if (process.env.NODE_ENV === 'production') {
@@ -64,31 +77,64 @@ export function setupAuth(app: Express) {
   // Configure Passport to use local username/password strategy
   passport.use(
     new LocalStrategy(async (username, password, done) => {
+      console.log('🔍 LocalStrategy starting authentication for:', username);
       try {
+        console.log('Attempting to find user by username');
         const user = await storage.getUserByUsername(username);
         
         if (!user) {
+          console.error('❌ User not found with username:', username);
           return done(null, false, { message: "Invalid username or password" });
         }
         
+        console.log('✅ User found:', { id: user.id, isAdmin: user.isAdmin });
+        
+        console.log('Verifying password');
         const passwordValid = await comparePasswords(password, user.password);
         if (!passwordValid) {
+          console.error('❌ Invalid password for user:', username);
           return done(null, false, { message: "Invalid username or password" });
+        }
+        
+        console.log('✅ Password valid, user authenticated successfully:', { id: user.id, username: user.username, isAdmin: user.isAdmin });
+        
+        if (user.isBanned) {
+          console.error('❌ User is banned:', username);
+          return done(null, false, { message: "Your account has been suspended. Please contact support." });
         }
         
         return done(null, user);
       } catch (error) {
+        console.error('❌ Error in LocalStrategy:', error);
         return done(error);
       }
     }),
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  passport.serializeUser((user, done) => {
+    console.log('📝 Serializing user to session:', { id: user.id, username: user.username });
+    done(null, user.id);
+  });
+  
   passport.deserializeUser(async (id: number, done) => {
+    console.log('🔍 Deserializing user from session ID:', id);
     try {
       const user = await storage.getUser(id);
+      if (!user) {
+        console.error('❌ User not found during deserialization, session ID:', id);
+        return done(null, false);
+      }
+      console.log('✅ User deserialized successfully:', { id: user.id, username: user.username, isAdmin: user.isAdmin });
+      
+      // In production, also check if user has been banned
+      if (user.isBanned) {
+        console.log('⛔ Preventing login for banned user:', user.username);
+        return done(null, false);
+      }
+      
       done(null, user);
     } catch (error) {
+      console.error('❌ Error deserializing user:', error);
       done(error);
     }
   });
@@ -220,12 +266,20 @@ export function setupAuth(app: Express) {
 
   // Get current user endpoint
   app.get("/api/user", (req, res) => {
+    console.log('🔒 Current user request received');
+    console.log('Session ID:', req.sessionID);
+    console.log('Is authenticated:', req.isAuthenticated());
+    
     if (!req.isAuthenticated()) {
+      console.log('❌ Unauthorized - user not authenticated');
       return res.status(401).json({ message: "Unauthorized" });
     }
     
+    console.log('✅ User is authenticated:', { id: req.user.id, username: req.user.username });
+    
     // Remove password before sending to client
     const { password, ...userWithoutPassword } = req.user as User;
+    console.log('Sending user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
     res.json(userWithoutPassword);
   });
 
