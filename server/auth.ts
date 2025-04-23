@@ -88,9 +88,12 @@ export function setupAuth(app: Express) {
     store: storage.sessionStore,
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      secure: process.env.NODE_ENV === "production", // Secure cookies in production
-      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax', // None for cross-origin in production
-      domain: process.env.NODE_ENV === "production" ? cookieDomain : undefined,
+      // In development: standard cookie settings 
+      // In production: required settings for cross-domain cookies
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      // Use explicit COOKIE_DOMAIN if set, otherwise use derived cookieDomain
+      domain: process.env.COOKIE_DOMAIN || (process.env.NODE_ENV === "production" ? cookieDomain : undefined),
       // Set path to root to ensure cookies are available for all paths
       path: "/",
       httpOnly: true // Cookie not accessible via JavaScript

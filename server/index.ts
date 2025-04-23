@@ -27,6 +27,13 @@ function configureAllowedOrigins() {
 // Enhanced CORS configuration with detailed console logging
 const corsOptions = {
   origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Extreme logging for debugging CORS issues
+    console.log(`🔄 CORS Origin Check [${new Date().toISOString()}]:`, { 
+      origin: origin || 'undefined',
+      environment: process.env.NODE_ENV || 'development',
+      renderBuild: process.env.RENDER === 'true' ? 'yes' : 'no'
+    });
+    
     // In development, allow all origins including undefined (direct browser requests)
     if (process.env.NODE_ENV !== 'production') {
       console.log(`🔓 Development CORS: allowing origin: ${origin || 'undefined (direct)'}`);
@@ -35,11 +42,20 @@ const corsOptions = {
     }
     
     const allowedOrigins = configureAllowedOrigins();
+    console.log('👮 Production CORS with allowed origins:', allowedOrigins);
     
     // For production, only allow specific origins and log details
     if (!origin) {
-      console.log('⚠️ Production request with no origin header');
+      console.log('⚠️ Production request with no origin header - ALLOWING');
       callback(null, true);  // Allow requests with no origin (like mobile apps or curl)
+      return;
+    }
+    
+    // Special handling for Render - use permissive matching for known domains
+    if (origin.includes('bluewhalecompetitions.co.uk') || 
+        origin.includes('onrender.com')) {
+      console.log(`✅ CORS allowed for recognized domain: ${origin}`);
+      callback(null, true);
       return;
     }
     
@@ -53,9 +69,10 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Length', 'X-Confirm-Delete'],
-  maxAge: 86400 // 24 hours in seconds
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cookie'],
+  exposedHeaders: ['Content-Length', 'X-Confirm-Delete', 'Set-Cookie'],
+  maxAge: 86400, // 24 hours in seconds
+  preflightContinue: false
 };
 
 const app = express();

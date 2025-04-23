@@ -112,7 +112,20 @@ export async function apiRequest(
         if (url === '/api/login') {
           throw new Error('Invalid username or password. Please try again.');
         } else if (url === '/api/register') {
-          throw new Error('Registration failed - unable to reach our servers. This could be due to a CORS restriction or cross-domain cookie issue. Please try again later or contact support if the issue persists.');
+          // Provide a much more detailed error message for registration failures
+          const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
+          const domain = window.location.hostname;
+          const isProduction = import.meta.env.MODE === 'production';
+          
+          throw new Error(`Registration failed - the server may be temporarily unavailable. 
+          
+Technical details:
+- Network: ${window.navigator.onLine ? 'Online' : 'Offline'} 
+- Domain: ${domain}
+- API URL: ${apiUrl}
+- Environment: ${isProduction ? 'Production' : 'Development'}
+
+This issue is being investigated. Please try again later or contact support at admin@bluewhalecompetitions.com if the problem persists.`);
         } else if (url.includes('/api/test-register')) {
           throw new Error('Registration test failed - unable to reach our servers. This is likely due to a CORS or cookie restriction.');
         } else {
