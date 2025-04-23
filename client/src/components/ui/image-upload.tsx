@@ -66,7 +66,7 @@ export function ImageUpload({
       }
 
       const data = await response.json();
-      onImageUploaded(data.imageUrl);
+      onImageUploaded(data.url);
       
       toast({
         title: "Image uploaded",
