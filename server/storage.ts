@@ -745,8 +745,25 @@ export class DatabaseStorage implements IStorage {
       });
     }
     
+    // Also seed default site configurations
+    await this.seedDefaultSiteConfig();
+    
     // Also seed some sample competitions if needed
     await this.seedSampleCompetitions();
+  }
+  
+  // Method to seed default site configurations
+  async seedDefaultSiteConfig() {
+    // Check for siteLogo configuration
+    const logoConfig = await this.getSiteConfig("siteLogo");
+    if (!logoConfig) {
+      // Create empty siteLogo configuration (will be filled by admin later)
+      await this.setSiteConfig({
+        key: "siteLogo",
+        value: "",
+        description: "Custom site logo image URL"
+      });
+    }
   }
   
   // Method to seed sample competitions if none exist
