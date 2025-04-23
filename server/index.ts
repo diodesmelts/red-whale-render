@@ -3,76 +3,41 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
 
-// Configure allowed origins based on environment
-function configureAllowedOrigins() {
-  const explicitOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-    : [];
-  
-  // Always include standard production domains
-  const standardOrigins = [
-    'https://bluewhalecompetitions.co.uk',
-    'https://www.bluewhalecompetitions.co.uk',
-    'https://redwhale.onrender.com',
-    'https://blue-whale.onrender.com'
-  ];
-  
-  // Combine and deduplicate
-  const origins = Array.from(new Set([...explicitOrigins, ...standardOrigins]));
-  
-  console.log('🔒 Configured CORS allowed origins:', origins);
-  return origins;
-}
-
-// Enhanced CORS configuration with detailed console logging
+// Simple CORS configuration for a unified web service architecture
 const corsOptions = {
+  // For a single service architecture, we can be more permissive with CORS
+  // Since API requests come from the same origin as the frontend
   origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    // Extreme logging for debugging CORS issues
-    console.log(`🔄 CORS Origin Check [${new Date().toISOString()}]:`, { 
-      origin: origin || 'undefined',
-      environment: process.env.NODE_ENV || 'development',
-      renderBuild: process.env.RENDER === 'true' ? 'yes' : 'no'
-    });
+    // Simple logging for CORS requests
+    console.log(`🔄 CORS request from origin: ${origin || 'same-origin'}`);
     
-    // In development, allow all origins including undefined (direct browser requests)
+    // In development, allow all origins
     if (process.env.NODE_ENV !== 'production') {
-      console.log(`🔓 Development CORS: allowing origin: ${origin || 'undefined (direct)'}`);
       callback(null, true);
       return;
     }
     
-    const allowedOrigins = configureAllowedOrigins();
-    console.log('👮 Production CORS with allowed origins:', allowedOrigins);
+    // In production, add explicit allowed origins if needed
+    const allowedOrigins = process.env.ALLOWED_ORIGINS 
+      ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+      : [];
+      
+    // Always include standard domains
+    allowedOrigins.push(
+      'https://bluewhalecompetitions.co.uk',
+      'https://www.bluewhalecompetitions.co.uk'
+    );
     
-    // For production, only allow specific origins and log details
-    if (!origin) {
-      console.log('⚠️ Production request with no origin header - ALLOWING');
-      callback(null, true);  // Allow requests with no origin (like mobile apps or curl)
-      return;
-    }
-    
-    // Special handling for Render - use permissive matching for known domains
-    if (origin.includes('bluewhalecompetitions.co.uk') || 
-        origin.includes('onrender.com')) {
-      console.log(`✅ CORS allowed for recognized domain: ${origin}`);
-      callback(null, true);
-      return;
-    }
-    
-    if (allowedOrigins.includes(origin)) {
-      console.log(`✅ CORS allowed origin: ${origin}`);
+    // If no origin header (same-origin request) or it's in our allowed list
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log(`❌ CORS rejected origin: ${origin}`);
       callback(new Error(`CORS not allowed for origin: ${origin}`));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cookie'],
-  exposedHeaders: ['Content-Length', 'X-Confirm-Delete', 'Set-Cookie'],
-  maxAge: 86400, // 24 hours in seconds
-  preflightContinue: false
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 const app = express();

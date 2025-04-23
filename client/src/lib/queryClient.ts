@@ -8,34 +8,8 @@ export const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // In production, use a specific API URL
-  if (import.meta.env.MODE === 'production') {
-    // Use multiple potential API URLs with fallbacks
-    const apiUrls = [
-      'https://blue-whale-api.onrender.com',
-      'https://redwhale-api.onrender.com',
-      'https://api.bluewhalecompetitions.co.uk'
-    ];
-    
-    // If we're in bluewhalecompetitions.co.uk, prefer that API domain
-    if (window.location.hostname.includes('bluewhalecompetitions.co.uk')) {
-      console.log('🔌 Using bluewhalecompetitions.co.uk API');
-      return 'https://api.bluewhalecompetitions.co.uk';
-    }
-    
-    // If we're in render.com domain, prefer render.com API
-    if (window.location.hostname.includes('render.com')) {
-      console.log('🔌 Using Render API');
-      return 'https://blue-whale-api.onrender.com';
-    }
-    
-    // Default API URL
-    console.log('🔌 Using default production API: blue-whale-api.onrender.com');
-    return 'https://blue-whale-api.onrender.com';
-  }
-  
-  // In development, use the local server (empty string for same-origin)
-  console.log('🔌 Using development API (same origin)');
+  // Single service architecture - API is always same origin (empty string)
+  console.log('🔌 Using API on same origin');
   return '';
 };
 
