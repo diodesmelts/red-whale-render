@@ -15,6 +15,12 @@ services:
         sync: false
       - key: FRONTEND_URL
         value: https://redwhale.onrender.com
+      # Cross-domain cookie settings
+      - key: COOKIE_DOMAIN
+        value: .onrender.com
+      # Multiple allowed origins comma-separated
+      - key: ALLOWED_ORIGINS
+        value: https://redwhale.onrender.com,https://www.bluewhalecompetitions.co.uk,https://bluewhalecompetitions.co.uk
       - key: DATABASE_URL
         sync: false
         # Note to user: You'll need to manually update this value in Render to append ?sslmode=require 

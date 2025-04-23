@@ -35,11 +35,42 @@ export function setupAuth(app: Express) {
   // Determine the domain for cookies in production
   let cookieDomain;
   if (process.env.NODE_ENV === "production") {
-    // Use environment variable if defined, otherwise try to detect from request origin
-    cookieDomain = process.env.COOKIE_DOMAIN || 
-                  (process.env.FRONTEND_URL && process.env.FRONTEND_URL.includes('bluewhalecompetitions.co.uk') 
-                    ? '.bluewhalecompetitions.co.uk' 
-                    : '.onrender.com');
+    // 1. Use explicit COOKIE_DOMAIN if set
+    if (process.env.COOKIE_DOMAIN) {
+      cookieDomain = process.env.COOKIE_DOMAIN;
+      console.log(`🍪 Using explicitly configured COOKIE_DOMAIN: ${cookieDomain}`);
+    } 
+    // 2. Detect from FRONTEND_URL
+    else if (process.env.FRONTEND_URL) {
+      try {
+        // Parse domain from the URL
+        const url = new URL(process.env.FRONTEND_URL);
+        const hostParts = url.hostname.split('.');
+        
+        // For domains with at least two parts (example.com), use a domain cookie
+        if (hostParts.length >= 2) {
+          // Extract the top two parts of the domain for the cookie
+          const domain = hostParts.slice(-2).join('.');
+          cookieDomain = `.${domain}`;
+          console.log(`🍪 Detected cookie domain from FRONTEND_URL: ${cookieDomain}`);
+        } else {
+          cookieDomain = url.hostname;
+          console.log(`🍪 Using hostname from FRONTEND_URL: ${cookieDomain}`);
+        }
+      } catch (error) {
+        console.error(`❌ Error parsing FRONTEND_URL for cookie domain: ${error}`);
+        // Fallback to default domains
+        cookieDomain = process.env.FRONTEND_URL.includes('bluewhalecompetitions.co.uk') 
+          ? '.bluewhalecompetitions.co.uk' 
+          : '.onrender.com';
+        console.log(`🍪 Using fallback cookie domain: ${cookieDomain}`);
+      }
+    }
+    // 3. Default fallback
+    else {
+      cookieDomain = '.onrender.com';
+      console.log(`🍪 Using default cookie domain: ${cookieDomain}`);
+    }
   }
   
   console.log(`🍪 Session configuration:`, {

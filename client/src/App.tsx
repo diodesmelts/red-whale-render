@@ -1,11 +1,13 @@
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
+import { queryClient, getApiBaseUrl } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
+import { useEffect } from "react";
+import ApiTest from "./api-test";
 
 // Pages
 import HomePage from "@/pages/home-page";
@@ -67,6 +69,49 @@ function Router() {
   );
 }
 
+// Add a connectivity check component that runs on app initialization
+function ApiConnectivityCheck() {
+  useEffect(() => {
+    // Check API connectivity on app load
+    const checkApiConnectivity = async () => {
+      try {
+        const apiUrl = getApiBaseUrl();
+        console.log(`🔌 App initialization - API base URL: ${apiUrl || 'same-origin'}`);
+        
+        // Log browser info for debugging
+        console.log(`🌐 Browser info:`, {
+          userAgent: navigator.userAgent,
+          hostname: window.location.hostname,
+          protocol: window.location.protocol,
+          href: window.location.href,
+        });
+        
+        // Perform a basic health check to the API
+        const healthCheckUrl = `${apiUrl}/api/health`;
+        console.log(`🩺 Performing API health check: ${healthCheckUrl}`);
+        const response = await fetch(healthCheckUrl, { 
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          console.log('✅ API health check successful');
+        } else {
+          console.error(`❌ API health check failed: ${response.status} ${response.statusText}`);
+        }
+      } catch (error) {
+        console.error('❌ API connectivity check failed:', error);
+      }
+    };
+    
+    checkApiConnectivity();
+  }, []);
+  
+  return null; // This component doesn't render anything
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -74,6 +119,7 @@ function App() {
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
+            <ApiConnectivityCheck />
             <Router />
           </TooltipProvider>
         </AuthProvider>

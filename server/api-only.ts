@@ -18,8 +18,8 @@ app.use((req, res, next) => {
     host: req.headers.host
   });
 
-  // Accept multiple allowed origins
-  const allowedOrigins = [
+  // Initialize with default allowed origins
+  let allowedOrigins = [
     'https://redwhale.onrender.com', 
     'https://www.bluewhalecompetitions.co.uk',
     'https://bluewhalecompetitions.co.uk',
@@ -27,6 +27,21 @@ app.use((req, res, next) => {
     'http://localhost:5000',
     'http://localhost:3000'
   ];
+  
+  // Check for ALLOWED_ORIGINS env variable (comma-separated list)
+  if (process.env.ALLOWED_ORIGINS) {
+    try {
+      const configuredOrigins = process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim());
+      console.log(`🔒 Using configured origins from ALLOWED_ORIGINS: ${configuredOrigins.join(', ')}`);
+      
+      // Replace default origins with configured ones if valid
+      if (configuredOrigins.length > 0) {
+        allowedOrigins = configuredOrigins;
+      }
+    } catch (error) {
+      console.error(`❌ Error parsing ALLOWED_ORIGINS: ${error}`);
+    }
+  }
   
   // Use configured frontend URL if set
   if (process.env.FRONTEND_URL) {
