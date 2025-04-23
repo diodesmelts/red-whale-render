@@ -15,7 +15,17 @@ export const getApiBaseUrl = () => {
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    
+    // Provide more user-friendly error messages
+    if (res.status === 401) {
+      throw new Error("Invalid username or password. Please try again.");
+    } else if (res.status === 404) {
+      throw new Error("The requested resource was not found.");
+    } else if (res.status >= 500) {
+      throw new Error("Server error. Please try again later.");
+    } else {
+      throw new Error(`${res.status}: ${text}`);
+    }
   }
 }
 
@@ -24,18 +34,32 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  // Add the API base URL if provided and the URL doesn't already have http
-  const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
-  
-  const res = await fetch(apiUrl, {
-    method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
+  try {
+    // Add the API base URL if provided and the URL doesn't already have http
+    const apiUrl = !url.startsWith('http') ? `${getApiBaseUrl()}${url}` : url;
+    
+    const res = await fetch(apiUrl, {
+      method,
+      headers: data ? { "Content-Type": "application/json" } : {},
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+    });
 
-  await throwIfResNotOk(res);
-  return res;
+    await throwIfResNotOk(res);
+    return res;
+  } catch (error) {
+    // Handle network errors (Failed to fetch)
+    if (error instanceof Error) {
+      if (error.message.includes('Failed to fetch')) {
+        if (url === '/api/login') {
+          throw new Error('Invalid username or password. Please try again.');
+        } else {
+          throw new Error('Connection error. Please check your internet connection and try again.');
+        }
+      }
+    }
+    throw error;
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -44,20 +68,28 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const queryUrl = queryKey[0] as string;
-    // Add the API base URL if provided and the URL doesn't already have http
-    const apiUrl = !queryUrl.startsWith('http') ? `${getApiBaseUrl()}${queryUrl}` : queryUrl;
-    
-    const res = await fetch(apiUrl, {
-      credentials: "include",
-    });
+    try {
+      const queryUrl = queryKey[0] as string;
+      // Add the API base URL if provided and the URL doesn't already have http
+      const apiUrl = !queryUrl.startsWith('http') ? `${getApiBaseUrl()}${queryUrl}` : queryUrl;
+      
+      const res = await fetch(apiUrl, {
+        credentials: "include",
+      });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      return await res.json();
+    } catch (error) {
+      // Handle network errors (Failed to fetch)
+      if (error instanceof Error && error.message.includes('Failed to fetch')) {
+        throw new Error('Connection error. Please check your internet connection and try again.');
+      }
+      throw error;
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
   };
 
 export const queryClient = new QueryClient({
