@@ -32,7 +32,7 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 bg-background/90 backdrop-blur-sm z-50 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link href="/">
@@ -42,19 +42,19 @@ export function Navbar() {
               </Link>
             </div>
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
+              <div className="ml-10 flex items-baseline space-x-6">
                 <Link href="/" className={cn(
-                  "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
                   location === "/" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                 )}>
-                  <i className="fas fa-home mr-1"></i> Home
+                  <i className="fas fa-home mr-2"></i> Home
                 </Link>
                 <div className="relative group">
                   <Link href="/competitions" className={cn(
-                    "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150 flex items-center",
+                    "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
                     location.includes("/competitions") ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                   )}>
-                    <i className="fas fa-trophy mr-1"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
+                    <i className="fas fa-trophy mr-2"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
                   </Link>
                   <div className="hidden group-hover:block absolute left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-10">
                     <Link href="/competitions" className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
@@ -73,24 +73,24 @@ export function Navbar() {
                   </div>
                 </div>
                 <Link href="/how-to-play" className={cn(
-                  "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
                   location === "/how-to-play" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                 )}>
-                  <i className="fas fa-question-circle mr-1"></i> How to Play
+                  <i className="fas fa-question-circle mr-2"></i> How to Play
                 </Link>
                 {user && (
                   <>
                     <Link href="/my-entries" className={cn(
-                      "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
                       location === "/my-entries" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                     )}>
-                      <i className="fas fa-clipboard-list mr-1"></i> My Entries
+                      <i className="fas fa-clipboard-list mr-2"></i> My Entries
                     </Link>
                     <Link href="/my-wins" className={cn(
-                      "px-3 py-2 text-sm font-medium hover:text-primary transition duration-150",
+                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150",
                       location === "/my-wins" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
                     )}>
-                      <i className="fas fa-award mr-1"></i> My Wins
+                      <i className="fas fa-award mr-2"></i> My Wins
                     </Link>
                   </>
                 )}
@@ -167,11 +167,11 @@ export function Navbar() {
                   </DropdownMenu>
                 </>
               ) : (
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => window.location.href = '/auth'}>
+                <div className="flex items-center space-x-3">
+                  <Button variant="outline" onClick={() => window.location.href = '/auth'} className="px-5 py-2 h-auto">
                     Login
                   </Button>
-                  <Button size="sm" onClick={() => window.location.href = '/auth?tab=register'}>
+                  <Button onClick={() => window.location.href = '/auth?tab=register'} className="px-5 py-2 h-auto">
                     Register
                   </Button>
                 </div>
