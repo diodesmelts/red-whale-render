@@ -93,23 +93,33 @@ export function setupAuth(app: Express) {
 
   // User registration endpoint
   app.post("/api/register", async (req, res, next) => {
+    console.log('📝 Registration request received');
     try {
+      console.log('Request body:', { ...req.body, password: 'REDACTED', confirmPassword: 'REDACTED' });
+      
       // Validate request data using Zod schema
+      console.log('Validating request data with Zod schema');
       const validatedData = insertUserSchema.parse(req.body);
+      console.log('✅ Data validation successful');
       
       // Check if username already exists
+      console.log('Checking if username already exists:', validatedData.username);
       const existingUsername = await storage.getUserByUsername(validatedData.username);
       if (existingUsername) {
+        console.log('❌ Username already exists');
         return res.status(400).json({ message: "Username already exists" });
       }
       
       // Check if email already exists
+      console.log('Checking if email already exists:', validatedData.email);
       const existingEmail = await storage.getUserByEmail(validatedData.email);
       if (existingEmail) {
+        console.log('❌ Email already exists');
         return res.status(400).json({ message: "Email already exists" });
       }
       
       // Hash password and create user
+      console.log('Hashing password and creating user');
       const hashedPassword = await hashPassword(validatedData.password);
       const user = await storage.createUser({
         username: validatedData.username,
@@ -120,19 +130,25 @@ export function setupAuth(app: Express) {
         notificationSettings: validatedData.notificationSettings,
         isAdmin: false
       });
+      console.log('✅ User created successfully:', { id: user.id, username: user.username });
       
       // Remove password before sending to client
       const { password, ...userWithoutPassword } = user;
       
       // Log the user in
+      console.log('Logging in the newly registered user');
       req.login(user, (err) => {
         if (err) {
+          console.error('❌ Error logging in new user:', err);
           return next(err);
         }
+        console.log('✅ User logged in successfully');
         res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
+      console.error('❌ Registration error:', error);
       if (error instanceof z.ZodError) {
+        console.log('Validation errors:', error.errors);
         return res.status(400).json({ message: error.errors });
       }
       next(error);
