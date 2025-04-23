@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { SiteConfig } from "@shared/schema";
 import { Loader2, Save } from "lucide-react";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, getApiBaseUrl } from "@/lib/queryClient";
 import { ApiDiagnostics } from "@/components/admin/api-diagnostics";
 
 export default function AdminSettings() {
