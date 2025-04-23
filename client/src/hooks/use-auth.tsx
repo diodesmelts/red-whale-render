@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const res = await apiRequest("POST", "/login", credentials);
+      const res = await apiRequest("POST", "/api/login", credentials);
       return await res.json();
     },
     onSuccess: (user: Omit<User, "password">) => {
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (userData: InsertUser) => {
       console.log("Attempting registration with:", { ...userData, password: "REDACTED" });
       try {
-        const res = await apiRequest("POST", "/register", userData);
+        const res = await apiRequest("POST", "/api/register", userData);
         const data = await res.json();
         console.log("Registration response:", data);
         return data;
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/logout");
+      await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
