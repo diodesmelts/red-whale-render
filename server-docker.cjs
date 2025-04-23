@@ -222,6 +222,11 @@ passport.use(new LocalStrategy(async (username, password, done) => {
       return done(null, false, { message: "Invalid username or password" });
     }
     
+    // Check if user is banned
+    if (user.is_banned) {
+      return done(null, false, { message: "Your account has been banned. Please contact support." });
+    }
+    
     const passwordValid = await comparePasswords(password, user.password);
     if (!passwordValid) {
       return done(null, false, { message: "Invalid username or password" });
@@ -266,6 +271,8 @@ async function ensureUsersTable() {
         mascot VARCHAR(100),
         notification_settings JSONB DEFAULT '{}',
         is_admin BOOLEAN DEFAULT FALSE,
+        is_banned BOOLEAN DEFAULT FALSE,
+        stripe_customer_id VARCHAR(255),
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
     `);
@@ -342,10 +349,10 @@ app.post('/api/register', async (req, res) => {
     const result = await pool.query(`
       INSERT INTO users (
         username, email, password, display_name,
-        mascot, notification_settings, is_admin
-      ) VALUES ($1, $2, $3, $4, $5, $6, FALSE)
-      RETURNING id, username, email, display_name, mascot, 
-        notification_settings, is_admin, created_at
+        mascot, notification_settings, is_admin, is_banned
+      ) VALUES ($1, $2, $3, $4, $5, $6, FALSE, FALSE)
+      RETURNING id, username, email, display_name as "displayName", mascot, 
+        notification_settings as "notificationSettings", is_admin as "isAdmin", is_banned as "isBanned", created_at as "createdAt"
     `, [
       req.body.username,
       req.body.email,
