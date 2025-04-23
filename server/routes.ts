@@ -100,6 +100,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Special test endpoint for diagnosing registration issues
+  app.get('/api/register-diagnostics', (req, res) => {
+    // Always log these diagnostics to the server console
+    console.log('\n\n=====================================================');
+    console.log('📋 REGISTRATION DIAGNOSTICS TEST AT', new Date().toISOString());
+    console.log('=====================================================');
+    
+    console.log('🌐 REQUEST INFO:');
+    console.log('IP:', req.ip);
+    console.log('Method:', req.method);
+    console.log('URL:', req.originalUrl);
+    
+    console.log('\n🔤 REQUEST HEADERS:');
+    console.log('Origin:', req.headers.origin || 'Not provided');
+    console.log('Host:', req.headers.host || 'Not provided');
+    console.log('Referer:', req.headers.referer || 'Not provided');
+    console.log('User-Agent:', req.headers['user-agent'] || 'Not provided');
+    console.log('Content-Type:', req.headers['content-type'] || 'Not provided');
+    console.log('Cookie Length:', req.headers.cookie ? req.headers.cookie.length : 0);
+    console.log('Cookie Present:', req.headers.cookie ? 'Yes' : 'No');
+    
+    console.log('\n👤 SESSION INFO:');
+    console.log('Session Exists:', req.session ? 'Yes' : 'No');
+    console.log('Session ID:', req.sessionID || 'No session ID');
+    console.log('Is Authenticated:', req.isAuthenticated ? req.isAuthenticated() : 'Function not available');
+    
+    if (req.session?.cookie) {
+      console.log('\n🍪 COOKIE DETAILS:');
+      console.log('Max Age:', req.session.cookie.maxAge);
+      console.log('Original Max Age:', req.session.cookie.originalMaxAge);
+      console.log('Expires:', req.session.cookie.expires);
+      console.log('Secure Flag:', req.session.cookie.secure ? 'Yes' : 'No');
+      console.log('HTTP Only:', req.session.cookie.httpOnly ? 'Yes' : 'No');
+      console.log('Domain:', req.session.cookie.domain || 'Not set');
+      console.log('Path:', req.session.cookie.path);
+      console.log('SameSite:', req.session.cookie.sameSite);
+    }
+    
+    console.log('\n⚙️ ENVIRONMENT CONFIGURATION:');
+    console.log('NODE_ENV:', process.env.NODE_ENV || 'Not set');
+    console.log('FRONTEND_URL:', process.env.FRONTEND_URL || 'Not set');
+    console.log('API_URL:', process.env.API_URL || 'Not set');
+    console.log('COOKIE_DOMAIN:', process.env.COOKIE_DOMAIN || 'Not set');
+    console.log('ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS || 'Not set');
+    
+    // Set a test cookie with different settings to see what works
+    res.cookie('test_cookie_lax', 'value', { 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      domain: process.env.COOKIE_DOMAIN || undefined
+    });
+    
+    res.cookie('test_cookie_none', 'value', { 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      domain: process.env.COOKIE_DOMAIN || undefined
+    });
+    
+    // Create a test session and try to store something in it
+    if (req.session) {
+      req.session.testValue = 'Diagnostic test at ' + new Date().toISOString();
+      console.log('\n🔍 TEST SESSION VALUE SET');
+    }
+    
+    console.log('=====================================================\n\n');
+    
+    // Return everything we logged as JSON
+    res.json({
+      status: 'success',
+      message: 'Registration diagnostics complete. Check server logs for detailed information.',
+      diagnostics: {
+        timestamp: new Date().toISOString(),
+        request: {
+          ip: req.ip,
+          method: req.method,
+          url: req.originalUrl
+        },
+        headers: {
+          origin: req.headers.origin || null,
+          host: req.headers.host || null,
+          referer: req.headers.referer || null,
+          userAgent: req.headers['user-agent'] || null,
+          contentType: req.headers['content-type'] || null,
+          cookiePresent: req.headers.cookie ? true : false
+        },
+        session: {
+          exists: req.session ? true : false,
+          id: req.sessionID || null,
+          isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : null,
+          testValueSet: req.session ? true : false
+        },
+        environment: {
+          nodeEnv: process.env.NODE_ENV || null,
+          frontendUrl: process.env.FRONTEND_URL || null,
+          apiUrl: process.env.API_URL || null,
+          cookieDomain: process.env.COOKIE_DOMAIN || null
+        },
+        testCookies: [
+          {
+            name: 'test_cookie_lax',
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            domain: process.env.COOKIE_DOMAIN || 'default'
+          },
+          {
+            name: 'test_cookie_none',
+            sameSite: 'none',
+            secure: process.env.NODE_ENV === 'production',
+            domain: process.env.COOKIE_DOMAIN || 'default'
+          }
+        ]
+      }
+    });
+  });
+  
   // Set up authentication routes
   setupAuth(app);
   

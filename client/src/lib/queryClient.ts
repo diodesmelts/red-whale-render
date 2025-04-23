@@ -108,8 +108,13 @@ export async function apiRequest(
           mode: import.meta.env.MODE
         });
         
+        // Provide specific and helpful error messages by endpoint
         if (url === '/api/login') {
           throw new Error('Invalid username or password. Please try again.');
+        } else if (url === '/api/register') {
+          throw new Error('Registration failed - unable to reach our servers. This could be due to a CORS restriction or cross-domain cookie issue. Please try again later or contact support if the issue persists.');
+        } else if (url.includes('/api/test-register')) {
+          throw new Error('Registration test failed - unable to reach our servers. This is likely due to a CORS or cookie restriction.');
         } else {
           throw new Error('Connection error. Please check your internet connection and try again.');
         }

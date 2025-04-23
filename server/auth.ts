@@ -376,6 +376,118 @@ export function setupAuth(app: Express) {
     });
   });
 
+  // Special test endpoint for authentication diagnostics
+  app.post("/api/test-register", async (req, res) => {
+    try {
+      console.log('\n\n======================================================');
+      console.log(`📋 TEST REGISTRATION ATTEMPT [${new Date().toISOString()}]`);
+      console.log('======================================================');
+      
+      console.log('🌐 REQUEST INFO:');
+      console.log('IP:', req.ip);
+      console.log('Method:', req.method);
+      console.log('URL:', req.originalUrl);
+      
+      console.log('\n🔤 REQUEST HEADERS:');
+      Object.keys(req.headers).forEach(key => {
+        console.log(`${key}:`, key === 'cookie' ? `Length: ${(req.headers[key] as string)?.length || 0}` : req.headers[key]);
+      });
+      
+      console.log('\n👤 SESSION INFO:');
+      console.log('Session Exists:', req.session ? 'Yes' : 'No');
+      console.log('Session ID:', req.sessionID || 'No session ID');
+      console.log('Is Authenticated:', req.isAuthenticated ? req.isAuthenticated() : 'Function not available');
+      
+      if (req.session?.cookie) {
+        console.log('\n🍪 COOKIE DETAILS:');
+        console.log('Max Age:', req.session.cookie.maxAge);
+        console.log('Original Max Age:', req.session.cookie.originalMaxAge);
+        console.log('Expires:', req.session.cookie.expires);
+        console.log('Secure Flag:', req.session.cookie.secure ? 'Yes' : 'No');
+        console.log('HTTP Only:', req.session.cookie.httpOnly ? 'Yes' : 'No');
+        console.log('Domain:', req.session.cookie.domain || 'Not set');
+        console.log('Path:', req.session.cookie.path);
+        console.log('SameSite:', req.session.cookie.sameSite);
+      }
+      
+      console.log('\n⚙️ ENVIRONMENT CONFIGURATION:');
+      console.log('NODE_ENV:', process.env.NODE_ENV || 'Not set');
+      console.log('FRONTEND_URL:', process.env.FRONTEND_URL || 'Not set');
+      console.log('API_URL:', process.env.API_URL || 'Not set');
+      console.log('COOKIE_DOMAIN:', process.env.COOKIE_DOMAIN || 'Not set');
+      console.log('ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS || 'Not set');
+      
+      // Test with made-up data to avoid creating a real user
+      const testData = {
+        username: `test-${Date.now()}`,
+        email: `test-${Date.now()}@example.com`,
+        password: 'Test password',
+      };
+      
+      console.log('\n👤 TEST USER DATA:');
+      console.log('Username:', testData.username);
+      console.log('Email:', testData.email);
+      
+      // Simulate creating a session and setting cookies
+      if (req.session) {
+        req.session.testData = {
+          timestamp: new Date().toISOString(),
+          message: 'This is a test session value'
+        };
+        console.log('\n✅ TEST SESSION VALUE SET');
+      }
+      
+      // Set test cookies with different settings
+      res.cookie('test_cookie_lax', 'value', { 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        domain: process.env.COOKIE_DOMAIN || undefined
+      });
+      
+      res.cookie('test_cookie_none', 'value', { 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        domain: process.env.COOKIE_DOMAIN || undefined
+      });
+      
+      console.log('======================================================\n\n');
+      
+      // Return success response with diagnostic info
+      res.json({
+        status: 'success',
+        message: 'Registration test completed. Check server logs for detailed information.',
+        diagnostics: {
+          timestamp: new Date().toISOString(),
+          testUser: testData.username,
+          environment: process.env.NODE_ENV || 'development',
+          sessionCreated: req.session ? true : false,
+          sessionId: req.sessionID || 'none',
+          cookiesSet: [
+            {
+              name: 'test_cookie_lax',
+              sameSite: 'lax',
+              secure: process.env.NODE_ENV === 'production'
+            },
+            {
+              name: 'test_cookie_none',
+              sameSite: 'none',
+              secure: process.env.NODE_ENV === 'production'
+            }
+          ]
+        }
+      });
+    } catch (error: any) {
+      console.error('❌ TEST REGISTRATION ERROR:', error);
+      res.status(500).json({ 
+        status: 'error',
+        message: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   app.get("/api/user", (req, res) => {
     // Enhanced logging for authentication debugging in production
     const requestInfo = {
