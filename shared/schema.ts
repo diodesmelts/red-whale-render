@@ -99,6 +99,11 @@ export const insertWinnerSchema = createInsertSchema(winners).omit({
   announcedAt: true 
 });
 
+export const insertSiteConfigSchema = createInsertSchema(siteConfig).omit({
+  id: true,
+  updatedAt: true
+});
+
 export const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
@@ -114,4 +119,6 @@ export type Entry = typeof entries.$inferSelect;
 export type InsertEntry = z.infer<typeof insertEntrySchema>;
 export type Winner = typeof winners.$inferSelect;
 export type InsertWinner = z.infer<typeof insertWinnerSchema>;
+export type SiteConfig = typeof siteConfig.$inferSelect;
+export type InsertSiteConfig = z.infer<typeof insertSiteConfigSchema>;
 export type LoginCredentials = z.infer<typeof loginSchema>;

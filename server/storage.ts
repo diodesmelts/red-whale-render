@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser, competitions, type Competition, type InsertCompetition, entries, type Entry, type InsertEntry, winners, type Winner, type InsertWinner } from "@shared/schema";
+import { users, type User, type InsertUser, competitions, type Competition, type InsertCompetition, entries, type Entry, type InsertEntry, winners, type Winner, type InsertWinner, siteConfig, type SiteConfig, type InsertSiteConfig } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, lte, gte, and, or, sql } from "drizzle-orm";
 import session from "express-session";
@@ -46,6 +46,11 @@ export interface IStorage {
   getWinnersByCompetition(competitionId: number): Promise<Winner[]>;
   updateWinnerClaimStatus(id: number, status: string): Promise<Winner | undefined>;
 
+  // Site configuration operations
+  getSiteConfig(key: string): Promise<SiteConfig | undefined>;
+  setSiteConfig(config: InsertSiteConfig): Promise<SiteConfig>;
+  getAllSiteConfig(): Promise<SiteConfig[]>;
+
   // Session store
   sessionStore: session.SessionStore;
 }
@@ -55,11 +60,13 @@ export class MemStorage implements IStorage {
   private competitions: Map<number, Competition>;
   private entries: Map<number, Entry>;
   private winners: Map<number, Winner>;
+  private siteConfig: Map<string, SiteConfig>;
   
   userCurrentId: number;
   competitionCurrentId: number;
   entryCurrentId: number;
   winnerCurrentId: number;
+  siteConfigCurrentId: number;
   
   sessionStore: session.SessionStore;
 
@@ -68,11 +75,13 @@ export class MemStorage implements IStorage {
     this.competitions = new Map();
     this.entries = new Map();
     this.winners = new Map();
+    this.siteConfig = new Map();
     
     this.userCurrentId = 1;
     this.competitionCurrentId = 1;
     this.entryCurrentId = 1;
     this.winnerCurrentId = 1;
+    this.siteConfigCurrentId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // prune expired entries every 24h
@@ -317,6 +326,46 @@ export class MemStorage implements IStorage {
     return updatedWinner;
   }
   
+  // Site configuration operations
+  async getSiteConfig(key: string): Promise<SiteConfig | undefined> {
+    // Find by key in the map (values)
+    return Array.from(this.siteConfig.values()).find(
+      (config) => config.key === key
+    );
+  }
+  
+  async setSiteConfig(config: InsertSiteConfig): Promise<SiteConfig> {
+    // Check if config with this key already exists
+    const existingConfig = await this.getSiteConfig(config.key);
+    
+    if (existingConfig) {
+      // Update the existing config
+      const updatedConfig: SiteConfig = {
+        ...existingConfig,
+        value: config.value,
+        description: config.description,
+        updatedAt: new Date()
+      };
+      this.siteConfig.set(existingConfig.id, updatedConfig);
+      return updatedConfig;
+    } else {
+      // Create a new config
+      const id = this.siteConfigCurrentId++;
+      const now = new Date();
+      const newConfig: SiteConfig = {
+        ...config,
+        id,
+        updatedAt: now
+      };
+      this.siteConfig.set(id, newConfig);
+      return newConfig;
+    }
+  }
+  
+  async getAllSiteConfig(): Promise<SiteConfig[]> {
+    return Array.from(this.siteConfig.values());
+  }
+
   // Seed method for demo competitions
   private seedCompetitions() {
     const oneDay = 24 * 60 * 60 * 1000;
@@ -637,6 +686,46 @@ export class DatabaseStorage implements IStorage {
       .where(eq(winners.id, id))
       .returning();
     return updatedWinner;
+  }
+
+  // Site configuration operations
+  async getSiteConfig(key: string): Promise<SiteConfig | undefined> {
+    const [config] = await db
+      .select()
+      .from(siteConfig)
+      .where(eq(siteConfig.key, key))
+      .limit(1);
+    return config;
+  }
+  
+  async setSiteConfig(config: InsertSiteConfig): Promise<SiteConfig> {
+    // Check if config with this key already exists
+    const existingConfig = await this.getSiteConfig(config.key);
+    
+    if (existingConfig) {
+      // Update the existing config
+      const [updatedConfig] = await db
+        .update(siteConfig)
+        .set({
+          value: config.value,
+          description: config.description,
+          updatedAt: new Date()
+        })
+        .where(eq(siteConfig.id, existingConfig.id))
+        .returning();
+      return updatedConfig;
+    } else {
+      // Create a new config
+      const [newConfig] = await db
+        .insert(siteConfig)
+        .values(config)
+        .returning();
+      return newConfig;
+    }
+  }
+  
+  async getAllSiteConfig(): Promise<SiteConfig[]> {
+    return db.select().from(siteConfig);
   }
 
   // Method to seed the admin user if it doesn't exist
