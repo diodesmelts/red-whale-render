@@ -1,129 +1,71 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
-  Award, 
-  Users, 
-  Settings, 
-  Ticket, 
-  LogOut,
-  ChevronLeft
-} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { BarChart, Home, Package, Settings, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { Redirect } from "wouter";
 
-type AdminLayoutProps = {
+interface AdminLayoutProps {
   children: ReactNode;
-};
+}
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
-  const { logoutMutation } = useAuth();
+  const { user } = useAuth();
+
+  // If not admin, redirect to homepage
+  if (!user || !user.isAdmin) {
+    return <Redirect to="/" />;
+  }
 
   const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/admin/competitions", icon: Award, label: "Competitions" },
-    { href: "/admin/entries", icon: Ticket, label: "Entries" },
-    { href: "/admin/users", icon: Users, label: "Users" },
-    { href: "/admin/settings", icon: Settings, label: "Settings" },
+    { href: "/admin", label: "Dashboard", icon: Home },
+    { href: "/admin/competitions", label: "Competitions", icon: Package },
+    { href: "/admin/users", label: "Users", icon: Users },
+    { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-muted/30">
       {/* Sidebar */}
-      <div className="hidden md:flex flex-col w-64 bg-card border-r border-border">
-        <div className="p-4 border-b border-border">
-          <h2 className="font-bold text-xl text-primary">Admin Panel</h2>
-          <p className="text-sm text-muted-foreground">Manage your competitions</p>
+      <aside className="w-64 bg-card border-r hidden md:block">
+        <div className="p-6">
+          <h2 className="text-xl font-bold flex items-center text-primary">
+            <Shield className="h-5 w-5 mr-2" />
+            Admin Dashboard
+          </h2>
         </div>
-
-        <nav className="flex-1 py-6 px-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = location === item.href;
-            return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  className="w-full justify-start"
-                >
-                  <item.icon className="mr-2 h-5 w-5" />
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
+        <nav className="mt-6">
+          <ul className="space-y-1 px-3">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.href;
+              
+              return (
+                <li key={item.href}>
+                  <Link href={item.href}>
+                    <a
+                      className={cn(
+                        "flex items-center px-3 py-2 rounded-md group hover:bg-primary/10 transition-all",
+                        isActive ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-muted-foreground"
+                      )}
+                    >
+                      <Icon className={cn("h-5 w-5 mr-3", isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary")} />
+                      {item.label}
+                    </a>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
-
-        <div className="p-4 border-t border-border">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <Button variant="outline" size="sm" className="w-full justify-start">
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Back to Site
-              </Button>
-            </Link>
-          </div>
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start mt-2 text-red-500 hover:text-red-600 hover:bg-red-100/10"
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2 h-5 w-5" />
-            Logout
-          </Button>
-        </div>
-      </div>
+      </aside>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto">
-        {/* Mobile header */}
-        <div className="md:hidden p-4 border-b border-border bg-card flex items-center justify-between">
-          <h2 className="font-bold text-xl text-primary">Admin Panel</h2>
-          <div className="flex items-center space-x-2">
-            <Link href="/">
-              <Button variant="outline" size="sm">
-                <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only">Back to Site</span>
-              </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-red-500"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="sr-only">Logout</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile navigation */}
-        <div className="md:hidden flex overflow-x-auto py-2 px-4 border-b border-border bg-card no-scrollbar">
-          {navItems.map((item) => {
-            const isActive = location === item.href;
-            return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  size="sm"
-                  className="whitespace-nowrap mr-2"
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Page content */}
-        <main>{children}</main>
-      </div>
+      <main className="flex-1 p-6">
+        {children}
+      </main>
     </div>
   );
 }

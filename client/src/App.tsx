@@ -22,12 +22,9 @@ import ProfilePage from "@/pages/profile";
 import TestRegister from "@/pages/test-register";
 
 // Admin Pages
-import AdminDashboard from "@/pages/admin/dashboard";
-import ListingsManagement from "@/pages/admin/listings-management";
-import CreateCompetition from "@/pages/admin/create-competition";
-import EditCompetition from "@/pages/admin/edit-competition";
-import SiteConfigPage from "@/pages/admin/site-config";
-import AdminSettings from "@/pages/admin/settings";
+import AdminDashboard from "@/pages/admin/index";
+import CompetitionsManagement from "@/pages/admin/competitions";
+import UsersManagement from "@/pages/admin/users";
 
 import { Layout } from "@/components/layout/layout";
 import { Navbar } from "@/components/layout/navbar";
@@ -55,11 +52,8 @@ function Router() {
               
               {/* Admin Routes - protected and require admin role */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
-              <ProtectedRoute path="/admin/listings" component={ListingsManagement} adminRequired={true} />
-              <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
-              <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
-              <ProtectedRoute path="/admin/site-config" component={SiteConfigPage} adminRequired={true} />
-              <ProtectedRoute path="/admin/settings" component={AdminSettings} adminRequired={true} />
+              <ProtectedRoute path="/admin/competitions" component={CompetitionsManagement} adminRequired={true} />
+              <ProtectedRoute path="/admin/users" component={UsersManagement} adminRequired={true} />
               
               {/* Fallback to 404 */}
               <Route component={NotFound} />
