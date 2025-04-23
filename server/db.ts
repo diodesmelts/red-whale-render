@@ -11,5 +11,16 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Append sslmode=require if not already in the connection string for production
+let connectionString = process.env.DATABASE_URL || '';
+if (process.env.NODE_ENV === 'production' && !connectionString.includes('sslmode=')) {
+  connectionString += connectionString.includes('?') 
+    ? '&sslmode=require' 
+    : '?sslmode=require';
+}
+
+export const pool = new Pool({ 
+  connectionString,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
+});
 export const db = drizzle({ client: pool, schema });

@@ -10,10 +10,10 @@ app.use(express.urlencoded({ extended: false }));
 
 // Setup CORS for separate frontend deployment
 app.use((req, res, next) => {
-  // Allow requests from any origin in development
-  res.header("Access-Control-Allow-Origin", "*");
-  // In production, you'd want to restrict this to your frontend domain:
-  // res.header("Access-Control-Allow-Origin", "https://your-frontend-domain.com");
+  const frontendUrl = process.env.FRONTEND_URL || 'https://redwhale.onrender.com';
+  
+  // Set the appropriate CORS headers
+  res.header("Access-Control-Allow-Origin", frontendUrl);
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Credentials", "true");
