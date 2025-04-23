@@ -213,12 +213,58 @@ passport.use(new LocalStrategy(async (username, password, done) => {
   try {
     console.log(`🔍 Authenticating user: ${username}`);
     
+    // Check what columns exist in the users table
+    const columnsQuery = `
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'users'
+      AND column_name IN ('is_banned', 'stripe_customer_id');
+    `;
+    
+    const columnsCheck = await pool.query(columnsQuery);
+    const existingColumns = columnsCheck.rows.map(row => row.column_name);
+    
+    const isBannedColumnExists = existingColumns.includes('is_banned');
+    const stripeCustomerIdColumnExists = existingColumns.includes('stripe_customer_id');
+    
+    console.log('Database columns check for login:', {
+      isBannedExists: isBannedColumnExists,
+      stripeCustomerIdExists: stripeCustomerIdColumnExists
+    });
+    
+    // If columns don't exist, create them
+    if (!isBannedColumnExists) {
+      console.log('Adding missing is_banned column to users table');
+      await pool.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT FALSE
+      `);
+    }
+    
+    if (!stripeCustomerIdColumnExists) {
+      console.log('Adding missing stripe_customer_id column to users table');
+      await pool.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255)
+      `);
+    }
+    
+    // Build a query based on what columns exist
+    let selectFields = [
+      'id', 'username', 'email', 'password', 'display_name as "displayName"', 
+      'mascot', 'is_admin as "isAdmin"', 
+      'notification_settings as "notificationSettings"', 'created_at as "createdAt"'
+    ];
+    
+    if (isBannedColumnExists) {
+      selectFields.push('is_banned as "isBanned"');
+    }
+    
+    if (stripeCustomerIdColumnExists) {
+      selectFields.push('stripe_customer_id as "stripeCustomerId"');
+    }
+    
     // Query the database for the user with properly named fields
     const { rows } = await pool.query(`
-      SELECT id, username, email, password, display_name as "displayName", 
-      mascot, is_admin as "isAdmin", is_banned as "isBanned", 
-      notification_settings as "notificationSettings", created_at as "createdAt",
-      stripe_customer_id as "stripeCustomerId"
+      SELECT ${selectFields.join(', ')}
       FROM users WHERE username = $1
     `, [username]);
     
@@ -228,8 +274,16 @@ passport.use(new LocalStrategy(async (username, password, done) => {
       return done(null, false, { message: "Invalid username or password" });
     }
     
-    // Check if user is banned (using camelCase property)
-    // Skip ban check if the column doesn't exist yet
+    // Set default values for missing columns
+    if (!isBannedColumnExists || user.isBanned === undefined) {
+      user.isBanned = false;
+    }
+    
+    if (!stripeCustomerIdColumnExists || user.stripeCustomerId === undefined) {
+      user.stripeCustomerId = null;
+    }
+    
+    // Check if user is banned
     if (user.isBanned) {
       console.log(`❌ Authentication failed: User ${username} is banned`);
       return done(null, false, { message: "Your account has been banned. Please contact support." });
@@ -456,21 +510,43 @@ app.post('/api/register', async (req, res) => {
 
 // Login endpoint
 app.post('/api/login', (req, res, next) => {
+  console.log('Login attempt:', { username: req.body.username });
+  
   passport.authenticate('local', (err, user, info) => {
     if (err) {
+      console.error('Login error:', err);
       return next(err);
     }
     
     if (!user) {
+      console.log('Authentication failed:', info?.message || 'Invalid credentials');
       return res.status(401).json({ 
         message: info?.message || "Invalid username or password" 
       });
     }
     
+    // Make sure user has all required fields before logging in
+    if (user.isBanned === undefined) {
+      user.isBanned = false;
+    }
+    
+    if (user.stripeCustomerId === undefined) {
+      user.stripeCustomerId = null;
+    }
+    
+    console.log('Authentication successful for user:', { 
+      id: user.id, 
+      username: user.username,
+      fields: Object.keys(user)
+    });
+    
     req.login(user, (loginErr) => {
       if (loginErr) {
+        console.error('Session creation error:', loginErr);
         return next(loginErr);
       }
+      
+      console.log('Login successful, session created');
       
       // Don't send the password back to the client
       const { password, ...userWithoutPassword } = user;
