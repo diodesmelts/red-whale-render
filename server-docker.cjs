@@ -256,35 +256,47 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    // First check if the is_banned column exists
-    let query = `
+    // Check what columns exist in the users table
+    const columnsQuery = `
       SELECT column_name 
       FROM information_schema.columns 
-      WHERE table_name = 'users' AND column_name = 'is_banned';
+      WHERE table_name = 'users'
+      AND column_name IN ('is_banned', 'stripe_customer_id');
     `;
     
-    const columnCheck = await pool.query(query);
-    const isBannedColumnExists = columnCheck.rows.length > 0;
+    const columnsCheck = await pool.query(columnsQuery);
+    const existingColumns = columnsCheck.rows.map(row => row.column_name);
+    
+    const isBannedColumnExists = existingColumns.includes('is_banned');
+    const stripeCustomerIdColumnExists = existingColumns.includes('stripe_customer_id');
+    
+    console.log('Database columns check:', {
+      isBannedExists: isBannedColumnExists,
+      stripeCustomerIdExists: stripeCustomerIdColumnExists
+    });
+    
+    // Build a query based on what columns exist
+    let selectFields = [
+      'id', 'username', 'email', 'display_name as "displayName"', 
+      'mascot', 'is_admin as "isAdmin"', 
+      'notification_settings as "notificationSettings"', 'created_at as "createdAt"',
+      'password'
+    ];
     
     if (isBannedColumnExists) {
-      console.log('✅ is_banned column exists in the database');
-      query = `
-        SELECT id, username, email, display_name as "displayName", 
-        mascot, is_admin as "isAdmin", is_banned as "isBanned", 
-        notification_settings as "notificationSettings", created_at as "createdAt",
-        stripe_customer_id as "stripeCustomerId", password
-        FROM users WHERE id = $1
-      `;
-    } else {
-      console.log('⚠️ is_banned column does not exist in the database, using fallback query');
-      query = `
-        SELECT id, username, email, display_name as "displayName", 
-        mascot, is_admin as "isAdmin", 
-        notification_settings as "notificationSettings", created_at as "createdAt",
-        stripe_customer_id as "stripeCustomerId", password
-        FROM users WHERE id = $1
-      `;
+      selectFields.push('is_banned as "isBanned"');
     }
+    
+    if (stripeCustomerIdColumnExists) {
+      selectFields.push('stripe_customer_id as "stripeCustomerId"');
+    }
+    
+    const query = `
+      SELECT ${selectFields.join(', ')}
+      FROM users WHERE id = $1
+    `;
+    
+    console.log('Using customized select query for user');
     
     const { rows } = await pool.query(query, [id]);
     
@@ -294,12 +306,22 @@ passport.deserializeUser(async (id, done) => {
     
     const user = rows[0];
     
-    // Add isBanned field if it doesn't exist
+    // Add missing fields with default values
     if (!isBannedColumnExists) {
       user.isBanned = false;
     }
     
-    console.log('✅ User deserialized successfully:', { id: user.id, username: user.username, isAdmin: user.isAdmin });
+    if (!stripeCustomerIdColumnExists) {
+      user.stripeCustomerId = null;
+    }
+    
+    console.log('✅ User deserialized successfully:', { 
+      id: user.id, 
+      username: user.username, 
+      isAdmin: user.isAdmin,
+      stripeCustomerId: user.stripeCustomerId ? 'exists' : 'null'
+    });
+    
     done(null, user);
   } catch (error) {
     console.error('❌ Error deserializing user:', error);
@@ -536,44 +558,59 @@ function isAdmin(req, res, next) {
 // Admin routes
 app.get('/api/admin/users', isAdmin, async (req, res) => {
   try {
-    // First check if the is_banned column exists
-    let query = `
+    // Check what columns exist in the users table
+    const columnsQuery = `
       SELECT column_name 
       FROM information_schema.columns 
-      WHERE table_name = 'users' AND column_name = 'is_banned';
+      WHERE table_name = 'users'
+      AND column_name IN ('is_banned', 'stripe_customer_id');
     `;
     
-    const columnCheck = await pool.query(query);
-    const isBannedColumnExists = columnCheck.rows.length > 0;
+    const columnsCheck = await pool.query(columnsQuery);
+    const existingColumns = columnsCheck.rows.map(row => row.column_name);
+    
+    const isBannedColumnExists = existingColumns.includes('is_banned');
+    const stripeCustomerIdColumnExists = existingColumns.includes('stripe_customer_id');
+    
+    console.log('Database columns check for admin/users:', {
+      isBannedExists: isBannedColumnExists,
+      stripeCustomerIdExists: stripeCustomerIdColumnExists
+    });
+    
+    // Build a query based on what columns exist
+    let selectFields = [
+      'id', 'username', 'email', 'display_name as "displayName"', 
+      'mascot', 'is_admin as "isAdmin"', 
+      'notification_settings as "notificationSettings"', 'created_at as "createdAt"'
+    ];
     
     if (isBannedColumnExists) {
-      console.log('✅ is_banned column exists in the database - using standard query');
-      query = `
-        SELECT id, username, email, display_name as "displayName", 
-        mascot, is_admin as "isAdmin", is_banned as "isBanned", 
-        notification_settings as "notificationSettings", created_at as "createdAt",
-        stripe_customer_id as "stripeCustomerId"
-        FROM users ORDER BY created_at DESC
-      `;
-    } else {
-      console.log('⚠️ is_banned column does not exist in the database - using fallback query');
-      query = `
-        SELECT id, username, email, display_name as "displayName", 
-        mascot, is_admin as "isAdmin", 
-        notification_settings as "notificationSettings", created_at as "createdAt",
-        stripe_customer_id as "stripeCustomerId"
-        FROM users ORDER BY created_at DESC
-      `;
+      selectFields.push('is_banned as "isBanned"');
     }
+    
+    if (stripeCustomerIdColumnExists) {
+      selectFields.push('stripe_customer_id as "stripeCustomerId"');
+    }
+    
+    const query = `
+      SELECT ${selectFields.join(', ')}
+      FROM users ORDER BY created_at DESC
+    `;
+    
+    console.log('Using customized admin/users select query');
     
     const result = await pool.query(query);
     
-    // Add isBanned field if it doesn't exist in the database
-    if (!isBannedColumnExists) {
-      result.rows.forEach(user => {
+    // Add missing fields with default values
+    result.rows.forEach(user => {
+      if (!isBannedColumnExists) {
         user.isBanned = false;
-      });
-    }
+      }
+      
+      if (!stripeCustomerIdColumnExists) {
+        user.stripeCustomerId = null;
+      }
+    });
     
     res.json(result.rows);
   } catch (err) {
@@ -590,14 +627,24 @@ app.patch('/api/admin/users/:id/ban', isAdmin, async (req, res) => {
     
     console.log(`Admin action: ${isBanned ? 'Banning' : 'Unbanning'} user ID ${id}`);
     
-    // First check if the is_banned column exists
-    const columnCheck = await pool.query(`
+    // Check what columns exist in the users table
+    const columnsQuery = `
       SELECT column_name 
       FROM information_schema.columns 
-      WHERE table_name = 'users' AND column_name = 'is_banned'
-    `);
+      WHERE table_name = 'users'
+      AND column_name IN ('is_banned', 'stripe_customer_id');
+    `;
     
-    const isBannedColumnExists = columnCheck.rows.length > 0;
+    const columnsCheck = await pool.query(columnsQuery);
+    const existingColumns = columnsCheck.rows.map(row => row.column_name);
+    
+    const isBannedColumnExists = existingColumns.includes('is_banned');
+    const stripeCustomerIdColumnExists = existingColumns.includes('stripe_customer_id');
+    
+    console.log('Database columns check for ban/unban:', {
+      isBannedExists: isBannedColumnExists,
+      stripeCustomerIdExists: stripeCustomerIdColumnExists
+    });
     
     // If the is_banned column doesn't exist, we need to add it first
     if (!isBannedColumnExists) {
@@ -612,13 +659,35 @@ app.patch('/api/admin/users/:id/ban', isAdmin, async (req, res) => {
       console.log('✅ is_banned column added to users table');
     }
     
+    // If the stripe_customer_id column doesn't exist, we need to add it too
+    if (!stripeCustomerIdColumnExists) {
+      console.log('⚠️ stripe_customer_id column does not exist in the database - adding it');
+      
+      // Add the column
+      await pool.query(`
+        ALTER TABLE users 
+        ADD COLUMN stripe_customer_id VARCHAR(255)
+      `);
+      
+      console.log('✅ stripe_customer_id column added to users table');
+    }
+    
+    // Build a query based on what columns exist
+    let selectFields = [
+      'id', 'username', 'email', 'display_name as "displayName"', 
+      'mascot', 'is_admin as "isAdmin"', 
+      'notification_settings as "notificationSettings"', 'created_at as "createdAt"',
+      'is_banned as "isBanned"'
+    ];
+    
+    if (stripeCustomerIdColumnExists) {
+      selectFields.push('stripe_customer_id as "stripeCustomerId"');
+    }
+    
     // Now we can update the user
     const result = await pool.query(`
       UPDATE users SET is_banned = $1 WHERE id = $2 
-      RETURNING id, username, email, display_name as "displayName", 
-      mascot, is_admin as "isAdmin", is_banned as "isBanned", 
-      notification_settings as "notificationSettings", created_at as "createdAt",
-      stripe_customer_id as "stripeCustomerId"
+      RETURNING ${selectFields.join(', ')}
     `, [isBanned, id]);
     
     if (result.rows.length === 0) {
@@ -626,8 +695,15 @@ app.patch('/api/admin/users/:id/ban', isAdmin, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    console.log(`User ${result.rows[0].username} successfully ${isBanned ? 'banned' : 'unbanned'}`);
-    res.json(result.rows[0]);
+    // Add missing fields with default values if needed
+    const user = result.rows[0];
+    
+    if (!stripeCustomerIdColumnExists) {
+      user.stripeCustomerId = null;
+    }
+    
+    console.log(`User ${user.username} successfully ${isBanned ? 'banned' : 'unbanned'}`);
+    res.json(user);
   } catch (err) {
     console.error('Error updating user ban status:', err);
     res.status(500).json({ message: 'Failed to update user' });
