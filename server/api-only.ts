@@ -111,11 +111,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Set up authentication
-setupAuth(app);
-
 // Start server
 (async () => {
+  // First register the authentication routes
+  setupAuth(app);
+  
+  // Then register all other routes
   const server = await registerRoutes(app);
 
   // Error handling middleware
