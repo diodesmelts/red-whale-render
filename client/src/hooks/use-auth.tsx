@@ -54,17 +54,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (userData: InsertUser) => {
-      const res = await apiRequest("POST", "/api/register", userData);
-      return await res.json();
+      console.log("Attempting registration with:", { ...userData, password: "REDACTED" });
+      try {
+        const res = await apiRequest("POST", "/api/register", userData);
+        const data = await res.json();
+        console.log("Registration response:", data);
+        return data;
+      } catch (err) {
+        console.error("Registration error:", err);
+        throw err;
+      }
     },
     onSuccess: (user: Omit<User, "password">) => {
+      console.log("Registration successful, user:", user);
       queryClient.setQueryData(["/api/user"], user);
       toast({
         title: "Registration successful",
-        description: `Welcome to Red Whale Competitions, ${user.displayName || user.username}!`,
+        description: `Welcome to Blue Whale Competitions, ${user.displayName || user.username}!`,
       });
     },
     onError: (error: Error) => {
+      console.error("Registration mutation error:", error);
       toast({
         title: "Registration failed",
         description: error.message,
