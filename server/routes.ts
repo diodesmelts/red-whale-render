@@ -18,23 +18,11 @@ const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" })
   : undefined;
 
-// Configure multer for file uploads
-const uploadsDir = './uploads';
-// Ensure uploads directory exists
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// Import storage service for file uploads
+import { storageService } from './storage-service';
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
+// Configure multer for memory storage (files temporarily held in memory)
+const multerStorage = multer.memoryStorage();
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
   // Accept only image files
@@ -66,18 +54,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/uploads', express.static('uploads'));
   
   // Image upload endpoint
-  app.post('/api/upload', isAuthenticated, upload.single('image'), (req, res) => {
+  app.post('/api/upload', isAuthenticated, upload.single('image'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
       }
       
-      const filePath = `/${req.file.path}`; // Path relative to server root
+      // Upload using the storage service (either local or Cloudinary)
+      const result = await storageService.uploadFile(
+        req.file.buffer, 
+        req.file.originalname
+      );
+      
       return res.status(200).json({ 
-        url: filePath,
+        url: result.url,
+        publicId: result.publicId,
         message: 'File uploaded successfully' 
       });
     } catch (error: any) {
+      console.error('Upload error:', error);
       return res.status(500).json({ message: error.message });
     }
   });
