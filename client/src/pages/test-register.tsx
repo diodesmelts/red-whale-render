@@ -175,10 +175,20 @@ export default function TestRegister() {
             <div className="mt-4">
               <h3 className="font-medium">Request Details:</h3>
               <p className="text-sm">
-                <strong>Endpoint:</strong> POST /api/register<br />
+                <strong>Endpoint:</strong> POST {`${envInfo.apiBaseUrl}/register`}<br />
                 <strong>Content-Type:</strong> application/json<br />
                 <strong>Credentials:</strong> include<br />
               </p>
+            </div>
+            
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
+              <h3 className="font-medium text-blue-800">Environment Info:</h3>
+              <ul className="text-xs text-blue-700 mt-2 space-y-1">
+                <li><strong>API Base URL:</strong> {envInfo.apiBaseUrl}</li>
+                <li><strong>App Mode:</strong> {envInfo.appMode}</li>
+                <li><strong>Hostname:</strong> {envInfo.hostname}</li>
+                <li><strong>Production:</strong> {envInfo.isProduction ? 'Yes' : 'No'}</li>
+              </ul>
             </div>
           </CardContent>
         </Card>
