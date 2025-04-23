@@ -292,7 +292,12 @@ export default function AuthPage() {
                       <div className="flex items-center h-5">
                         <Checkbox 
                           id="agree-terms" 
-                          {...registerForm.register("agreeToTerms")}
+                          checked={registerForm.watch("agreeToTerms")}
+                          onCheckedChange={(checked) => {
+                            registerForm.setValue("agreeToTerms", checked === true, { 
+                              shouldValidate: true 
+                            });
+                          }}
                         />
                       </div>
                       <label htmlFor="agree-terms" className="ml-2 block text-sm text-muted-foreground">
