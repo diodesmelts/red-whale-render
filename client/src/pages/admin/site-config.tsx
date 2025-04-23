@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Button } from "@/components/ui/button";
@@ -75,11 +75,11 @@ export default function SiteConfigPage() {
   };
 
   // Initialize hero banner image from config when data is loaded
-  useState(() => {
+  useEffect(() => {
     if (heroBannerConfig?.value) {
       setHeroBannerImage(heroBannerConfig.value);
     }
-  });
+  }, [heroBannerConfig]);
 
   return (
     <AdminLayout>
