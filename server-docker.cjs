@@ -450,6 +450,69 @@ app.get('/api/register-diagnostics', (req, res) => {
   });
 });
 
+// Authentication middleware for protected routes
+function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: 'Not authenticated' });
+}
+
+// Admin middleware
+function isAdmin(req, res, next) {
+  if (req.isAuthenticated() && req.user.isAdmin) {
+    return next();
+  }
+  res.status(403).json({ message: 'Admin access required' });
+}
+
+// Admin routes
+app.get('/api/admin/users', isAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, username, email, display_name as "displayName", 
+      mascot, is_admin as "isAdmin", is_banned as "isBanned", 
+      notification_settings as "notificationSettings", created_at as "createdAt",
+      stripe_customer_id as "stripeCustomerId"
+      FROM users ORDER BY created_at DESC
+    `);
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Failed to fetch users' });
+  }
+});
+
+// Ban/unban user
+app.patch('/api/admin/users/:id/ban', isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isBanned } = req.body;
+    
+    console.log(`Admin action: ${isBanned ? 'Banning' : 'Unbanning'} user ID ${id}`);
+    
+    const result = await pool.query(`
+      UPDATE users SET is_banned = $1 WHERE id = $2 
+      RETURNING id, username, email, display_name as "displayName", 
+      mascot, is_admin as "isAdmin", is_banned as "isBanned", 
+      notification_settings as "notificationSettings", created_at as "createdAt",
+      stripe_customer_id as "stripeCustomerId"
+    `, [isBanned, id]);
+    
+    if (result.rows.length === 0) {
+      console.log(`User not found: ${id}`);
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    console.log(`User ${result.rows[0].username} successfully ${isBanned ? 'banned' : 'unbanned'}`);
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating user ban status:', err);
+    res.status(500).json({ message: 'Failed to update user' });
+  }
+});
+
 // Build the frontend
 console.log('Copying Vite-built frontend assets in Docker...');
 
