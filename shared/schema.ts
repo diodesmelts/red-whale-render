@@ -59,6 +59,15 @@ export const winners = pgTable("winners", {
   claimStatus: text("claim_status").default("pending"), // pending, claimed, expired
 });
 
+// Site configuration schema
+export const siteConfig = pgTable("site_config", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  value: text("value"),
+  description: text("description"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users)
   .omit({ id: true, createdAt: true })
