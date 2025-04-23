@@ -18,6 +18,8 @@ services:
         fromDatabase:
           name: blue-whale-db
           property: connectionString
+        previewValue: postgres://postgres:postgres@postgres:5432/postgres?sslmode=require
+        sync: false
 
 databases:
   - name: blue-whale-db

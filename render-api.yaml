@@ -15,3 +15,7 @@ services:
         sync: false
       - key: FRONTEND_URL
         value: https://redwhale.onrender.com
+      - key: DATABASE_URL
+        sync: false
+        # Note to user: You'll need to manually update this value in Render to append ?sslmode=require 
+        # to your existing database connection string
