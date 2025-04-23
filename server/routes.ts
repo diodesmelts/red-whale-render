@@ -42,6 +42,9 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication and auth routes
+  setupAuth(app);
+  
   // Seed the admin user in the database (if it doesn't exist)
   if (dataStorage instanceof Object && typeof (dataStorage as any).seedAdminUser === 'function') {
     await (dataStorage as any).seedAdminUser();
@@ -216,9 +219,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   });
-  
-  // Set up authentication routes
-  setupAuth(app);
   
   // Serve uploaded files statically
   app.use('/uploads', express.static('uploads'));
