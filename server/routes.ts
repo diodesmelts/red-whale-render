@@ -352,6 +352,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Site Configuration Routes
+  
+  // Get site config by key
+  app.get("/api/site-config/:key", async (req, res) => {
+    try {
+      const { key } = req.params;
+      const config = await dataStorage.getSiteConfig(key);
+      
+      if (!config) {
+        return res.status(404).json({ message: "Configuration not found" });
+      }
+      
+      res.json(config);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Get all site config
+  app.get("/api/site-config", async (req, res) => {
+    try {
+      const configs = await dataStorage.getAllSiteConfig();
+      res.json(configs);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Update or create site config (admin only)
+  app.post("/api/admin/site-config", isAdmin, async (req, res) => {
+    try {
+      const { key, value, description } = req.body;
+      
+      if (!key) {
+        return res.status(400).json({ message: "Key is required" });
+      }
+      
+      const config = await dataStorage.setSiteConfig({
+        key,
+        value,
+        description
+      });
+      
+      res.status(201).json(config);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
   // Webhook to handle successful payments
   app.post("/api/payment-webhook", async (req, res) => {
     if (!stripe) {
