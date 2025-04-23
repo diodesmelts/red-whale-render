@@ -159,33 +159,53 @@ export function setupAuth(app: Express) {
 
   // User login endpoint
   app.post("/api/login", (req, res, next) => {
+    console.log('🔒 Login request received');
     try {
+      // Log request data without exposing password
+      console.log('Login request body:', { username: req.body.username, password: 'REDACTED' });
+      
       // Validate login request
-      loginSchema.parse(req.body);
+      console.log('Validating login data with schema');
+      try {
+        loginSchema.parse(req.body);
+        console.log('✅ Login data validation successful');
+      } catch (validationError) {
+        console.error('❌ Login data validation failed:', validationError);
+        if (validationError instanceof z.ZodError) {
+          return res.status(400).json({ message: validationError.errors });
+        }
+        throw validationError;
+      }
       
       passport.authenticate("local", (err, user, info) => {
         if (err) {
+          console.error('❌ Authentication error:', err);
           return next(err);
         }
         
         if (!user) {
+          console.error('❌ Authentication failed:', info?.message || "Invalid username or password");
           return res.status(401).json({ message: info?.message || "Invalid username or password" });
         }
         
+        console.log('✅ User authenticated successfully:', { id: user.id, username: user.username, isAdmin: user.isAdmin });
+        
         req.login(user, (loginErr) => {
           if (loginErr) {
+            console.error('❌ Login session creation error:', loginErr);
             return next(loginErr);
           }
           
+          console.log('✅ Login session created successfully');
+          
           // Remove password before sending to client
           const { password, ...userWithoutPassword } = user;
+          console.log('Returning user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
           return res.status(200).json(userWithoutPassword);
         });
       })(req, res, next);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors });
-      }
+      console.error('❌ Unexpected login error:', error);
       next(error);
     }
   });

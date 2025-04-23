@@ -33,8 +33,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+      console.log("Attempting login with:", { ...credentials, password: "REDACTED" });
+      try {
+        const res = await apiRequest("POST", "/api/login", credentials);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Login failed with status:", res.status, "Response:", errorText);
+          throw new Error(`Login failed: ${res.status} ${errorText || res.statusText}`);
+        }
+        const data = await res.json();
+        console.log("Login response:", data);
+        return data;
+      } catch (err) {
+        console.error("Login error:", err);
+        throw err;
+      }
     },
     onSuccess: (user: Omit<User, "password">) => {
       queryClient.setQueryData(["/api/user"], user);
