@@ -100,7 +100,7 @@ export default function AuthPage() {
       <p class="text-xs mb-2">Password: REDACTED</p>
       <p class="text-xs mb-2">Environment: ${import.meta.env.MODE}</p>
       <p class="text-xs mb-2">API Base URL: ${getApiBaseUrl()}</p>
-      <p class="text-xs">Registration Endpoint: ${getApiBaseUrl()}/api/register</p>
+      <p class="text-xs">Registration Endpoint: ${getApiBaseUrl()}/register</p>
       <pre class="text-xs mt-2" id="debug-results">Submitting registration...</pre>
       <button class="bg-red-500 text-white px-2 py-1 text-xs mt-2 rounded" id="close-debug">Close</button>
     `;
@@ -119,7 +119,7 @@ export default function AuthPage() {
     
     try {
       // Directly use fetch for more control over the process
-      const apiUrl = `${getApiBaseUrl()}/api/register`;
+      const apiUrl = `${getApiBaseUrl()}/register`;
       updateDebug(`Sending request to ${apiUrl}...`);
       
       fetch(apiUrl, {
