@@ -19,6 +19,7 @@ export interface IStorage {
   createUser(user: Omit<InsertUser, "confirmPassword" | "agreeToTerms">): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
   promoteToAdmin(id: number): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>; // Added for admin dashboard
   
   // Competition operations
   getCompetition(id: number): Promise<Competition | undefined>;
@@ -39,6 +40,7 @@ export interface IStorage {
   getEntries(userId: number): Promise<Entry[]>;
   getEntriesByCompetition(competitionId: number): Promise<Entry[]>;
   updateEntryPaymentStatus(id: number, status: string, paymentId?: string): Promise<Entry | undefined>;
+  getAllEntries(): Promise<Entry[]>; // Added for admin dashboard
   
   // Winner operations
   createWinner(winner: InsertWinner): Promise<Winner>;
@@ -326,6 +328,16 @@ export class MemStorage implements IStorage {
     return updatedWinner;
   }
   
+  // Get all users - added for admin dashboard
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+  
+  // Get all entries - added for admin dashboard
+  async getAllEntries(): Promise<Entry[]> {
+    return Array.from(this.entries.values());
+  }
+  
   // Site configuration operations
   async getSiteConfig(key: string): Promise<SiteConfig | undefined> {
     // Find by key in the map (values)
@@ -454,6 +466,16 @@ export class DatabaseStorage implements IStorage {
       tableName: 'session',
       createTableIfMissing: true
     });
+  }
+  
+  // Get all users - added for admin dashboard
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users);
+  }
+  
+  // Get all entries - added for admin dashboard
+  async getAllEntries(): Promise<Entry[]> {
+    return db.select().from(entries);
   }
 
   // User operations

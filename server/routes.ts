@@ -521,6 +521,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Admin - Get all users
+  app.get("/api/admin/users", isAdmin, async (req, res) => {
+    try {
+      const users = await dataStorage.getAllUsers();
+      
+      // Remove password before sending response
+      const usersWithoutPasswords = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.json(usersWithoutPasswords);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Admin - Promote user to admin
+  app.patch("/api/admin/users/:id/promote", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updatedUser = await dataStorage.promoteToAdmin(id);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove password before sending response
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Admin - Update user
+  app.patch("/api/admin/users/:id", isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updatedUser = await dataStorage.updateUser(id, req.body);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove password before sending response
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Admin - Get all entries
+  app.get("/api/admin/entries", isAdmin, async (req, res) => {
+    try {
+      const entries = await dataStorage.getAllEntries();
+      res.json(entries);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
   // Site Configuration Routes
   
   // Get site config by key
