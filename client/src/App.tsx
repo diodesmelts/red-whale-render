@@ -25,6 +25,7 @@ import TestRegister from "@/pages/test-register";
 // Admin Pages
 import AdminDashboard from "@/pages/admin/index";
 import CompetitionsManagement from "@/pages/admin/competitions";
+import CreateCompetition from "@/pages/admin/create-competition";
 import UsersManagement from "@/pages/admin/users";
 import AdminSettings from "@/pages/admin/settings";
 import SiteConfigPage from "@/pages/admin/site-config";
@@ -56,6 +57,7 @@ function Router() {
               {/* Admin Routes - protected and require admin role */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
               <ProtectedRoute path="/admin/competitions" component={CompetitionsManagement} adminRequired={true} />
+              <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
               <ProtectedRoute path="/admin/users" component={UsersManagement} adminRequired={true} />
               <ProtectedRoute path="/admin/settings" component={AdminSettings} adminRequired={true} />
               <ProtectedRoute path="/admin/site-config" component={SiteConfigPage} adminRequired={true} />
