@@ -88,14 +88,14 @@ export const storageService = {
       
       const uploadOptions = {
         public_id: `blue-whale/${uuidv4()}`,
-        folder: 'competitions',
-        resource_type: 'image' as 'image' // Type assertion to match Cloudinary's expected types
+        folder: 'competitions'
+        // Note: resource_type is specified in the upload_stream method, not here
       };
       
       console.log('Cloudinary upload options:', JSON.stringify(uploadOptions));
 
       const uploadStream = cloudinary.uploader.upload_stream(
-        uploadOptions,
+        { resource_type: 'auto', ...uploadOptions },
         (error: any, result: UploadApiResponse) => {
           if (error || !result) {
             console.error('Cloudinary upload error:', error);

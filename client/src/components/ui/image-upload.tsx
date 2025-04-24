@@ -56,9 +56,29 @@ export function ImageUpload({
     formData.append("image", file);
 
     try {
+      console.log("Starting upload to:", "/api/upload");
+      
+      // Log the request being made for diagnostics
+      const requestInfo = {
+        url: "/api/upload",
+        method: "POST",
+        formDataKeys: [...formData.keys()],
+        hasImageFile: formData.has('image'),
+      };
+      console.log("Upload request details:", requestInfo);
+      
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
+      });
+      
+      console.log("Upload response received:", {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries([...response.headers.entries()]),
+        url: response.url,
+        redirected: response.redirected,
+        type: response.type,
       });
 
       if (!response.ok) {
@@ -69,8 +89,10 @@ export function ImageUpload({
           errorDetail = errorData.message || errorData.details || errorDetail;
           console.error("Upload error details:", errorData);
         } catch (parseError) {
-          // If we can't parse the error response, use the status text
+          console.error("Could not parse error response:", parseError);
+          // If we can't parse the error response, use the status text and full URL
           errorDetail = `Failed to upload image (${response.status}: ${response.statusText})`;
+          console.error("Response text:", await response.text().catch(() => "Could not read response text"));
         }
         throw new Error(errorDetail);
       }
