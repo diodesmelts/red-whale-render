@@ -488,6 +488,12 @@ export class DatabaseStorage implements IStorage {
       tableName: 'session',
       createTableIfMissing: true
     });
+    
+    // Initialize database schema and seed data
+    this.ensureTablesExist()
+      .then(() => this.seedAdminUser())
+      .then(() => console.log("🚀 Database initialization complete"))
+      .catch(error => console.error("❌ Error during database initialization:", error));
   }
   
   // Get all users - added for admin dashboard
