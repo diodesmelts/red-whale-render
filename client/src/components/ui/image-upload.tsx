@@ -20,7 +20,9 @@ export function ImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string>(currentImageUrl);
   const { toast } = useToast();
-  const { showError, DebugOverlayComponent } = useDebugOverlay();
+  const { showError, DebugOverlayComponent, closeOverlay } = useDebugOverlay();
+  // Track when debug overlay is open
+  const [isDebugOverlayOpen, setIsDebugOverlayOpen] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -140,6 +142,25 @@ export function ImageUpload({
       if (error instanceof Error) {
         errorMessage = "Upload failed";
         errorDetail = error.message;
+      }
+      
+      // Make sure the debug overlay is shown regardless of error source
+      if (!isDebugOverlayOpen) {
+        setIsDebugOverlayOpen(true);
+        showError({
+          title: errorMessage,
+          message: errorDetail,
+          details: error instanceof Error ? error.stack || "No stack trace available" : "Unknown error",
+          requestInfo: {
+            url: '/api/upload',
+            method: "POST",
+            formDataKeys: Array.from(formData.keys())
+          },
+          responseInfo: {
+            error: error instanceof Error ? error.message : String(error)
+          },
+          apiUrl: '/api/upload'
+        });
       }
       
       toast({
