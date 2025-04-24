@@ -83,8 +83,7 @@ export default function ListingsManagement() {
     mutationFn: async (id: number) => {
       console.log(`🔍 DEBUG[CLIENT]: Attempting to delete competition with ID: ${id}`);
       
-      // Special handling for Render.com environment
-      // Ensure we're using the correct API path in production
+      // Enhanced endpoint resolution for production vs development environments
       const isProduction = import.meta.env.MODE === 'production';
       const hostname = window.location.hostname;
       const isRender = hostname.includes('onrender.com');
@@ -95,11 +94,10 @@ export default function ListingsManagement() {
         isRender
       });
       
-      // SUPER SIMPLIFIED PATH FORMAT
-      // apiRequest() already adds /api prefix, so we don't need to include it
-      // Using just the competition ID for maximum compatibility
-      const endpointPath = `/competitions/${id}`;
-      console.log(`🔗 DEBUG[CLIENT]: Using endpoint path: ${endpointPath}`);
+      // Specifically use the admin endpoint for deletions across all environments
+      // This provides the best compatibility with both local and production setups
+      const endpointPath = `/admin/competitions/${id}`;
+      console.log(`🔗 DEBUG[CLIENT]: Using admin endpoint path: ${endpointPath}`);
       
       try {
         console.log(`🚀 DEBUG[CLIENT]: Sending DELETE request to ${endpointPath}`);
