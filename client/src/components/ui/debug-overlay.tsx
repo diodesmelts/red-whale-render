@@ -12,6 +12,7 @@ interface DebugOverlayProps {
     requestInfo?: any;
     responseInfo?: any;
     apiUrl?: string;
+    finalApiUrl?: string;
   };
 }
 
@@ -90,9 +91,16 @@ export function DebugOverlay({ isOpen, onClose, errorDetails }: DebugOverlayProp
           {tab === 'request' && (
             <div>
               <div className="mb-4">
-                <h3 className="text-lg font-medium mb-1">API URL</h3>
+                <h3 className="text-lg font-medium mb-1">Initial API URL</h3>
                 <p className="p-2 bg-muted rounded">{errorDetails.apiUrl || 'Not available'}</p>
               </div>
+              
+              {errorDetails.finalApiUrl && (
+                <div className="mb-4">
+                  <h3 className="text-lg font-medium mb-1">Final API URL</h3>
+                  <p className="p-2 bg-muted rounded">{errorDetails.finalApiUrl}</p>
+                </div>
+              )}
               
               <div className="mb-4">
                 <h3 className="text-lg font-medium mb-1">Request Information</h3>
@@ -138,6 +146,7 @@ export function useDebugOverlay() {
     requestInfo: any;
     responseInfo: any;
     apiUrl: string;
+    finalApiUrl?: string;
   }>({
     title: '',
     message: '',
@@ -145,7 +154,8 @@ export function useDebugOverlay() {
     timestamp: '',
     requestInfo: null,
     responseInfo: null,
-    apiUrl: ''
+    apiUrl: '',
+    finalApiUrl: undefined
   });
 
   const showError = (details: Partial<typeof errorDetails>) => {

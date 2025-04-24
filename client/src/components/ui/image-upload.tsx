@@ -59,15 +59,9 @@ export function ImageUpload({
     formData.append("image", file);
 
     try {
-      // Get the correctly formatted API URL from window.location
-      // This will help prevent CORS issues in different environments
-      const baseUrl = window.location.origin;
-      const finalApiUrl = new URL('/api/upload', baseUrl).href;
-      console.log("Starting upload to:", finalApiUrl);
-      
       // Log the request being made for diagnostics
       const requestInfo = {
-        url: finalApiUrl,
+        url: '/api/upload',
         method: "POST",
         formDataKeys: Array.from(formData.keys()), // Use Array.from to avoid TS iterator issue
         hasImageFile: formData.has('image'),
@@ -77,11 +71,10 @@ export function ImageUpload({
       };
       console.log("Upload request details:", requestInfo);
       
-      // Make the request directly with the absolute URL
-      const response = await fetch(finalApiUrl, {
-        method: "POST",
-        body: formData,
-        credentials: "include", // Important: Include credentials for authenticated requests
+      // Use our improved apiRequest function from queryClient
+      // which handles all the URL construction and CORS headers
+      const response = await apiRequest("POST", "/api/upload", undefined, {
+        body: formData
       });
       
       const responseInfo = {
@@ -124,7 +117,8 @@ export function ImageUpload({
           details: responseText || (errorData ? JSON.stringify(errorData, null, 2) : ""),
           requestInfo,
           responseInfo,
-          finalApiUrl
+          apiUrl: '/api/upload',
+          finalApiUrl: response.url
         });
         
         throw new Error(errorDetail);
