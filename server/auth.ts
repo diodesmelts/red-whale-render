@@ -39,12 +39,25 @@ export function setupAuth(app: Express) {
   console.log('- COOKIE_DOMAIN:', process.env.COOKIE_DOMAIN);
   console.log('- FRONTEND_URL:', process.env.FRONTEND_URL);
   
+  // Diagnostic middleware to track session initialization
+  app.use((req, res, next) => {
+    if (req.path !== '/api/health' && !req.path.includes('vite')) {
+      console.log(`🔍 Request to ${req.method} ${req.path}`, {
+        hasSession: !!req.session,
+        sessionID: req.sessionID || 'no-session-id',
+        hasSessionData: req.session ? Object.keys(req.session).length > 0 : false
+      });
+    }
+    next();
+  });
+  
   // Configure session settings
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Changed to true to ensure session is created for all users
     store: storage.sessionStore,
+    name: 'bw.sid', // Custom name to avoid defaults
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       secure: process.env.NODE_ENV === 'production', // Only secure in production
@@ -52,8 +65,7 @@ export function setupAuth(app: Express) {
       path: "/",
       httpOnly: true,
       domain: process.env.COOKIE_DOMAIN || undefined, // Set domain in production
-    },
-    name: "bw.sid"
+    }
   };
   
   console.log('✅ Session cookie configuration:', {
