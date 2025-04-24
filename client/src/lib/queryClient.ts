@@ -135,37 +135,26 @@ export async function apiRequest(
     } else {
       const baseUrl = getApiBaseUrl();
       
-      // Special handling for Render environment
-      if (isProduction && isRender) {
-        console.log(`🌐 Render-specific URL handling for: ${url}`);
-        
-        // Special case for admin API routes in Render
-        if (url.startsWith('/admin/')) {
-          // Render requires /api prefix for these URLs
-          console.log(`🌐 Admin route detected in Render: /api${url}`);
-          apiUrl = `/api${url}`;
-        }
-        // Handle standard API routes
-        else if (url.startsWith('/api/')) {
-          // URL already has /api prefix
-          console.log(`🌐 Standard API route with prefix: ${url}`);
-          apiUrl = url;
-        } 
-        else {
-          // Add /api prefix for other routes
-          console.log(`🌐 Adding API prefix in Render: ${baseUrl}${url}`);
-          apiUrl = `${baseUrl}${url}`;
-        }
+      // SIMPLIFIED URL HANDLING FOR ALL ENVIRONMENTS
+      // Always use consistent URL formatting
+      
+      // If URL already has /api prefix and baseUrl also has /api
+      if (baseUrl === '/api' && url.startsWith('/api/')) {
+        // Just use the URL as is - no need for additional prefix
+        console.log(`🌐 URL already has /api prefix: ${url}`);
+        apiUrl = url;
       } 
-      // Standard URL handling for non-Render environments
+      // For admin routes in production when baseUrl is /api
+      else if (baseUrl === '/api' && url.startsWith('/admin/')) {
+        // Add /api prefix
+        console.log(`🌐 Adding /api prefix to admin route: /api${url}`);
+        apiUrl = `/api${url}`;
+      }
+      // For all other cases
       else {
-        // Prevent double /api prefix issues in production
-        if (baseUrl === '/api' && url.startsWith('/api/')) {
-          // Strip the leading /api from the url to avoid duplication
-          apiUrl = url;
-        } else {
-          apiUrl = `${baseUrl}${url}`;
-        }
+        // Add whatever baseUrl is to the URL
+        console.log(`🌐 Standard URL construction: ${baseUrl}${url}`);
+        apiUrl = `${baseUrl}${url}`;
       }
     }
     
@@ -359,11 +348,20 @@ export const getQueryFn: <T>(options: {
         apiUrl = queryUrl;
       } else {
         const baseUrl = getApiBaseUrl();
-        // Prevent double /api prefix issues in production
+        // Use the same URL formatting logic for consistency
+        // If URL already has /api prefix and baseUrl also has /api
         if (baseUrl === '/api' && queryUrl.startsWith('/api/')) {
-          // Strip the leading /api from the url to avoid duplication
+          // Just use the URL as is - no need for additional prefix
           apiUrl = queryUrl;
-        } else {
+        } 
+        // For admin routes in production when baseUrl is /api
+        else if (baseUrl === '/api' && queryUrl.startsWith('/admin/')) {
+          // Add /api prefix
+          apiUrl = `/api${queryUrl}`;
+        }
+        // For all other cases
+        else {
+          // Add whatever baseUrl is to the URL
           apiUrl = `${baseUrl}${queryUrl}`;
         }
       }
