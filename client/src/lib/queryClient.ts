@@ -151,11 +151,24 @@ export async function apiRequest(
       body = options.body;
     }
     
+    // Enhanced debugging for admin endpoints
+    if (apiUrl.includes('/api/admin/')) {
+      console.log('📝 ADMIN API REQUEST:', {
+        url: apiUrl,
+        method,
+        headers,
+        withCredentials: true,
+        cookiesEnabled: navigator.cookieEnabled,
+        cookieLength: document.cookie.length,
+        time: new Date().toISOString()
+      });
+    }
+    
     const res = await fetch(apiUrl, {
       method,
       headers,
       body,
-      credentials: "include",
+      credentials: "include", // This ensures cookies are sent with the request
     });
 
     console.log(`📥 API Response: ${res.status} ${res.statusText}`);
@@ -317,9 +330,25 @@ export const getQueryFn: <T>(options: {
       
       console.log(`🔍 Query request: GET ${apiUrl}`);
       
+      // Enhanced debugging for admin endpoints
+      if (apiUrl.includes('/api/admin/')) {
+        console.log('📝 ADMIN QUERY REQUEST:', {
+          url: apiUrl,
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true,
+          cookiesEnabled: navigator.cookieEnabled,
+          cookieLength: document.cookie.length,
+          time: new Date().toISOString()
+        });
+      }
+      
       const res = await fetch(apiUrl, {
         method: 'GET',
-        credentials: "include",
+        credentials: "include", // This ensures cookies are sent with the request
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
