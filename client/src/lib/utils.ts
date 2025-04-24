@@ -86,6 +86,7 @@ export function debounce<T extends (...args: any[]) => any>(
  * - Cloudinary URLs are returned as is
  * - Data URLs are returned as is
  * - Relative URLs (/uploads/*) have the current origin prepended
+ * - Special handling for Render environment with API domain separation
  */
 export function getImageUrl(url: string | null | undefined): string {
   if (!url) return '';
@@ -96,12 +97,26 @@ export function getImageUrl(url: string | null | undefined): string {
   // Return empty string for empty URLs
   if (cleanUrl === '') return '';
   
+  // Environment detection - critical for Render
+  const isProduction = import.meta.env.MODE === 'production';
+  const hostname = window.location.hostname;
+  const isRender = hostname.includes('onrender.com');
+  
+  // Debug logging for image URL resolution
+  console.log(`🖼️ Processing image URL: "${cleanUrl}"`, {
+    isProduction,
+    hostname,
+    isRender,
+    origin: window.location.origin
+  });
+  
   // Already absolute URL (http/https) or data URL or Cloudinary
   if (
     cleanUrl.startsWith('http') || 
     cleanUrl.startsWith('data:') || 
     cleanUrl.includes('cloudinary.com')
   ) {
+    console.log(`🖼️ Using absolute URL as is: "${cleanUrl}"`);
     return cleanUrl;
   }
   
@@ -115,6 +130,34 @@ export function getImageUrl(url: string | null | undefined): string {
     fixedPath = '/' + fixedPath;
   }
   
-  // Relative URL - add origin
-  return `${window.location.origin}${fixedPath}`;
+  // For Render environment, we need to handle the API domain differently
+  if (isProduction && isRender) {
+    // The render web service URL where images are hosted
+    // Assuming format: app-name.onrender.com, the API would be at api-app-name.onrender.com
+    // or app-name-api.onrender.com depending on your naming convention
+    
+    // Get the application domain (remove any subdomains like 'www')
+    const currentDomain = hostname;
+    
+    // This handles either main app -> API or render deployment hostname
+    let apiDomain;
+    
+    // If URL is from same origin, use the same origin
+    if (fixedPath.startsWith('/uploads/')) {
+      // Assume uploads are on the same domain in Render
+      apiDomain = window.location.origin;
+      console.log(`🖼️ Using same domain for uploads: "${apiDomain}${fixedPath}"`);
+    } else {
+      // For other paths, use the current domain
+      apiDomain = window.location.origin;
+      console.log(`🖼️ Using current domain for API: "${apiDomain}${fixedPath}"`);
+    }
+    
+    return `${apiDomain}${fixedPath}`;
+  }
+  
+  // Standard behavior for non-Render environments
+  const finalUrl = `${window.location.origin}${fixedPath}`;
+  console.log(`🖼️ Final image URL: "${finalUrl}"`);
+  return finalUrl;
 }

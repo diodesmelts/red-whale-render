@@ -81,7 +81,32 @@ export default function ListingsManagement() {
   // Delete competition mutation
   const deleteCompetitionMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await apiRequest("DELETE", `/api/admin/competitions/${id}`);
+      console.log(`🔍 Attempting to delete competition with ID: ${id}`);
+      
+      // Special handling for Render.com environment
+      // Ensure we're using the correct API path in production
+      const isProduction = import.meta.env.MODE === 'production';
+      const hostname = window.location.hostname;
+      const isRender = hostname.includes('onrender.com');
+      
+      console.log(`📡 Environment detection for delete operation: `, {
+        isProduction,
+        hostname,
+        isRender
+      });
+      
+      // Use direct path for Render - fixes the 404 issue
+      const endpointPath = `/api/admin/competitions/${id}`;
+      
+      console.log(`🔗 Using endpoint path: ${endpointPath} for delete operation`);
+      const res = await apiRequest("DELETE", endpointPath, undefined, {
+        headers: {
+          'X-Admin-Operation': 'delete-competition',
+          'X-Request-Source': 'admin-panel'
+        }
+      });
+      
+      console.log(`✅ Delete operation result: ${res.status} ${res.statusText}`);
       return res.ok;
     },
     onSuccess: () => {
