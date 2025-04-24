@@ -1,0 +1,200 @@
+     ==> Deploying...
+flvjl
+Cloudinary configured for image uploads
+flvjl
+Copying Vite-built frontend assets in Docker...
+flvjl
+Server running on http://0.0.0.0:10000
+flvjl
+Database connection successful
+     ==> Your service is live 🎉
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flvjl
+Fetching site config for key: siteLogo
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+🔒 Current user request received
+qz6ht
+Session ID: CIuJMpZ2xlDpHzKLaTQKjCVJyl2Zlyuz
+qz6ht
+Is authenticated: true
+qz6ht
+✅ User is authenticated: { id: 1, username: 'admin' }
+qz6ht
+Sending user data to client: { id: 1, username: 'admin', isAdmin: true }
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+Fetching site config for key: heroBanner
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flvjl
+🌐 Serving SPA for client route: /uploads/image-1745509102068-397408672.png
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flvjl
+🌐 Serving SPA for client route: /uploads/image-1745509088806-454972230.png
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized select query for user
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+Admin request: Fetching all entries
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+qz6ht
+Entries table columns: []
+qz6ht
+Database columns check for admin/users: { isBannedExists: true, stripeCustomerIdExists: true }
+qz6ht
+Using customized admin/users select query
+qz6ht
+Error checking entries table structure: error: relation "entries" does not exist
+qz6ht
+    at /app/node_modules/pg-pool/index.js:45:11
+qz6ht
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+qz6ht
+    at async /app/server-docker.cjs:956:22 {
+qz6ht
+  length: 107,
+qz6ht
+  severity: 'ERROR',
+qz6ht
+  code: '42P01',
+qz6ht
+  detail: undefined,
+qz6ht
+  hint: undefined,
+qz6ht
+  position: '401',
+qz6ht
+  internalPosition: undefined,
+qz6ht
+  internalQuery: undefined,
+qz6ht
+  where: undefined,
+qz6ht
+  schema: undefined,
+qz6ht
+  table: undefined,
+qz6ht
+  column: undefined,
+qz6ht
+  dataType: undefined,
+qz6ht
+  constraint: undefined,
+qz6ht
+  file: 'parse_relation.c',
+qz6ht
+  line: '1449',
+qz6ht
+  routine: 'parserOpenTable'
+qz6ht
+}
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flvjl
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flvjl
+Using customized select query for user
+flvjl
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
