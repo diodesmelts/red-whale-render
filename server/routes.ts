@@ -775,7 +775,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   
   // Register both route formats to handle delete operations
+  // Direct SQL deletion endpoint - bypasses all possible issues
+  app.delete("/api/competitions/direct/:id", async (req, res) => {
+    try {
+      console.log("🛑 DIRECT SQL DELETION ROUTE CALLED");
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // @ts-ignore - We know the user object structure
+      if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ message: "Admin privileges required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid competition ID" });
+      }
+      
+      console.log(`🔥 Executing direct SQL deletion for competition ID: ${id}`);
+      
+      // Direct SQL query to delete the competition
+      const result = await pool.query('DELETE FROM competitions WHERE id = $1 RETURNING id', [id]);
+      
+      if (result.rowCount && result.rowCount > 0) {
+        console.log(`✅ Successfully deleted competition with direct SQL: ${id}`);
+        return res.status(200).json({ success: true });
+      } else {
+        console.log(`❌ Competition not found or not deleted with ID: ${id}`);
+        return res.status(404).json({ message: "Competition not found" });
+      }
+    } catch (error) {
+      console.error("❌ Error in direct deletion:", error);
+      return res.status(500).json({ 
+        message: "Error deleting competition",
+        error: error.message
+      });
+    }
+  });
+  
+  // Standard admin route
   app.delete("/api/admin/competitions/:id", (req, res) => deleteCompetitionHandler(req, res));
+  
+  // Regular competition delete route
   app.delete("/api/competitions/:id", (req, res) => deleteCompetitionHandler(req, res));
   
   // Admin - Get all users

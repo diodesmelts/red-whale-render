@@ -83,21 +83,10 @@ export default function ListingsManagement() {
     mutationFn: async (id: number) => {
       console.log(`🔍 DEBUG[CLIENT]: Attempting to delete competition with ID: ${id}`);
       
-      // Enhanced endpoint resolution for production vs development environments
-      const isProduction = import.meta.env.MODE === 'production';
-      const hostname = window.location.hostname;
-      const isRender = hostname.includes('onrender.com');
-      
-      console.log(`📡 DEBUG[CLIENT]: Environment detection for delete operation: `, {
-        isProduction,
-        hostname,
-        isRender
-      });
-      
-      // Specifically use the admin endpoint for deletions across all environments
-      // This provides the best compatibility with both local and production setups
-      const endpointPath = `/admin/competitions/${id}`;
-      console.log(`🔗 DEBUG[CLIENT]: Using admin endpoint path: ${endpointPath}`);
+      // Use the direct SQL deletion endpoint which bypasses all middlewares
+      // This endpoint is specially designed to work in Render production environment
+      const endpointPath = `/api/competitions/direct/${id}`;
+      console.log(`🔗 Using direct SQL deletion endpoint: ${endpointPath}`);
       
       try {
         console.log(`🚀 DEBUG[CLIENT]: Sending DELETE request to ${endpointPath}`);
