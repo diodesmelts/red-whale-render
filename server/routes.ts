@@ -1106,53 +1106,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ received: true });
   });
 
-  // Create a direct reset endpoint for admins
-  app.post('/api/admin/reset-competitions', (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: 'Forbidden. Admin access required.' });
-    }
-    
-    console.log('Starting competition reset process...');
-    
-    // Use direct SQL for maximum compatibility
-    pool.query('BEGIN')
-      .then(() => pool.query('DELETE FROM entries'))
-      .then(() => {
-        console.log('Entries deleted');
-        return pool.query('DELETE FROM winners');
-      })
-      .then(() => {
-        console.log('Winners deleted');
-        return pool.query('DELETE FROM competitions');
-      })
-      .then(() => {
-        console.log('Competitions deleted');
-        return pool.query('ALTER SEQUENCE IF EXISTS entries_id_seq RESTART WITH 1');
-      })
-      .then(() => pool.query('ALTER SEQUENCE IF EXISTS winners_id_seq RESTART WITH 1'))
-      .then(() => pool.query('ALTER SEQUENCE IF EXISTS competitions_id_seq RESTART WITH 1'))
-      .then(() => pool.query('COMMIT'))
-      .then(() => {
-        console.log('Database reset completed successfully');
+  // Create a direct reset endpoint for admins - Ultra robust implementation
+  app.post('/api/admin/reset-competitions', async (req, res) => {
+    try {
+      // Authentication check
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      if (!req.user.isAdmin) {
+        return res.status(403).json({ message: 'Forbidden. Admin access required.' });
+      }
+      
+      console.log('🧹 Starting competition reset process...');
+      
+      // Comprehensive approach: try several methods to ensure successful reset
+      
+      // First approach: Use direct SQL transaction with error handling
+      try {
+        console.log('🔄 Attempt 1: Using SQL transaction');
+        await pool.query('BEGIN');
+        
+        // Clear entries table first (to avoid foreign key constraints)
+        console.log('🗑️ Deleting entries...');
+        await pool.query('DELETE FROM entries');
+        console.log('✓ Entries deleted');
+        
+        // Then clear winners
+        console.log('🗑️ Deleting winners...');
+        await pool.query('DELETE FROM winners');
+        console.log('✓ Winners deleted');
+        
+        // Finally clear competitions
+        console.log('🗑️ Deleting competitions...');
+        await pool.query('DELETE FROM competitions');
+        console.log('✓ Competitions deleted');
+        
+        // Reset sequences
+        await pool.query('ALTER SEQUENCE IF EXISTS entries_id_seq RESTART WITH 1');
+        await pool.query('ALTER SEQUENCE IF EXISTS winners_id_seq RESTART WITH 1');
+        await pool.query('ALTER SEQUENCE IF EXISTS competitions_id_seq RESTART WITH 1');
+        
+        await pool.query('COMMIT');
+        console.log('✅ Transaction completed successfully');
+        
         res.status(200).json({ 
           success: true, 
           message: 'All competitions have been successfully deleted.'
         });
-      })
-      .catch(error => {
-        console.error('Error during competition reset:', error);
-        // Try to rollback on error
-        pool.query('ROLLBACK').catch(() => {}); 
-        res.status(500).json({ 
-          success: false, 
-          message: 'An error occurred during the reset process.',
-          error: error.message
+        return;
+      } catch (txError) {
+        console.error('❌ Transaction method failed:', txError);
+        // Try to rollback the transaction
+        try {
+          await pool.query('ROLLBACK');
+          console.log('↩️ Transaction rolled back');
+        } catch (rollbackError) {
+          console.error('❌ Rollback also failed:', rollbackError);
+        }
+        
+        // Don't return here - continue to the next approach
+      }
+      
+      // Second approach: Try one-by-one operations outside a transaction
+      try {
+        console.log('🔄 Attempt 2: Using individual queries');
+        
+        // Clear entries table first (to avoid foreign key constraints)
+        console.log('🗑️ Deleting entries individually...');
+        await pool.query('DELETE FROM entries');
+        console.log('✓ Entries deleted individually');
+        
+        // Then clear winners
+        console.log('🗑️ Deleting winners individually...');
+        await pool.query('DELETE FROM winners');
+        console.log('✓ Winners deleted individually');
+        
+        // Finally clear competitions
+        console.log('🗑️ Deleting competitions individually...');
+        await pool.query('DELETE FROM competitions');
+        console.log('✓ Competitions deleted individually');
+        
+        // Reset sequences
+        await pool.query('ALTER SEQUENCE IF EXISTS entries_id_seq RESTART WITH 1');
+        await pool.query('ALTER SEQUENCE IF EXISTS winners_id_seq RESTART WITH 1');
+        await pool.query('ALTER SEQUENCE IF EXISTS competitions_id_seq RESTART WITH 1');
+        
+        console.log('✅ Individual operations completed successfully');
+        
+        res.status(200).json({ 
+          success: true, 
+          message: 'All competitions have been successfully deleted.'
         });
+        return;
+      } catch (individualError) {
+        console.error('❌ Individual queries method failed:', individualError);
+        // Continue to the next approach
+      }
+      
+      // Third approach: Force deletion with cascade
+      try {
+        console.log('🔄 Attempt 3: Using CASCADE operations');
+        
+        // Temporarily disable foreign key constraints
+        await pool.query('SET CONSTRAINTS ALL DEFERRED');
+        
+        // Delete competitions with force
+        console.log('🗑️ Force deleting competitions with CASCADE...');
+        await pool.query('TRUNCATE competitions, entries, winners CASCADE');
+        console.log('✓ Forced deletion successful');
+        
+        // Reset sequences
+        await pool.query('ALTER SEQUENCE IF EXISTS entries_id_seq RESTART WITH 1');
+        await pool.query('ALTER SEQUENCE IF EXISTS winners_id_seq RESTART WITH 1');
+        await pool.query('ALTER SEQUENCE IF EXISTS competitions_id_seq RESTART WITH 1');
+        
+        // Re-enable constraints
+        await pool.query('SET CONSTRAINTS ALL IMMEDIATE');
+        
+        console.log('✅ CASCADE operation completed successfully');
+        
+        res.status(200).json({ 
+          success: true, 
+          message: 'All competitions have been successfully deleted with force approach.'
+        });
+        return;
+      } catch (cascadeError) {
+        console.error('❌ CASCADE operation failed:', cascadeError);
+      }
+      
+      // If we reach here, all approaches failed
+      console.error('❌ All reset approaches failed');
+      res.status(500).json({ 
+        success: false, 
+        message: 'Multiple reset approaches failed. Database might be locked or corrupted.'
       });
+    } catch (outerError) {
+      console.error('❌ Catastrophic error in reset process:', outerError);
+      res.status(500).json({ 
+        success: false, 
+        message: 'A severe error occurred during the reset process.',
+        error: outerError.message
+      });
+    }
   });
 
   const httpServer = createServer(app);
