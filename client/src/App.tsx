@@ -25,6 +25,8 @@ import TestRegister from "@/pages/test-register";
 import AdminDashboard from "@/pages/admin/index";
 import CompetitionsManagement from "@/pages/admin/competitions";
 import UsersManagement from "@/pages/admin/users";
+import AdminSettings from "@/pages/admin/settings";
+import SiteConfigPage from "@/pages/admin/site-config";
 
 import { Layout } from "@/components/layout/layout";
 import { Navbar } from "@/components/layout/navbar";
