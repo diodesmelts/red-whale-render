@@ -122,27 +122,54 @@ export default function HomePage() {
       </section>
       
       {/* Featured Competitions Section */}
-      <section className="py-16 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-primary/20 text-primary mb-2">
+      <section className="py-24 bg-background relative overflow-hidden">
+        {/* Fun background elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-primary/20 text-primary mb-3 animate-pulse-slow">
               CURRENT OPPORTUNITIES
             </span>
-            <h2 className="text-3xl font-bold">
-              <span className="text-primary">Live</span>Competitions
+            <h2 className="text-4xl font-extrabold mb-4 tracking-tight relative inline-block">
+              <span className="text-primary relative">Live</span>Competitions
+              <span className="absolute -top-1 -right-5 text-yellow-400 text-lg transform rotate-12">🏆</span>
             </h2>
-            <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-              Don't miss your chance to win these amazing prizes! New competitions added regularly.
+            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg font-light">
+              Don't miss your chance to win these <span className="text-primary font-medium">amazing prizes</span>! New competitions added regularly.
             </p>
-            <div className="w-24 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+            
+            {/* Decorative line with highlight */}
+            <div className="relative w-32 h-1.5 bg-primary/30 mx-auto mt-8 rounded-full overflow-hidden">
+              <div className="absolute inset-0 w-full h-full bg-primary animate-shine" 
+                style={{ backgroundImage: 'linear-gradient(to right, transparent, rgba(255,255,255,0.5) 50%, transparent 100%)' }}>
+              </div>
+            </div>
           </div>
           
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <div className="flex flex-col justify-center items-center py-32">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground animate-pulse">Loading amazing competitions...</p>
+            </div>
+          ) : featuredCompetitions?.length === 0 ? (
+            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-border rounded-xl">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 animate-pulse-slow">
+                <i className="fas fa-trophy text-primary text-3xl"></i>
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-3">No Active Competitions</h3>
+              <p className="text-muted-foreground max-w-md text-center mb-6">
+                We're preparing some exciting new competitions. Check back soon or follow us on social media for updates!
+              </p>
+              <Link href="/how-to-play">
+                <Button variant="outline" className="border-primary border-2 text-primary hover:bg-primary/10">
+                  Learn How Competitions Work
+                </Button>
+              </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
               {featuredCompetitions?.map(competition => (
                 <CompetitionCard key={competition.id} competition={competition} />
               ))}
@@ -151,9 +178,8 @@ export default function HomePage() {
           
           <div className="text-center">
             <Link href="/competitions">
-              <Button size="lg" className="group relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
-                <i className="fas fa-trophy mr-2"></i> View All Competitions <ChevronRight className="ml-2 h-4 w-4" />
+              <Button size="lg" className="group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-primary/20">
+                <i className="fas fa-trophy mr-2"></i> View All Competitions <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>
