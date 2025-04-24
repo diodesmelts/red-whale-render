@@ -1,0 +1,207 @@
+==> Cloning from https://github.com/diodesmelts/RedWhale
+==> Checking out commit 3f4715a08b3db1a7a29f69e46df18aeb1076ec2c in branch main
+==> Downloading cache...
+==> Transferred 2.0GB in 22s. Extraction took 4s.
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.85kB done
+#1 DONE 0.0s
+#2 [auth] library/node:pull render-prod/docker-mirror-repository/library/node:pull token for us-west1-docker.pkg.dev
+#2 DONE 0.0s
+#3 [internal] load metadata for docker.io/library/node:20-slim
+#3 DONE 0.5s
+#4 [internal] load .dockerignore
+#4 transferring context: 218B done
+#4 DONE 0.0s
+#5 importing cache manifest from local:2051885882052703010
+#5 inferred cache manifest type: application/vnd.oci.image.index.v1+json done
+#5 DONE 0.0s
+#6 [builder 1/6] FROM docker.io/library/node:20-slim@sha256:9513b8d4c59c7c35e76934765add45efb89102d639f945341d7948b168237633
+#6 resolve docker.io/library/node:20-slim@sha256:9513b8d4c59c7c35e76934765add45efb89102d639f945341d7948b168237633 0.0s done
+#6 DONE 0.0s
+#7 [internal] load build context
+#7 transferring context: 38.76MB 1.2s done
+#7 DONE 1.2s
+#8 [builder 2/6] WORKDIR /app
+#8 CACHED
+#9 [builder 3/6] COPY package.json package-lock.json ./
+#9 CACHED
+#10 [builder 4/6] RUN npm install
+#10 sha256:8a628cdd7ccc83e90e5a95888fcb0ec24b991141176c515ad101f12d6433eb96 7.34MB / 28.23MB 0.2s
+#10 sha256:8a628cdd7ccc83e90e5a95888fcb0ec24b991141176c515ad101f12d6433eb96 14.68MB / 28.23MB 0.3s
+#10 sha256:8a628cdd7ccc83e90e5a95888fcb0ec24b991141176c515ad101f12d6433eb96 25.17MB / 28.23MB 0.5s
+#10 sha256:8a628cdd7ccc83e90e5a95888fcb0ec24b991141176c515ad101f12d6433eb96 28.23MB / 28.23MB 0.5s done
+#10 extracting sha256:8a628cdd7ccc83e90e5a95888fcb0ec24b991141176c515ad101f12d6433eb96
+#10 extracting sha256:8a628cdd7ccc83e90e5a95888fcb0ec24b991141176c515ad101f12d6433eb96 1.5s done
+#10 sha256:d1dd334a81115b09134618d67d53ebb6162d9cd6858905dfaec3a8da9e64ae39 3.31kB / 3.31kB done
+#10 extracting sha256:d1dd334a81115b09134618d67d53ebb6162d9cd6858905dfaec3a8da9e64ae39
+#10 extracting sha256:d1dd334a81115b09134618d67d53ebb6162d9cd6858905dfaec3a8da9e64ae39 0.1s done
+#10 sha256:b452662ac2b1cc5015de958ca3db9cf65d6ea42ad1ffda528555cad4476cd3f9 10.31MB / 41.16MB 0.2s
+#10 sha256:b452662ac2b1cc5015de958ca3db9cf65d6ea42ad1ffda528555cad4476cd3f9 16.78MB / 41.16MB 0.3s
+#10 sha256:b452662ac2b1cc5015de958ca3db9cf65d6ea42ad1ffda528555cad4476cd3f9 25.17MB / 41.16MB 0.5s
+#10 sha256:b452662ac2b1cc5015de958ca3db9cf65d6ea42ad1ffda528555cad4476cd3f9 34.60MB / 41.16MB 0.6s
+#10 sha256:b452662ac2b1cc5015de958ca3db9cf65d6ea42ad1ffda528555cad4476cd3f9 41.16MB / 41.16MB 0.7s done
+#10 extracting sha256:b452662ac2b1cc5015de958ca3db9cf65d6ea42ad1ffda528555cad4476cd3f9
+#10 extracting sha256:b452662ac2b1cc5015de958ca3db9cf65d6ea42ad1ffda528555cad4476cd3f9 2.1s done
+#10 sha256:b085206451dbd0bcfa0cdf6c5c2cf33f257e2d077408c49b0a9ff1b411c126a8 1.71MB / 1.71MB 0.0s done
+#10 extracting sha256:b085206451dbd0bcfa0cdf6c5c2cf33f257e2d077408c49b0a9ff1b411c126a8
+#10 extracting sha256:b085206451dbd0bcfa0cdf6c5c2cf33f257e2d077408c49b0a9ff1b411c126a8 0.1s done
+#10 sha256:9a176e756f6b6a4029593582d7c51f7c2839913d7da3e1a3f967de6e82654258 449B / 449B done
+#10 extracting sha256:9a176e756f6b6a4029593582d7c51f7c2839913d7da3e1a3f967de6e82654258 0.0s done
+#10 sha256:6dd8188b54cc48a329481d08bf42e47024271f8e79c44a28729b12a41e988ed0 92B / 92B done
+#10 extracting sha256:6dd8188b54cc48a329481d08bf42e47024271f8e79c44a28729b12a41e988ed0 done
+#10 sha256:f253dfc1a916f16f3f1d1a4707ea7a231843f285f32035fb9b0239847f0f77df 73.89kB / 73.89kB done
+#10 extracting sha256:f253dfc1a916f16f3f1d1a4707ea7a231843f285f32035fb9b0239847f0f77df 0.0s done
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 9.44MB / 171.09MB 0.2s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 25.17MB / 171.09MB 0.5s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 49.28MB / 171.09MB 0.9s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 67.11MB / 171.09MB 1.2s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 82.84MB / 171.09MB 1.5s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 100.66MB / 171.09MB 1.8s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 118.49MB / 171.09MB 2.1s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 133.17MB / 171.09MB 2.4s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 149.95MB / 171.09MB 2.7s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 165.68MB / 171.09MB 3.0s
+#10 sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 171.09MB / 171.09MB 3.2s done
+#10 extracting sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566
+#10 extracting sha256:c9318d3f245961e59df68c8a7dc6b7b35f87d5390c4ef3979b9bce85005c7566 12.0s done
+#10 CACHED
+#11 [builder 5/6] COPY . .
+#11 DONE 0.2s
+#12 [builder 6/6] RUN npm run build
+#12 0.294 
+#12 0.294 > rest-express@1.0.0 build
+#12 0.294 > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+#12 0.294 
+#12 0.631 vite v5.4.14 building for production...
+#12 0.716 transforming...
+#12 1.113 Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+#12 1.113   npx update-browserslist-db@latest
+#12 1.113   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+#12 13.63 ✓ 3879 modules transformed.
+#12 14.62 rendering chunks...
+#12 14.64 computing gzip size...
+#12 14.69 ../dist/public/index.html                     0.63 kB │ gzip:   0.38 kB
+#12 14.69 ../dist/public/assets/index-z4A-jZnG.css     79.62 kB │ gzip:  13.70 kB
+#12 14.69 ../dist/public/assets/index-C-LKlEzW.js   1,011.38 kB │ gzip: 294.96 kB
+#12 14.69 
+#12 14.69 (!) Some chunks are larger than 500 kB after minification. Consider:
+#12 14.69 - Using dynamic import() to code-split the application
+#12 14.69 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#12 14.69 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#12 14.69 ✓ built in 14.02s
+#12 14.84 
+#12 14.84   dist/index.js  58.3kb
+#12 14.84 
+#12 14.84 ⚡ Done in 11ms
+#12 DONE 15.7s
+#13 [stage-1  3/18] COPY package.docker.json ./package.json
+#13 CACHED
+#14 [stage-1  4/18] RUN npm install
+#14 CACHED
+#15 [stage-1  5/18] COPY --from=builder /app/dist ./dist
+#15 sha256:99f7a2afe63f51ce528b2b241fda73370d8ec981ef0dc2a76ac031e417a06581 368B / 368B done
+#15 extracting sha256:99f7a2afe63f51ce528b2b241fda73370d8ec981ef0dc2a76ac031e417a06581
+#15 extracting sha256:99f7a2afe63f51ce528b2b241fda73370d8ec981ef0dc2a76ac031e417a06581 0.1s done
+#15 sha256:6be277bafeb22ad6de3f4c3eaf13fce8bb7fde2fbe5b3aff5b1d346048aa0af7 3.25MB / 3.25MB 0.1s done
+#15 extracting sha256:6be277bafeb22ad6de3f4c3eaf13fce8bb7fde2fbe5b3aff5b1d346048aa0af7
+#15 extracting sha256:6be277bafeb22ad6de3f4c3eaf13fce8bb7fde2fbe5b3aff5b1d346048aa0af7 0.8s done
+#15 sha256:b251ee64b967efdcad013e22d56196b842761c7d9c85866146cf12036ac43d94 324.52kB / 324.52kB done
+#15 extracting sha256:b251ee64b967efdcad013e22d56196b842761c7d9c85866146cf12036ac43d94 0.0s done
+#15 CACHED
+#16 [stage-1  6/18] COPY server-docker.cjs .
+#16 DONE 0.0s
+#17 [stage-1  7/18] RUN mkdir -p dist/public dist/server
+#17 DONE 0.1s
+#18 [stage-1  8/18] RUN mkdir -p dist/public/images
+#18 DONE 0.1s
+#19 [stage-1  9/18] RUN mkdir -p uploads
+#19 DONE 0.2s
+#20 [stage-1 10/18] RUN chmod 777 uploads
+#20 DONE 0.2s
+#21 [stage-1 11/18] RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#0099cc"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">Air Fryer</text></svg>' > dist/public/images/air-fryer.jpg
+#21 DONE 0.1s
+#22 [stage-1 12/18] RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#202060"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">PlayStation 5</text></svg>' > dist/public/images/ps5.jpg
+#22 DONE 0.1s
+#23 [stage-1 13/18] RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#3f71e9"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">MacBook Pro</text></svg>' > dist/public/images/macbook.jpg
+#23 DONE 0.1s
+#24 [stage-1 14/18] RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#34a853"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">Paris Weekend</text></svg>' > dist/public/images/paris.jpg
+#24 DONE 0.1s
+#25 [stage-1 15/18] RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#1db954"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">Cash Prize</text></svg>' > dist/public/images/cash.jpg
+#25 DONE 0.1s
+#26 [stage-1 16/18] RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#cccccc"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">Placeholder</text></svg>' > dist/public/images/placeholder.jpg
+#26 DONE 0.2s
+#27 [stage-1 17/18] RUN ls -la dist || true
+#27 0.078 total 76
+#27 0.078 drwxr-sr-x 1 root root  4096 Apr 24 10:36 .
+#27 0.078 drwxr-sr-x 1 root root  4096 Apr 24 10:36 ..
+#27 0.078 -rw-r--r-- 1 root root 59684 Apr 24 10:02 index.js
+#27 0.078 drwxr-sr-x 1 root root  4096 Apr 24 10:36 public
+#27 0.078 drwxr-sr-x 2 root root  4096 Apr 24 10:36 server
+#27 DONE 0.1s
+#28 [stage-1 18/18] RUN find dist -type f | sort || true
+#28 0.079 dist/index.js
+#28 0.079 dist/public/assets/index-C-LKlEzW.js
+#28 0.079 dist/public/assets/index-z4A-jZnG.css
+#28 0.079 dist/public/images/air-fryer.jpg
+#28 0.079 dist/public/images/cash.jpg
+#28 0.079 dist/public/images/macbook.jpg
+#28 0.079 dist/public/images/paris.jpg
+#28 0.079 dist/public/images/placeholder.jpg
+#28 0.079 dist/public/images/ps5.jpg
+#28 0.079 dist/public/index.html
+#28 DONE 0.1s
+#29 exporting to docker image format
+#29 exporting layers
+#29 exporting layers 0.2s done
+#29 exporting manifest sha256:00ce3a5f13ae13202a1c2f819d623c9ed95386c1245909ccf9e59700d2b577d5 done
+#29 exporting config sha256:d830aed34a83949504eed6690411e35321d460470dbe0d2174cdabf28dde3e24 done
+#29 DONE 2.2s
+#30 exporting cache to client directory
+#30 preparing build cache for export
+#30 writing cache manifest sha256:6d586db61b98139bf6faf9dcbd43a1a8c274520a10b9c06cf1c526167e461c37 done
+#30 DONE 3.1s
+Pushing image to registry...
+Upload succeeded
+==> Deploying...
+node:internal/modules/cjs/loader:1215
+  throw err;
+  ^
+Error: Cannot find module 'multer'
+Require stack:
+- /app/server-docker.cjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/app/server-docker.cjs:18:16)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/app/server-docker.cjs' ]
+}
+Node.js v20.19.1
+==> Exited with status 1
+==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+node:internal/modules/cjs/loader:1215
+  throw err;
+  ^
+Error: Cannot find module 'multer'
+Require stack:
+- /app/server-docker.cjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/app/server-docker.cjs:18:16)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/app/server-docker.cjs' ]
+}
+Node.js v20.19.1
