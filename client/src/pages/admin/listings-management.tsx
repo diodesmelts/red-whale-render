@@ -81,7 +81,7 @@ export default function ListingsManagement() {
   // Delete competition mutation
   const deleteCompetitionMutation = useMutation({
     mutationFn: async (id: number) => {
-      console.log(`🔍 Attempting to delete competition with ID: ${id}`);
+      console.log(`🔍 DEBUG[CLIENT]: Attempting to delete competition with ID: ${id}`);
       
       // Special handling for Render.com environment
       // Ensure we're using the correct API path in production
@@ -89,42 +89,64 @@ export default function ListingsManagement() {
       const hostname = window.location.hostname;
       const isRender = hostname.includes('onrender.com');
       
-      console.log(`📡 Environment detection for delete operation: `, {
+      console.log(`📡 DEBUG[CLIENT]: Environment detection for delete operation: `, {
         isProduction,
         hostname,
         isRender
       });
       
-      // Special handling for Render.com environment
-      let endpointPath;
-      
-      // FIXED - SIMPLIFIED PATH FORMAT THAT ALWAYS WORKS
+      // SUPER SIMPLIFIED PATH FORMAT
       // apiRequest() already adds /api prefix, so we don't need to include it
-      endpointPath = `/competitions/${id}`;
-      console.log(`🔗 Using simplified endpoint path: ${endpointPath}`);
-      
-      console.log(`🔗 Final endpoint path: ${endpointPath} for delete operation`);
+      // Using just the competition ID for maximum compatibility
+      const endpointPath = `/competitions/${id}`;
+      console.log(`🔗 DEBUG[CLIENT]: Using endpoint path: ${endpointPath}`);
       
       try {
-        // Add additional headers and credentials for authentication in Render
+        console.log(`🚀 DEBUG[CLIENT]: Sending DELETE request to ${endpointPath}`);
+        
+        // Include session credentials and additional debug headers
         const res = await apiRequest("DELETE", endpointPath, undefined, {
           headers: {
             'X-Admin-Operation': 'delete-competition',
             'X-Request-Source': 'admin-panel',
+            'X-Debug-Client': 'true',
+            'X-Client-Timestamp': new Date().toISOString(),
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
           }
         });
         
-        console.log(`✅ Delete operation result: ${res.status} ${res.statusText}`);
+        console.log(`✅ DEBUG[CLIENT]: Delete operation response:`, {
+          status: res.status,
+          statusText: res.statusText,
+          ok: res.ok,
+          headers: Object.fromEntries([...res.headers.entries()])
+        });
+        
+        // Try to parse response body for additional error details
+        if (!res.ok) {
+          try {
+            const errorBody = await res.json();
+            console.error('❌ DEBUG[CLIENT]: Server returned error:', errorBody);
+          } catch (parseError) {
+            console.error('❌ DEBUG[CLIENT]: Could not parse error response:', parseError);
+          }
+        }
+        
         return res.ok;
       } catch (error) {
         // Enhanced error logging for debugging
-        console.error('❌ Delete operation failed:', error);
+        console.error('❌ DEBUG[CLIENT]: Delete operation failed with exception:', error);
+        console.error('❌ DEBUG[CLIENT]: Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause
+        });
         
         // Throw a more descriptive error
-        throw new Error(`Failed to delete competition: ${error.message}. Please check network tab for details.`);
+        throw new Error(`Failed to delete competition: ${error.message}. Please check console for details.`);
       }
     },
     onSuccess: () => {
