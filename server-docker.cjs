@@ -912,6 +912,64 @@ app.get('/api/admin/users', isAdmin, async (req, res) => {
   }
 });
 
+// Admin route to get all entries
+app.get('/api/admin/entries', isAdmin, async (req, res) => {
+  try {
+    console.log('Admin request: Fetching all entries');
+    
+    // Check if entries table exists and has all required columns
+    try {
+      // Check what columns exist in the entries table
+      const columnsQuery = `
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'entries';
+      `;
+      
+      const columnsCheck = await pool.query(columnsQuery);
+      const existingColumns = columnsCheck.rows.map(row => row.column_name);
+      
+      console.log('Entries table columns:', existingColumns);
+      
+      // Build query to get all entries with proper field mapping
+      const query = `
+        SELECT 
+          e.id, 
+          e.user_id as "userId", 
+          e.competition_id as "competitionId", 
+          e.ticket_count as "ticketCount", 
+          e.payment_status as "paymentStatus", 
+          e.stripe_payment_id as "stripePaymentId", 
+          e.created_at as "createdAt",
+          u.username as "username",
+          c.title as "competitionTitle"
+        FROM 
+          entries e
+        LEFT JOIN 
+          users u ON e.user_id = u.id
+        LEFT JOIN 
+          competitions c ON e.competition_id = c.id
+        ORDER BY 
+          e.created_at DESC
+      `;
+      
+      const result = await pool.query(query);
+      console.log(`Found ${result.rows.length} entries`);
+      
+      res.json(result.rows);
+      
+    } catch (error) {
+      console.error('Error checking entries table structure:', error);
+      
+      // If the table doesn't exist or has an unexpected structure, return an empty array
+      res.json([]);
+    }
+  } catch (err) {
+    console.error('Error fetching entries:', err);
+    res.status(500).json({ message: 'Failed to fetch entries' });
+  }
+});
+
 // Ban/unban user
 app.patch('/api/admin/users/:id/ban', isAdmin, async (req, res) => {
   try {
