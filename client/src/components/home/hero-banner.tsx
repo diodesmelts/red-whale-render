@@ -64,10 +64,8 @@ export function HeroBanner() {
             <span className="font-light tracking-wider">Time</span>
             <span className="absolute -bottom-2 -right-2 text-pink-400 text-2xl transform -rotate-6">✦</span>
           </h1>
-          <p className="mt-8 max-w-md mx-auto text-muted-foreground sm:text-xl md:mt-10 md:text-2xl md:max-w-4xl font-light">
-            Your premier destination for discovering, participating in, and winning exclusive
-            <span className="text-white">competitions</span>
-            across multiple platforms.
+          <p className="mt-8 max-w-md mx-auto text-white sm:text-xl md:mt-10 md:text-2xl md:max-w-4xl font-light">
+            Your premier destination for discovering, participating in, and winning exclusive competitions across multiple platforms.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-6">
             <Link href="/competitions">
