@@ -656,6 +656,161 @@ app.get('/api/user', (req, res) => {
   res.json(userWithoutPassword);
 });
 
+// File upload endpoint
+app.post('/api/upload', 
+  // Authentication check
+  (req, res, next) => {
+    console.log('🔒 Upload auth check - isAuthenticated:', req.isAuthenticated ? req.isAuthenticated() : 'function not available');
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      next();
+    } else {
+      console.error('❌ Authentication failed for upload request');
+      return res.status(401).json({ message: 'Unauthorized', details: 'Authentication required' });
+    }
+  },
+  // Multer file handler
+  (req, res, next) => {
+    console.log('📁 Starting multer file processing');
+    
+    // Use multer single file upload with proper error handling
+    upload.single('image')(req, res, (err) => {
+      if (err) {
+        console.error('❌ Multer error:', err);
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ 
+            message: 'File too large',
+            details: 'Maximum file size is 5MB',
+            error: err.message
+          });
+        }
+        return res.status(400).json({ 
+          message: 'File upload error',
+          details: err.message,
+          stack: err.stack
+        });
+      }
+      
+      console.log('✅ Multer processing complete, continuing to handler');
+      next();
+    });
+  },
+  // Process the uploaded file
+  async (req, res) => {
+    console.log('🔄 Processing file upload request');
+    try {
+      // Debug info about the request
+      console.log('📑 Request body keys:', Object.keys(req.body));
+      console.log('📑 Request files:', req.files ? 'Present' : 'Not present');
+      console.log('📑 Request file:', req.file ? 'Present' : 'Not present');
+      
+      if (!req.file) {
+        console.error('❌ No file received in request');
+        return res.status(400).json({ 
+          message: 'No file uploaded',
+          details: 'The request was processed but no file was found in the data'
+        });
+      }
+    
+      console.log('File received:', req.file.originalname, 'Size:', req.file.size, 'bytes', 'Type:', req.file.mimetype);
+      
+      // Verify this is actually an image file
+      if (!req.file.mimetype.startsWith('image/')) {
+        console.error('Invalid file type:', req.file.mimetype);
+        return res.status(400).json({ 
+          message: 'Invalid file type', 
+          details: 'Only image files are supported' 
+        });
+      }
+      
+      // Check Cloudinary configuration status
+      const cloudinaryStatus = {
+        allConfigured: isCloudinaryConfigured
+      };
+      
+      console.log('Cloudinary configuration status:', cloudinaryStatus);
+      
+      // Now upload the file using appropriate service
+      let uploadResult;
+      
+      if (isCloudinaryConfigured) {
+        // Upload to Cloudinary
+        try {
+          console.log('Uploading to Cloudinary...');
+          
+          // Use a Promise to handle the upload
+          uploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              { 
+                folder: 'bluewhale',
+                resource_type: 'image',
+                access_mode: 'public'
+              },
+              (error, result) => {
+                if (error) {
+                  console.error('Cloudinary upload error:', error);
+                  reject(error);
+                } else {
+                  console.log('Cloudinary upload success');
+                  resolve({
+                    url: result.secure_url,
+                    publicId: result.public_id
+                  });
+                }
+              }
+            );
+            
+            uploadStream.write(req.file.buffer);
+            uploadStream.end();
+          });
+          
+          console.log('Cloudinary upload result:', uploadResult);
+        } catch (error) {
+          console.error('Cloudinary upload failed, falling back to local storage', error);
+          // Fall back to local storage if Cloudinary fails
+          uploadResult = uploadToLocalStorage(req.file.buffer, req.file.originalname);
+        }
+      } else {
+        // Otherwise use local storage
+        console.log('Using local storage for upload');
+        uploadResult = uploadToLocalStorage(req.file.buffer, req.file.originalname);
+      }
+      
+      // Send success response
+      console.log('Upload successful, returning URL:', uploadResult.url);
+      res.status(200).json({
+        url: uploadResult.url,
+        message: 'File uploaded successfully',
+        service: isCloudinaryConfigured ? 'cloudinary' : 'local'
+      });
+    } catch (error) {
+      console.error('Error processing upload:', error);
+      res.status(500).json({
+        message: 'Server error during upload',
+        details: error.message,
+        stack: error.stack
+      });
+    }
+  }
+);
+
+// Helper function to upload to local storage
+function uploadToLocalStorage(file, originalFilename) {
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+  const ext = path.extname(originalFilename);
+  const filename = `image-${uniqueSuffix}${ext}`;
+  const filePath = path.join(uploadsDir, filename);
+  
+  console.log('Writing file to local storage:', filePath);
+  fs.writeFileSync(filePath, file);
+  
+  return {
+    url: `/uploads/${filename}`
+  };
+}
+
+// Make sure to serve the uploads directory statically
+app.use('/uploads', express.static('uploads'));
+
 // Registration diagnostics endpoint
 app.get('/api/register-diagnostics', (req, res) => {
   const diagnostics = {
