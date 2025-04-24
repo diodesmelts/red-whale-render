@@ -1,16 +1,6 @@
 // Script specifically for running on Render to reset competitions
-// This script is designed to be compatible with both CommonJS and ESM
-// It runs directly on Render's environment to reset all competitions data
-let Pool;
-try {
-  // Try ESM import first
-  const pg = await import('pg');
-  Pool = pg.Pool;
-} catch (error) {
-  // Fall back to CommonJS require
-  const pg = require('pg');
-  Pool = pg.Pool;
-}
+// CommonJS version that can be run directly
+const { Pool } = require('pg');
 
 async function resetCompetitions() {
   console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);

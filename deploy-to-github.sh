@@ -6,7 +6,7 @@ echo "🚀 Starting GitHub deployment process..."
 # Configuration
 REPO_URL="https://github.com/diodesmelts/RedWhale.git"
 BRANCH="main"
-COMMIT_MESSAGE="Fix create-competition page routing and form value handling"
+COMMIT_MESSAGE="Add database reset utilities for removing stubborn competitions"
 
 # Check if GitHub token is available
 if [ -z "$GITHUB_TOKEN" ]; then
