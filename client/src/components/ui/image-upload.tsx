@@ -62,10 +62,21 @@ export function ImageUpload({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to upload image");
+        // Try to get detailed error information from the response
+        let errorDetail = "Failed to upload image";
+        try {
+          const errorData = await response.json();
+          errorDetail = errorData.message || errorData.details || errorDetail;
+          console.error("Upload error details:", errorData);
+        } catch (parseError) {
+          // If we can't parse the error response, use the status text
+          errorDetail = `Failed to upload image (${response.status}: ${response.statusText})`;
+        }
+        throw new Error(errorDetail);
       }
 
       const data = await response.json();
+      console.log("Upload success response:", data);
       onImageUploaded(data.url);
       
       toast({
@@ -73,9 +84,18 @@ export function ImageUpload({
         description: "Your image has been uploaded successfully",
       });
     } catch (error) {
+      console.error("Image upload error:", error);
+      let errorMessage = "Upload failed";
+      let errorDetail = "An unexpected error occurred";
+      
+      if (error instanceof Error) {
+        errorMessage = "Upload failed";
+        errorDetail = error.message;
+      }
+      
       toast({
-        title: "Upload failed",
-        description: error instanceof Error ? error.message : "An error occurred",
+        title: errorMessage,
+        description: errorDetail,
         variant: "destructive",
       });
       // Reset preview if upload fails

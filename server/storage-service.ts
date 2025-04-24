@@ -84,18 +84,42 @@ export const storageService = {
    */
   uploadToCloudinary(file: Buffer, originalFilename: string): Promise<UploadResult> {
     return new Promise((resolve, reject) => {
+      console.log('Starting Cloudinary upload for file:', originalFilename);
+      
       const uploadOptions = {
         public_id: `blue-whale/${uuidv4()}`,
         folder: 'competitions',
         resource_type: 'image' as 'image' // Type assertion to match Cloudinary's expected types
       };
+      
+      console.log('Cloudinary upload options:', JSON.stringify(uploadOptions));
 
       const uploadStream = cloudinary.uploader.upload_stream(
         uploadOptions,
-        (error: Error, result: UploadApiResponse) => {
+        (error: any, result: UploadApiResponse) => {
           if (error || !result) {
-            return reject(error || new Error('Upload failed'));
+            console.error('Cloudinary upload error:', error);
+            
+            // Create a more detailed error object
+            let errorMessage = 'Upload to Cloudinary failed';
+            if (error) {
+              if (typeof error === 'object') {
+                errorMessage = `Cloudinary error: ${error.message || JSON.stringify(error)}`;
+                console.error('Cloudinary error details:', error);
+              } else {
+                errorMessage = `Cloudinary error: ${error}`;
+              }
+            }
+            
+            return reject(new Error(errorMessage));
           }
+          
+          console.log('Cloudinary upload success, result:', {
+            url: result.secure_url,
+            publicId: result.public_id,
+            format: result.format,
+            size: result.bytes
+          });
           
           resolve({
             url: result.secure_url,

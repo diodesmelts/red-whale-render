@@ -236,10 +236,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'No file uploaded' });
       }
       
-      console.log('File received:', req.file.originalname, 'Size:', req.file.size, 'bytes');
+      console.log('File received:', req.file.originalname, 'Size:', req.file.size, 'bytes', 'Type:', req.file.mimetype);
+      
+      // Verify this is actually an image file
+      if (!req.file.mimetype.startsWith('image/')) {
+        console.error('Invalid file type:', req.file.mimetype);
+        return res.status(400).json({ 
+          message: 'Invalid file type', 
+          details: 'Only image files are supported' 
+        });
+      }
+      
+      // Check Cloudinary configuration status
+      const cloudinaryStatus = {
+        cloudName: !!process.env.CLOUDINARY_CLOUD_NAME,
+        apiKey: !!process.env.CLOUDINARY_API_KEY,
+        apiSecret: !!process.env.CLOUDINARY_API_SECRET,
+        allConfigured: !!(
+          process.env.CLOUDINARY_CLOUD_NAME && 
+          process.env.CLOUDINARY_API_KEY && 
+          process.env.CLOUDINARY_API_SECRET
+        )
+      };
+      
+      console.log('Cloudinary configuration status:', cloudinaryStatus);
+      console.log('Sending file to storage service...');
       
       // Upload using the storage service (either local or Cloudinary)
-      console.log('Sending file to storage service...');
       const result = await storageService.uploadFile(
         req.file.buffer, 
         req.file.originalname
@@ -249,15 +272,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(200).json({ 
         url: result.url,
         publicId: result.publicId,
-        message: 'File uploaded successfully' 
+        message: 'File uploaded successfully',
+        storageType: cloudinaryStatus.allConfigured ? 'cloudinary' : 'local'
       });
     } catch (error: any) {
       console.error('Upload error:', error);
       console.error('Error stack:', error.stack);
+      
+      // Check Cloudinary configuration for error reporting
+      const cloudinaryStatus = {
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Not set',
+        apiKey: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not set',
+        apiSecret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not set',
+        allConfigured: !!(
+          process.env.CLOUDINARY_CLOUD_NAME && 
+          process.env.CLOUDINARY_API_KEY && 
+          process.env.CLOUDINARY_API_SECRET
+        )
+      };
+      
       return res.status(500).json({ 
         message: error.message,
         details: error.stack,
-        isCloudinaryEnabled: process.env.CLOUDINARY_CLOUD_NAME ? true : false
+        cloudinaryStatus: cloudinaryStatus,
+        timestamp: new Date().toISOString(),
+        nodeEnv: process.env.NODE_ENV || 'Not set'
       });
     }
   });
