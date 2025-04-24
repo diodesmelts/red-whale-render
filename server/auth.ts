@@ -52,19 +52,34 @@ export function setupAuth(app: Express) {
   });
   
   // Configure session settings
+  // Detect environment and Render deployment
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isRender = !!process.env.RENDER || (process.env.HOSTNAME && process.env.HOSTNAME.includes('render'));
+  const cookieDomain = process.env.COOKIE_DOMAIN || undefined;
+  
+  console.log('🌐 Environment detection:', { 
+    isProduction, 
+    isRender,
+    cookieDomain,
+    nodeEnv: process.env.NODE_ENV,
+    renderService: process.env.RENDER_SERVICE_ID ? 'Yes' : 'No',
+  });
+  
+  // For production on Render, we need these settings
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
-    resave: false,
-    saveUninitialized: true, // Changed to true to ensure session is created for all users
+    resave: true, 
+    saveUninitialized: true,
     store: storage.sessionStore,
-    name: 'bw.sid', // Custom name to avoid defaults
+    name: 'bw.sid',
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      secure: process.env.NODE_ENV === 'production', // Only secure in production
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-domain in production
+      // In production, especially on Render, we need secure cookies with sameSite=none
+      secure: isProduction, 
+      sameSite: isProduction ? 'none' : 'lax',
       path: "/",
       httpOnly: true,
-      domain: process.env.COOKIE_DOMAIN || undefined, // Set domain in production
+      domain: cookieDomain,
     }
   };
   
@@ -76,8 +91,10 @@ export function setupAuth(app: Express) {
     maxAge: sessionSettings.cookie?.maxAge
   });
 
-  // Trust proxy for production deploys
-  if (process.env.NODE_ENV === 'production') {
+  // Trust proxy for production deploys (especially important for Render)
+  // This ensures that secure cookies work behind load balancers and proxies
+  if (isProduction || isRender) {
+    console.log('🔒 Setting trust proxy to handle secure cookies behind proxy');
     app.set("trust proxy", 1);
   }
   
@@ -258,8 +275,34 @@ export function setupAuth(app: Express) {
           
           // Remove password before sending to client
           const { password, ...userWithoutPassword } = user;
-          console.log('Returning user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
-          return res.status(200).json(userWithoutPassword);
+          
+          // For production, especially on Render, add additional headers to ensure cookies are properly handled
+          if (isProduction || isRender) {
+            console.log('🔒 Setting production-specific headers for login response');
+            // These headers help with cookie handling in cross-domain scenarios
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+            // Explicitly set the SameSite value in a cookie header for browsers that might need it
+            if (req.session.cookie) {
+              console.log('📝 Ensuring cookie SameSite is properly set');
+              req.session.cookie.sameSite = 'none';
+              req.session.cookie.secure = true;
+            }
+            
+            // Force saving the session before responding
+            req.session.save((err) => {
+              if (err) {
+                console.error('❌ Error saving session on login:', err);
+                return next(err);
+              }
+              console.log('✅ Session saved successfully on login');
+              console.log('Returning user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
+              return res.status(200).json(userWithoutPassword);
+            });
+          } else {
+            // Standard flow for development
+            console.log('Returning user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
+            return res.status(200).json(userWithoutPassword);
+          }
         });
       })(req, res, next);
     } catch (error) {
@@ -291,8 +334,38 @@ export function setupAuth(app: Express) {
     
     // Remove password before sending to client
     const { password, ...userWithoutPassword } = req.user as User;
-    console.log('Sending user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
-    res.json(userWithoutPassword);
+    
+    // For production, especially on Render, add additional headers to ensure cookies are properly handled
+    if (isProduction || isRender) {
+      console.log('🔒 Setting production-specific headers for user response');
+      // These headers help with cookie handling in cross-domain scenarios
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      // Explicitly set the SameSite value in a cookie header for browsers that might need it
+      if (req.session.cookie) {
+        console.log('📝 Ensuring cookie SameSite is properly set for user request');
+        req.session.cookie.sameSite = 'none';
+        req.session.cookie.secure = true;
+      }
+      
+      // Log cookie headers being sent for debugging
+      console.log('📝 Cookie headers:', res.getHeaders()['set-cookie'] || 'No cookies set');
+      
+      // Force saving the session before responding
+      req.session.touch(); // Mark the session as active
+      req.session.save((err) => {
+        if (err) {
+          console.error('❌ Error saving session for user request:', err);
+          return res.status(500).json({ message: "Session error" });
+        }
+        console.log('✅ Session saved successfully for user request');
+        console.log('Sending user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
+        res.json(userWithoutPassword);
+      });
+    } else {
+      // Standard flow for development
+      console.log('Sending user data to client:', { id: userWithoutPassword.id, username: userWithoutPassword.username, isAdmin: userWithoutPassword.isAdmin });
+      res.json(userWithoutPassword);
+    }
   });
 
   // Health check endpoint is now in routes.ts
