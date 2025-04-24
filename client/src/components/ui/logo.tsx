@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 
 import { useQuery } from "@tanstack/react-query";
 import { SiteConfig } from "@shared/schema";
@@ -35,7 +35,7 @@ export function Logo({ size = "md", className }: LogoProps) {
       <div className={cn("flex-shrink-0", sizeClass[size])}>
         {customLogoUrl ? (
           <img 
-            src={customLogoUrl.startsWith('http') ? customLogoUrl : `${window.location.origin}${customLogoUrl}`} 
+            src={getImageUrl(customLogoUrl)} 
             alt="Blue Whale Competitions Logo" 
             className={cn(sizeClass[size], "w-auto object-contain")}
           />

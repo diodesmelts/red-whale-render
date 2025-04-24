@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search, ClipboardList } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { SiteConfig } from "@shared/schema";
+import { getImageUrl } from "@/lib/utils";
 
 export function HeroBanner() {
   const { data: heroBannerConfig, isLoading } = useQuery<SiteConfig>({
@@ -24,10 +25,8 @@ export function HeroBanner() {
   const backgroundImage = heroBannerConfig?.value || "";
   const hasBackgroundImage = backgroundImage && backgroundImage.trim() !== "";
   
-  // Make sure the URL is absolute for cross-domain compatibility
-  const absoluteBackgroundImage = backgroundImage && !backgroundImage.startsWith('http') 
-    ? `${window.location.origin}${backgroundImage}` 
-    : backgroundImage;
+  // Make sure the URL is absolute for cross-domain compatibility using our utility function
+  const absoluteBackgroundImage = getImageUrl(backgroundImage);
 
   return (
     <section 

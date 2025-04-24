@@ -79,3 +79,32 @@ export function debounce<T extends (...args: any[]) => any>(
     timeout = setTimeout(() => func(...args), delay);
   };
 }
+
+/**
+ * Ensures an image URL is properly formatted for displaying in the app
+ * - Absolute URLs (http/https) are returned as is
+ * - Cloudinary URLs are returned as is
+ * - Data URLs are returned as is
+ * - Relative URLs (/uploads/*) have the current origin prepended
+ */
+export function getImageUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  
+  // Clean the URL (remove extra spaces)
+  const cleanUrl = url.trim();
+  
+  // Return empty string for empty URLs
+  if (cleanUrl === '') return '';
+  
+  // Already absolute URL (http/https) or data URL or Cloudinary
+  if (
+    cleanUrl.startsWith('http') || 
+    cleanUrl.startsWith('data:') || 
+    cleanUrl.includes('cloudinary.com')
+  ) {
+    return cleanUrl;
+  }
+  
+  // Relative URL - add origin
+  return `${window.location.origin}${cleanUrl}`;
+}
