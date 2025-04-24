@@ -59,9 +59,9 @@ export function ImageUpload({
     formData.append("image", file);
 
     try {
-      // Get the API base URL from our helper function
-      const baseUrl = getApiBaseUrl();
-      const apiUrl = `${baseUrl}/api/upload`;
+      // Use the current window location for proper relative paths
+      // Ensuring we don't double up on api prefixes
+      const apiUrl = '/api/upload';
       console.log("Starting upload to:", apiUrl);
       
       // Log the request being made for diagnostics
