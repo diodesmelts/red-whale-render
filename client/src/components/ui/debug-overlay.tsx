@@ -1,6 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
+// Type definition for our error details
+type ErrorDetailsType = {
+  title: string;
+  message: string;
+  details: string;
+  timestamp: string;
+  requestInfo: any;
+  responseInfo: any;
+  apiUrl: string;
+  finalApiUrl: string;
+};
+
+// Keep a global variable to persist error data across component renders
+let persistedErrorDetails: ErrorDetailsType = {
+  title: '',
+  message: '',
+  details: '',
+  timestamp: '',
+  requestInfo: null,
+  responseInfo: null,
+  apiUrl: '',
+  finalApiUrl: ''
+};
+
 interface DebugOverlayProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,6 +42,34 @@ interface DebugOverlayProps {
 
 export function DebugOverlay({ isOpen, onClose, errorDetails }: DebugOverlayProps) {
   const [tab, setTab] = useState<'error' | 'request' | 'response'>('error');
+
+  // Update the persisted error details when new ones come in
+  useEffect(() => {
+    if (isOpen && errorDetails) {
+      persistedErrorDetails = {
+        ...persistedErrorDetails,
+        ...errorDetails
+      };
+      console.log('Persisted debug error details:', persistedErrorDetails);
+    }
+  }, [isOpen, errorDetails]);
+
+  // Use a debug key press to show the debug overlay (CTRL+SHIFT+D)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        console.log('Debug key combination pressed - forcing debug overlay open');
+        // This will be handled by the parent component
+        document.dispatchEvent(new CustomEvent('show-debug-overlay'));
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -138,16 +190,7 @@ export function DebugOverlay({ isOpen, onClose, errorDetails }: DebugOverlayProp
 
 export function useDebugOverlay() {
   const [isOpen, setIsOpen] = useState(false);
-  const [errorDetails, setErrorDetails] = useState<{
-    title: string;
-    message: string;
-    details: string;
-    timestamp: string;
-    requestInfo: any;
-    responseInfo: any;
-    apiUrl: string;
-    finalApiUrl?: string;
-  }>({
+  const [errorDetails, setErrorDetails] = useState<ErrorDetailsType>({
     title: '',
     message: '',
     details: '',
@@ -155,15 +198,59 @@ export function useDebugOverlay() {
     requestInfo: null,
     responseInfo: null,
     apiUrl: '',
-    finalApiUrl: undefined
+    finalApiUrl: ''
   });
 
+  // Listen for custom event to show debug overlay
+  useEffect(() => {
+    const handleShowDebugOverlay = () => {
+      // If we have persisted error details, show them
+      if (persistedErrorDetails.title || persistedErrorDetails.message) {
+        setErrorDetails({
+          ...persistedErrorDetails,
+          timestamp: persistedErrorDetails.timestamp || new Date().toISOString()
+        });
+        setIsOpen(true);
+        console.log('Showing debug overlay with persisted details');
+      } else {
+        // Otherwise show a generic message
+        setErrorDetails({
+          title: 'Debug Overlay',
+          message: 'No error details available',
+          details: 'No recent errors have been recorded',
+          timestamp: new Date().toISOString(),
+          requestInfo: null,
+          responseInfo: null,
+          apiUrl: '',
+          finalApiUrl: ''
+        });
+        setIsOpen(true);
+        console.log('Showing debug overlay with generic message');
+      }
+    };
+    
+    document.addEventListener('show-debug-overlay', handleShowDebugOverlay);
+    return () => {
+      document.removeEventListener('show-debug-overlay', handleShowDebugOverlay);
+    };
+  }, []);
+
   const showError = (details: Partial<typeof errorDetails>) => {
-    setErrorDetails({
+    const updatedDetails = {
       ...errorDetails,
       ...details,
       timestamp: new Date().toISOString()
-    });
+    };
+    
+    // Update both state and persisted data
+    setErrorDetails(updatedDetails);
+    persistedErrorDetails = {
+      ...persistedErrorDetails,
+      ...updatedDetails
+    };
+    
+    // Log that we're showing the overlay
+    console.log('Debug overlay showing error:', details.title);
     setIsOpen(true);
   };
 
@@ -180,6 +267,7 @@ export function useDebugOverlay() {
       />
     ),
     showError,
-    closeOverlay
+    closeOverlay,
+    isDebugOpen: isOpen
   };
 }
