@@ -88,7 +88,7 @@ export default function CreateCompetition() {
         title: "Competition created",
         description: "Your competition has been created successfully.",
       });
-      navigate(`/admin/listings`);
+      navigate(`/admin/competitions`);
     },
     onError: (error: Error) => {
       toast({
@@ -115,7 +115,7 @@ export default function CreateCompetition() {
           <Button 
             variant="outline" 
             size="icon"
-            onClick={() => navigate("/admin/listings")}
+            onClick={() => navigate("/admin/competitions")}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -218,7 +218,7 @@ export default function CreateCompetition() {
                       <FormControl>
                         <ImageUpload 
                           onImageUploaded={field.onChange}
-                          existingImageUrl={field.value}
+                          currentImageUrl={field.value}
                         />
                       </FormControl>
                       <FormMessage />
@@ -433,7 +433,7 @@ export default function CreateCompetition() {
                 <Button 
                   type="button" 
                   variant="outline"
-                  onClick={() => navigate("/admin/listings")}
+                  onClick={() => navigate("/admin/competitions")}
                 >
                   Cancel
                 </Button>

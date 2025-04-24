@@ -175,9 +175,9 @@ export default function CompetitionsManager() {
     )
     .sort((a, b) => {
       if (sortOrder === 'newest') {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return new Date(b.createdAt || new Date()).getTime() - new Date(a.createdAt || new Date()).getTime();
       } else if (sortOrder === 'oldest') {
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        return new Date(a.createdAt || new Date()).getTime() - new Date(b.createdAt || new Date()).getTime();
       } else if (sortOrder === 'price-asc') {
         return a.ticketPrice - b.ticketPrice;
       } else if (sortOrder === 'price-desc') {
@@ -187,7 +187,7 @@ export default function CompetitionsManager() {
       } else if (sortOrder === 'title') {
         return a.title.localeCompare(b.title);
       } else if (sortOrder === 'popularity') {
-        return (b.ticketsSold / b.totalTickets) - (a.ticketsSold / a.totalTickets);
+        return ((b.ticketsSold || 0) / b.totalTickets) - ((a.ticketsSold || 0) / a.totalTickets);
       }
       return 0;
     });
