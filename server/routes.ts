@@ -229,17 +229,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Image upload endpoint
   app.post('/api/upload', isAuthenticated, upload.single('image'), async (req, res) => {
+    console.log('Processing file upload request');
     try {
       if (!req.file) {
+        console.error('No file received in request');
         return res.status(400).json({ message: 'No file uploaded' });
       }
       
+      console.log('File received:', req.file.originalname, 'Size:', req.file.size, 'bytes');
+      
       // Upload using the storage service (either local or Cloudinary)
+      console.log('Sending file to storage service...');
       const result = await storageService.uploadFile(
         req.file.buffer, 
         req.file.originalname
       );
       
+      console.log('Upload successful:', result);
       return res.status(200).json({ 
         url: result.url,
         publicId: result.publicId,
@@ -247,7 +253,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('Upload error:', error);
-      return res.status(500).json({ message: error.message });
+      console.error('Error stack:', error.stack);
+      return res.status(500).json({ 
+        message: error.message,
+        details: error.stack,
+        isCloudinaryEnabled: process.env.CLOUDINARY_CLOUD_NAME ? true : false
+      });
     }
   });
   

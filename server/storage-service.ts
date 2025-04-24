@@ -10,6 +10,11 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Setup Cloudinary if credentials are available
+console.log('Checking Cloudinary configuration:');
+console.log('CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Not set');
+console.log('CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not set');
+console.log('CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not set');
+
 const isCloudinaryConfigured = 
   process.env.CLOUDINARY_CLOUD_NAME && 
   process.env.CLOUDINARY_API_KEY && 
@@ -22,7 +27,7 @@ if (isCloudinaryConfigured) {
     api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true
   });
-  console.log('Cloudinary configured for image uploads');
+  console.log('Cloudinary configured for image uploads successfully!');
 } else {
   console.log('Cloudinary not configured, using local storage for uploads');
 }
@@ -82,7 +87,7 @@ export const storageService = {
       const uploadOptions = {
         public_id: `blue-whale/${uuidv4()}`,
         folder: 'competitions',
-        resource_type: 'auto'
+        resource_type: 'image' as 'image' // Type assertion to match Cloudinary's expected types
       };
 
       const uploadStream = cloudinary.uploader.upload_stream(
