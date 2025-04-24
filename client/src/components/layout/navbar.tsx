@@ -31,13 +31,13 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 bg-background/90 backdrop-blur-sm z-50 border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-28">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link href="/">
                 <div className="flex items-center space-x-2 cursor-pointer">
-                  <Logo size="md" />
+                  <Logo size="lg" />
                 </div>
               </Link>
             </div>
