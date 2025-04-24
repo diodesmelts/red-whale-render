@@ -574,7 +574,7 @@ export class DatabaseStorage implements IStorage {
         .where(eq(users.id, id));
       
       // Return true if the user was deleted
-      return result.count > 0;
+      return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting user:', error);
       return false;
