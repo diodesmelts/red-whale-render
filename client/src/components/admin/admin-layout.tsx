@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { BarChart, Home, Package, Settings, Users, Shield } from "lucide-react";
+import { BarChart, Home, Package, Settings, Users, Shield, Layout, Image } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 
@@ -24,6 +24,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/analytics", label: "Analytics", icon: BarChart },
     { href: "/admin/settings", label: "Settings", icon: Settings },
+    { href: "/admin/site-config", label: "Site Configuration", icon: Image },
   ];
 
   return (
