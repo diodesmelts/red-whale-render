@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { setupAuth } from "./auth";
 import cors from "cors";
+import path from "path";
 
 // Simple CORS configuration for a unified web service architecture
 const corsOptions = {
@@ -86,6 +87,11 @@ app.use((req, res, next) => {
   // Set up authentication
   console.log('🔐 Setting up authentication...');
   setupAuth(app);
+  
+  // Serve uploads directory as static files before registering routes
+  const uploadsPath = path.join(process.cwd(), 'uploads');
+  console.log('📁 Serving uploads directory from:', uploadsPath);
+  app.use('/uploads', express.static(uploadsPath));
   
   // Then register all other routes
   console.log('🌐 Registering API routes...');
