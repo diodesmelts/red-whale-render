@@ -1106,6 +1106,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ received: true });
   });
 
+  // Create a direct reset endpoint for admins
+  app.post('/api/admin/reset-competitions', (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Forbidden. Admin access required.' });
+    }
+    
+    console.log('Starting competition reset process...');
+    
+    // Use direct SQL for maximum compatibility
+    pool.query('BEGIN')
+      .then(() => pool.query('DELETE FROM entries'))
+      .then(() => {
+        console.log('Entries deleted');
+        return pool.query('DELETE FROM winners');
+      })
+      .then(() => {
+        console.log('Winners deleted');
+        return pool.query('DELETE FROM competitions');
+      })
+      .then(() => {
+        console.log('Competitions deleted');
+        return pool.query('ALTER SEQUENCE IF EXISTS entries_id_seq RESTART WITH 1');
+      })
+      .then(() => pool.query('ALTER SEQUENCE IF EXISTS winners_id_seq RESTART WITH 1'))
+      .then(() => pool.query('ALTER SEQUENCE IF EXISTS competitions_id_seq RESTART WITH 1'))
+      .then(() => pool.query('COMMIT'))
+      .then(() => {
+        console.log('Database reset completed successfully');
+        res.status(200).json({ 
+          success: true, 
+          message: 'All competitions have been successfully deleted.'
+        });
+      })
+      .catch(error => {
+        console.error('Error during competition reset:', error);
+        // Try to rollback on error
+        pool.query('ROLLBACK').catch(() => {}); 
+        res.status(500).json({ 
+          success: false, 
+          message: 'An error occurred during the reset process.',
+          error: error.message
+        });
+      });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
