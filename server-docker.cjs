@@ -970,6 +970,162 @@ app.get('/api/admin/entries', isAdmin, async (req, res) => {
   }
 });
 
+// Admin endpoint to manage site configuration
+app.get('/api/admin/site-config', isAdmin, async (req, res) => {
+  try {
+    console.log('Admin request: Fetching all site configuration');
+    
+    // Check if site_config table exists
+    try {
+      const checkTableQuery = `
+        SELECT EXISTS (
+          SELECT 1 FROM information_schema.tables 
+          WHERE table_name = 'site_config'
+        );
+      `;
+      
+      const tableCheck = await pool.query(checkTableQuery);
+      const tableExists = tableCheck.rows[0].exists;
+      
+      if (!tableExists) {
+        console.log('Creating site_config table as it does not exist');
+        await pool.query(`
+          CREATE TABLE IF NOT EXISTS site_config (
+            id SERIAL PRIMARY KEY,
+            key VARCHAR(255) NOT NULL UNIQUE,
+            value TEXT,
+            description TEXT,
+            updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+          );
+        `);
+      }
+      
+      // Now fetch all site configuration
+      const result = await pool.query(`
+        SELECT 
+          id, 
+          key, 
+          value, 
+          description, 
+          updated_at as "updatedAt"
+        FROM 
+          site_config 
+        ORDER BY 
+          key ASC
+      `);
+      
+      console.log(`Found ${result.rows.length} site configuration entries`);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Error with site_config table:', error);
+      res.json([]);
+    }
+  } catch (err) {
+    console.error('Error fetching site configuration:', err);
+    res.status(500).json({ message: 'Failed to fetch site configuration' });
+  }
+});
+
+// Admin endpoint to update site configuration
+app.post('/api/admin/site-config', isAdmin, async (req, res) => {
+  try {
+    const { key, value, description } = req.body;
+    
+    if (!key) {
+      return res.status(400).json({ message: 'Key is required' });
+    }
+    
+    console.log(`Admin action: Updating site config "${key}" with value: ${value}`);
+    
+    // Ensure the site_config table exists
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_config (
+        id SERIAL PRIMARY KEY,
+        key VARCHAR(255) NOT NULL UNIQUE,
+        value TEXT,
+        description TEXT,
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+    `);
+    
+    // Try to insert, on conflict update
+    const query = `
+      INSERT INTO site_config (key, value, description, updated_at)
+      VALUES ($1, $2, $3, NOW())
+      ON CONFLICT (key) 
+      DO UPDATE SET 
+        value = $2, 
+        description = $3, 
+        updated_at = NOW()
+      RETURNING id, key, value, description, updated_at as "updatedAt";
+    `;
+    
+    const result = await pool.query(query, [key, value, description]);
+    
+    if (result.rows.length === 0) {
+      throw new Error('Failed to update site configuration');
+    }
+    
+    console.log(`Site config "${key}" updated successfully`);
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating site configuration:', err);
+    res.status(500).json({ message: 'Failed to update site configuration', error: err.message });
+  }
+});
+
+// Public endpoint to fetch specific site configuration
+app.get('/api/site-config/:key', async (req, res) => {
+  try {
+    const { key } = req.params;
+    
+    if (!key) {
+      return res.status(400).json({ message: 'Key is required' });
+    }
+    
+    console.log(`Fetching site config for key: ${key}`);
+    
+    // Check if site_config table exists
+    const checkTableQuery = `
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables 
+        WHERE table_name = 'site_config'
+      );
+    `;
+    
+    const tableCheck = await pool.query(checkTableQuery);
+    const tableExists = tableCheck.rows[0].exists;
+    
+    if (!tableExists) {
+      console.log('site_config table does not exist, returning empty result');
+      return res.status(404).json({ message: 'Configuration not found' });
+    }
+    
+    // Query the site config
+    const result = await pool.query(`
+      SELECT 
+        id, 
+        key, 
+        value, 
+        description, 
+        updated_at as "updatedAt"
+      FROM 
+        site_config 
+      WHERE 
+        key = $1
+    `, [key]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Configuration not found' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(`Error fetching site config for key ${req.params.key}:`, err);
+    res.status(500).json({ message: 'Failed to fetch site configuration' });
+  }
+});
+
 // Ban/unban user
 app.patch('/api/admin/users/:id/ban', isAdmin, async (req, res) => {
   try {
