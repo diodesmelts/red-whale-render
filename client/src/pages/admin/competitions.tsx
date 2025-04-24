@@ -56,8 +56,20 @@ import {
   Star,
   AlertTriangle,
   RefreshCw,
-  DatabaseZap
+  DatabaseZap,
+  AlertCircle
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { format, isPast, isToday } from 'date-fns';
 import { Competition } from '@shared/schema';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -174,6 +186,9 @@ export default function CompetitionsManager() {
       });
     },
   });
+  
+  // State to track if reset dialog is open
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   // Filter competitions based on all criteria
   const filteredCompetitions = competitions
@@ -216,9 +231,18 @@ export default function CompetitionsManager() {
       return 0;
     });
 
+  // State to track which competition is being deleted
+  const [competitionToDelete, setCompetitionToDelete] = useState<number | null>(null);
+  
   const handleDeleteCompetition = (id: number) => {
-    if (window.confirm('Are you sure you want to delete this competition? This action cannot be undone.')) {
-      deleteCompetitionMutation.mutate(id);
+    // Just set the ID in state to open the dialog
+    setCompetitionToDelete(id);
+  };
+  
+  const confirmDelete = () => {
+    if (competitionToDelete) {
+      deleteCompetitionMutation.mutate(competitionToDelete);
+      setCompetitionToDelete(null); // Reset after confirmation
     }
   };
 
@@ -343,11 +367,7 @@ export default function CompetitionsManager() {
           <div className="flex justify-end">
             <Button
               variant="destructive"
-              onClick={() => {
-                if (window.confirm('WARNING: This will permanently delete ALL competitions, entries, and winners from the database. This action cannot be undone. Continue?')) {
-                  resetCompetitionsMutation.mutate();
-                }
-              }}
+              onClick={() => setResetDialogOpen(true)}
               disabled={resetCompetitionsMutation.isPending}
               className="flex items-center gap-2"
             >
@@ -562,6 +582,76 @@ export default function CompetitionsManager() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete single competition confirmation dialog */}
+      <AlertDialog open={!!competitionToDelete} onOpenChange={(open) => !open && setCompetitionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              Delete Competition
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this competition? This will remove all entries, winners, and tickets. 
+              <span className="font-semibold block mt-2">This action cannot be undone.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={confirmDelete}
+              disabled={deleteCompetitionMutation.isPending}
+            >
+              {deleteCompetitionMutation.isPending ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Competition"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reset ALL competitions confirmation dialog */}
+      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              Reset All Competitions
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-semibold text-destructive block mb-2">WARNING: This is a destructive action!</span>
+              This will permanently delete ALL competitions, entries, winners, and tickets from the database.
+              <span className="font-semibold block mt-2">This action cannot be undone.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={() => {
+                resetCompetitionsMutation.mutate();
+                setResetDialogOpen(false);
+              }}
+              disabled={resetCompetitionsMutation.isPending}
+            >
+              {resetCompetitionsMutation.isPending ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Resetting...
+                </>
+              ) : (
+                "Yes, Reset Everything"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
