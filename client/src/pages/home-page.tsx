@@ -48,11 +48,11 @@ export default function HomePage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Step 1 */}
-            <div className="bg-card rounded-xl p-8 border border-border hover:border-primary transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,153,255,0.5)] group relative overflow-hidden">
+            <div className="bg-card rounded-xl p-8 border border-primary transition-all duration-300 shadow-[0_0_20px_rgba(0,153,255,0.5)] group relative overflow-hidden">
               {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">1</div>
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">1</div>
               
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors mt-4">Browse Competitions</h3>
+              <h3 className="text-2xl font-bold text-primary mb-3 transition-colors mt-4">Browse Competitions</h3>
               <p className="text-muted-foreground font-light text-base">
                 Explore our wide range of exciting competitions across different categories and platforms.
               </p>
@@ -62,11 +62,11 @@ export default function HomePage() {
             </div>
             
             {/* Step 2 */}
-            <div className="bg-card rounded-xl p-8 border border-border hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(155,89,182,0.5)] group relative overflow-hidden">
+            <div className="bg-card rounded-xl p-8 border border-purple-500 transition-all duration-300 shadow-[0_0_20px_rgba(155,89,182,0.5)] group relative overflow-hidden">
               {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">2</div>
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">2</div>
               
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-purple-500 transition-colors mt-4">Enter & Follow Steps</h3>
+              <h3 className="text-2xl font-bold text-purple-500 mb-3 transition-colors mt-4">Enter & Follow Steps</h3>
               <p className="text-muted-foreground font-light text-base">
                 Select a competition and follow the simple entry steps to secure your tickets.
               </p>
@@ -76,11 +76,11 @@ export default function HomePage() {
             </div>
             
             {/* Step 3 */}
-            <div className="bg-card rounded-xl p-8 border border-border hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(66,153,225,0.5)] group relative overflow-hidden">
+            <div className="bg-card rounded-xl p-8 border border-blue-500 transition-all duration-300 shadow-[0_0_20px_rgba(66,153,225,0.5)] group relative overflow-hidden">
               {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">3</div>
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">3</div>
               
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-blue-500 transition-colors mt-4">Track Entries</h3>
+              <h3 className="text-2xl font-bold text-blue-500 mb-3 transition-colors mt-4">Track Entries</h3>
               <p className="text-muted-foreground font-light text-base">
                 Monitor your active entries and check competition closing dates on your dashboard.
               </p>
@@ -90,11 +90,11 @@ export default function HomePage() {
             </div>
             
             {/* Step 4 */}
-            <div className="bg-card rounded-xl p-8 border border-border hover:border-orange-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,127,80,0.5)] group relative overflow-hidden">
+            <div className="bg-card rounded-xl p-8 border border-orange-500 transition-all duration-300 shadow-[0_0_20px_rgba(255,127,80,0.5)] group relative overflow-hidden">
               {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">4</div>
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">4</div>
               
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-orange-500 transition-colors mt-4">Win & Celebrate</h3>
+              <h3 className="text-2xl font-bold text-orange-500 mb-3 transition-colors mt-4">Win & Celebrate</h3>
               <p className="text-muted-foreground font-light text-base">
                 Get notified when you win and follow the simple claim process to receive your prize!
               </p>
