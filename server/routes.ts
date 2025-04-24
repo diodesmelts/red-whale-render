@@ -578,11 +578,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Admin - Create new competition
-  app.post("/api/admin/competitions", isAdmin, async (req, res) => {
+  app.post("/api/admin/competitions", async (req, res) => {
+    // Log authentication information
+    console.log('🔍 CREATE competition request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for competition creation');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for competition creation');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
+      console.log(`📌 Attempting to create competition:`, req.body);
+      
       const competition = await dataStorage.createCompetition(req.body);
+      
+      console.log(`✅ Successfully created competition: ${competition.title} (ID: ${competition.id})`);
       res.status(201).json(competition);
     } catch (error: any) {
+      console.error(`❌ Error creating competition:`, error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors });
       }
@@ -591,37 +616,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Admin - Update competition
-  app.patch("/api/admin/competitions/:id", isAdmin, async (req, res) => {
+  app.patch("/api/admin/competitions/:id", async (req, res) => {
+    // Log authentication information
+    console.log('🔍 PATCH competition request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      competitionId: req.params.id,
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for competition update');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for competition update');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
       const id = parseInt(req.params.id);
+      console.log(`📌 Attempting to update competition ${id}:`, req.body);
+      
       const competition = await dataStorage.updateCompetition(id, req.body);
       
       if (!competition) {
+        console.log(`❌ Competition ${id} not found for update`);
         return res.status(404).json({ message: "Competition not found" });
       }
       
+      console.log(`✅ Successfully updated competition ${id}`);
       res.json(competition);
     } catch (error: any) {
+      console.error(`❌ Error updating competition:`, error);
       res.status(500).json({ message: error.message });
     }
   });
   
   // Admin - Delete competition
-  app.delete("/api/admin/competitions/:id", isAdmin, async (req, res) => {
+  app.delete("/api/admin/competitions/:id", async (req, res) => {
+    // Log authentication information and request details
+    console.log('🔍 DELETE competition request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      competitionId: req.params.id,
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false,
+      headers: {
+        origin: req.headers.origin,
+        referer: req.headers.referer,
+        cookie: req.headers.cookie ? 'Present' : 'Not present'
+      }
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for competition deletion');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for competition deletion');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
       const id = parseInt(req.params.id);
+      console.log(`📌 Attempting to fetch competition ${id} before deletion`);
+      
       const competition = await dataStorage.getCompetition(id);
       
       if (!competition) {
+        console.log(`❌ Competition ${id} not found for deletion`);
         return res.status(404).json({ message: "Competition not found" });
       }
+      
+      console.log(`📌 About to delete competition: ${competition.title} (ID: ${competition.id})`);
       
       // Allow deleting any competition, even with sold tickets
       await dataStorage.deleteCompetition(id);
       
+      console.log(`✅ Successfully deleted competition ${id}`);
+      
       // Return success response without additional checks
       res.status(204).end();
     } catch (error: any) {
+      console.error(`❌ Error deleting competition:`, error);
       res.status(500).json({ message: error.message });
     }
   });
@@ -718,7 +803,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update or create site config (admin only)
-  app.post("/api/admin/site-config", isAdmin, async (req, res) => {
+  app.post("/api/admin/site-config", async (req, res) => {
+    // Log authentication information
+    console.log('🔍 SITE CONFIG request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false,
+      configKey: req.body.key
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for site config update');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for site config update');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
       const { key, value, description } = req.body;
       
@@ -726,14 +832,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Key is required" });
       }
       
+      console.log(`📌 Attempting to update site config "${key}":`, { value: value ? `${value.substring(0, 30)}...` : null });
+      
       const config = await dataStorage.setSiteConfig({
         key,
         value,
         description
       });
       
+      console.log(`✅ Successfully updated site config "${key}"`);
       res.status(201).json(config);
     } catch (error: any) {
+      console.error(`❌ Error updating site config:`, error);
       res.status(500).json({ message: error.message });
     }
   });
