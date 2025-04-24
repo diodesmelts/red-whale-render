@@ -116,16 +116,56 @@ export async function apiRequest(
     // Add the API base URL if provided and the URL doesn't already have http
     // Special handling for URLs that already include /api
     let apiUrl;
+    
+    // Get environment info for proper URL construction
+    const isProduction = import.meta.env.MODE === 'production';
+    const hostname = window.location.hostname;
+    const isRender = hostname.includes('onrender.com');
+    
+    // Log environment detection for debugging
+    console.log(`🌐 URL processing environment:`, {
+      url,
+      isProduction,
+      hostname,
+      isRender
+    });
+    
     if (url.startsWith('http')) {
       apiUrl = url;
     } else {
       const baseUrl = getApiBaseUrl();
-      // Prevent double /api prefix issues in production
-      if (baseUrl === '/api' && url.startsWith('/api/')) {
-        // Strip the leading /api from the url to avoid duplication
-        apiUrl = url;
-      } else {
-        apiUrl = `${baseUrl}${url}`;
+      
+      // Special handling for Render environment
+      if (isProduction && isRender) {
+        console.log(`🌐 Render-specific URL handling for: ${url}`);
+        
+        // Special case for admin API routes in Render
+        if (url.startsWith('/admin/')) {
+          // Render requires /api prefix for these URLs
+          console.log(`🌐 Admin route detected in Render: /api${url}`);
+          apiUrl = `/api${url}`;
+        }
+        // Handle standard API routes
+        else if (url.startsWith('/api/')) {
+          // URL already has /api prefix
+          console.log(`🌐 Standard API route with prefix: ${url}`);
+          apiUrl = url;
+        } 
+        else {
+          // Add /api prefix for other routes
+          console.log(`🌐 Adding API prefix in Render: ${baseUrl}${url}`);
+          apiUrl = `${baseUrl}${url}`;
+        }
+      } 
+      // Standard URL handling for non-Render environments
+      else {
+        // Prevent double /api prefix issues in production
+        if (baseUrl === '/api' && url.startsWith('/api/')) {
+          // Strip the leading /api from the url to avoid duplication
+          apiUrl = url;
+        } else {
+          apiUrl = `${baseUrl}${url}`;
+        }
       }
     }
     

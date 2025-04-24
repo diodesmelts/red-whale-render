@@ -95,19 +95,48 @@ export default function ListingsManagement() {
         isRender
       });
       
-      // Use direct path for Render - fixes the 404 issue
-      const endpointPath = `/api/admin/competitions/${id}`;
+      // Special handling for Render.com environment
+      let endpointPath;
       
-      console.log(`🔗 Using endpoint path: ${endpointPath} for delete operation`);
-      const res = await apiRequest("DELETE", endpointPath, undefined, {
-        headers: {
-          'X-Admin-Operation': 'delete-competition',
-          'X-Request-Source': 'admin-panel'
-        }
-      });
+      // Based on your error screenshots, there might be an issue with how the API URL is constructed
+      if (isProduction && isRender) {
+        // CRITICAL FIX FOR RENDER: Use the full API URL to avoid path issues
+        // For Render specifically, we need to ensure we're using the correct URL format
+        console.log('📡 Using Render-specific DELETE endpoint path');
+        
+        // Remove any /api prefix if using apiRequest which already adds it
+        endpointPath = `/admin/competitions/${id}`;
+        
+        console.log(`🔗 Render-specific endpoint path: ${endpointPath}`);
+      } else {
+        // Standard path for non-Render environments
+        endpointPath = `/api/admin/competitions/${id}`;
+        console.log(`🔗 Standard endpoint path: ${endpointPath}`);
+      }
       
-      console.log(`✅ Delete operation result: ${res.status} ${res.statusText}`);
-      return res.ok;
+      console.log(`🔗 Final endpoint path: ${endpointPath} for delete operation`);
+      
+      try {
+        // Add additional headers and credentials for authentication in Render
+        const res = await apiRequest("DELETE", endpointPath, undefined, {
+          headers: {
+            'X-Admin-Operation': 'delete-competition',
+            'X-Request-Source': 'admin-panel',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+        
+        console.log(`✅ Delete operation result: ${res.status} ${res.statusText}`);
+        return res.ok;
+      } catch (error) {
+        // Enhanced error logging for debugging
+        console.error('❌ Delete operation failed:', error);
+        
+        // Throw a more descriptive error
+        throw new Error(`Failed to delete competition: ${error.message}. Please check network tab for details.`);
+      }
     },
     onSuccess: () => {
       setDeleteDialogOpen(false);
