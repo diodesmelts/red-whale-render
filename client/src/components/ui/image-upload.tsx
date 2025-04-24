@@ -126,7 +126,18 @@ export function ImageUpload({
 
       const data = await response.json();
       console.log("Upload success response:", data);
-      onImageUploaded(data.url);
+      
+      // Ensure the URL is properly formatted for both local and cloud images
+      let imageUrl = data.url;
+      
+      // Only prepend origin if it's a relative URL (not http, not data:, not cloudinary)
+      if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:') 
+          && !imageUrl.includes('cloudinary.com')) {
+        imageUrl = `${window.location.origin}${imageUrl}`;
+      }
+      
+      console.log("Formatted image URL for use:", imageUrl);
+      onImageUploaded(imageUrl);
       
       toast({
         title: "Image uploaded",
@@ -198,7 +209,16 @@ export function ImageUpload({
       {preview && (
         <div className="relative border rounded-md overflow-hidden mt-4">
           <img
-            src={preview.startsWith('http') ? preview : `${window.location.origin}${preview}`}
+            src={
+              // Handle different preview types:
+              // 1. Data URL (from FileReader) - use as is
+              // 2. Absolute URL (starts with http) - use as is
+              // 3. Cloudinary URL (contains cloudinary.com) - use as is
+              // 4. Relative URL (/uploads/*) - prepend origin
+              preview.startsWith('data:') || preview.startsWith('http') || preview.includes('cloudinary.com')
+                ? preview
+                : `${window.location.origin}${preview}`
+            }
             alt="Image preview"
             className="max-h-[300px] w-auto object-contain mx-auto"
           />
