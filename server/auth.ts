@@ -284,4 +284,32 @@ export function setupAuth(app: Express) {
   });
 
   // Health check endpoint is now in routes.ts
+  
+  // Delete user account endpoint
+  app.delete("/api/user", (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    try {
+      const userId = req.user.id;
+      
+      // First log the user out
+      req.logout(async (err) => {
+        if (err) return next(err);
+        
+        // Then delete the user from the database
+        const deleted = await storage.deleteUser(userId);
+        if (!deleted) {
+          return res.status(500).json({ message: "Failed to delete user account" });
+        }
+        
+        // Send success response
+        res.status(200).json({ message: "User account deleted successfully" });
+      });
+    } catch (error) {
+      console.error('❌ Error deleting user account:', error);
+      next(error);
+    }
+  });
 }
