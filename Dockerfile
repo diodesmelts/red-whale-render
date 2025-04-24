@@ -37,6 +37,10 @@ RUN mkdir -p dist/public dist/server
 # Create a static public directory for static assets
 RUN mkdir -p dist/public/images
 
+# Create uploads directory for file storage (needed for image uploads fallback)
+RUN mkdir -p uploads
+RUN chmod 777 uploads
+
 # Create a few placeholder images for competitions
 RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#0099cc"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">Air Fryer</text></svg>' > dist/public/images/air-fryer.jpg
 RUN echo '<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="200" fill="#202060"/><text x="150" y="100" font-family="Arial" font-size="24" text-anchor="middle" fill="white">PlayStation 5</text></svg>' > dist/public/images/ps5.jpg
