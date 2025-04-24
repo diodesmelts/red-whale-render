@@ -712,8 +712,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Admin - Get all users
-  app.get("/api/admin/users", isAdmin, async (req, res) => {
+  app.get("/api/admin/users", async (req, res) => {
+    // Log authentication information
+    console.log('🔍 GET ALL USERS request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for retrieving all users');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for retrieving all users');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
+      console.log(`📌 Attempting to fetch all users`);
+      
       const users = await dataStorage.getAllUsers();
       
       // Remove password before sending response
@@ -722,54 +744,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return userWithoutPassword;
       });
       
+      console.log(`✅ Successfully retrieved ${users.length} users`);
       res.json(usersWithoutPasswords);
     } catch (error: any) {
+      console.error(`❌ Error retrieving users:`, error);
       res.status(500).json({ message: error.message });
     }
   });
   
   // Admin - Promote user to admin
-  app.patch("/api/admin/users/:id/promote", isAdmin, async (req, res) => {
+  app.patch("/api/admin/users/:id/promote", async (req, res) => {
+    // Log authentication information
+    console.log('🔍 PROMOTE USER request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false,
+      targetUserId: req.params.id
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for promoting user to admin');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for promoting user');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
       const id = parseInt(req.params.id);
+      console.log(`📌 Attempting to promote user ${id} to admin`);
+      
       const updatedUser = await dataStorage.promoteToAdmin(id);
       
       if (!updatedUser) {
+        console.log(`❌ User ${id} not found for promotion`);
         return res.status(404).json({ message: "User not found" });
       }
       
       // Remove password before sending response
       const { password, ...userWithoutPassword } = updatedUser;
+      
+      console.log(`✅ Successfully promoted user ${id} to admin`);
       res.json(userWithoutPassword);
     } catch (error: any) {
+      console.error(`❌ Error promoting user:`, error);
       res.status(500).json({ message: error.message });
     }
   });
   
   // Admin - Update user
-  app.patch("/api/admin/users/:id", isAdmin, async (req, res) => {
+  app.patch("/api/admin/users/:id", async (req, res) => {
+    // Log authentication information
+    console.log('🔍 UPDATE USER request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false,
+      targetUserId: req.params.id
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for updating user');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for updating user');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
       const id = parseInt(req.params.id);
+      console.log(`📌 Attempting to update user ${id}`);
+      
       const updatedUser = await dataStorage.updateUser(id, req.body);
       
       if (!updatedUser) {
+        console.log(`❌ User ${id} not found for update`);
         return res.status(404).json({ message: "User not found" });
       }
       
       // Remove password before sending response
       const { password, ...userWithoutPassword } = updatedUser;
+      
+      console.log(`✅ Successfully updated user ${id}`);
       res.json(userWithoutPassword);
     } catch (error: any) {
+      console.error(`❌ Error updating user:`, error);
       res.status(500).json({ message: error.message });
     }
   });
   
   // Admin - Get all entries
-  app.get("/api/admin/entries", isAdmin, async (req, res) => {
+  app.get("/api/admin/entries", async (req, res) => {
+    // Log authentication information
+    console.log('🔍 GET ALL ENTRIES request received:', {
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
+      sessionID: req.sessionID || 'no-session-id',
+      userId: req.user?.id || 'no-user',
+      userIsAdmin: req.user?.isAdmin || false
+    });
+    
+    // Authenticate user
+    if (!req.isAuthenticated()) {
+      console.log('❌ User not authenticated for retrieving all entries');
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Check if user is admin
+    if (!req.user.isAdmin) {
+      console.log('❌ User is not an admin for retrieving all entries');
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
     try {
+      console.log(`📌 Attempting to fetch all entries`);
+      
       const entries = await dataStorage.getAllEntries();
+      
+      console.log(`✅ Successfully retrieved ${entries.length} entries`);
       res.json(entries);
     } catch (error: any) {
+      console.error(`❌ Error retrieving entries:`, error);
       res.status(500).json({ message: error.message });
     }
   });
