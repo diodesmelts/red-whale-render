@@ -127,10 +127,10 @@ export async function apiRequest(
     let headers = options?.headers || {};
     let body: any = undefined;
     
-    if (options?.body instanceof FormData) {
+    if (options?.body && typeof options?.body !== 'string' && 'append' in options.body) {
       // FormData should not have content-type set (browser will set it with boundary)
       body = options.body;
-      console.log('Request with FormData:', Array.from((options.body as FormData).keys()));
+      console.log('Request with FormData:', Array.from((options.body as any).keys()));
     } else if (data) {
       // Standard JSON data
       if (options?.contentType !== false) {
@@ -138,7 +138,7 @@ export async function apiRequest(
       }
       body = options?.body || JSON.stringify(data);
       console.log('Request data:', { ...data, password: data && 'password' in (data as any) ? 'REDACTED' : undefined });
-    } else if (options?.body && !(options.body instanceof FormData)) {
+    } else if (options?.body && typeof options.body === 'string') {
       // String body provided directly in options
       body = options.body;
     }
