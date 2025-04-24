@@ -105,6 +105,16 @@ export function getImageUrl(url: string | null | undefined): string {
     return cleanUrl;
   }
   
+  // Fix paths with unwanted prefixes
+  let fixedPath = cleanUrl;
+  // Remove any /./ patterns that might appear
+  fixedPath = fixedPath.replace('/./uploads', '/uploads');
+  
+  // Ensure it starts with a slash
+  if (!fixedPath.startsWith('/')) {
+    fixedPath = '/' + fixedPath;
+  }
+  
   // Relative URL - add origin
-  return `${window.location.origin}${cleanUrl}`;
+  return `${window.location.origin}${fixedPath}`;
 }

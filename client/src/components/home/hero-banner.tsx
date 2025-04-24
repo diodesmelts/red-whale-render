@@ -19,7 +19,10 @@ export function HeroBanner() {
         throw new Error("Failed to fetch hero banner configuration");
       }
       return res.json();
-    }
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: 3, // Retry 3 times if the request fails
+    retryDelay: 1000, // Wait 1 second between retries
   });
 
   const backgroundImage = heroBannerConfig?.value || "";

@@ -26,9 +26,11 @@ export function Logo({ size = "md", className }: LogoProps) {
       return res.json();
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: 3, // Retry 3 times if the request fails
+    retryDelay: 1000, // Wait 1 second between retries
   });
 
-  const customLogoUrl = logoConfig?.value;
+  const customLogoUrl = logoConfig?.value || '';
 
   return (
     <div className={cn("flex items-center space-x-2", className)}>
