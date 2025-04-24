@@ -290,7 +290,7 @@ export function Navbar() {
                           onClick={() => setIsMenuOpen(false)}
                           className="flex items-center text-lg font-medium mt-4">
                           <User className="h-5 w-5 mr-2 text-primary" />
-                          My Profile
+                          My Settings
                         </Link>
                         <button 
                           onClick={() => { 

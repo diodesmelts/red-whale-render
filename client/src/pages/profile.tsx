@@ -34,6 +34,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/index";
 import {
   User,
@@ -82,6 +90,7 @@ export default function ProfilePage() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
+  const [deleteAccountDialogOpen, setDeleteAccountDialogOpen] = useState(false);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -205,6 +214,30 @@ export default function ProfilePage() {
       });
     },
   });
+  
+  // Account deletion mutation
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("DELETE", "/api/user");
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been permanently deleted.",
+      });
+      logoutMutation.mutate();
+      navigate("/");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Deletion Failed",
+        description: error.message || "Failed to delete your account. Please try again or contact support.",
+        variant: "destructive",
+      });
+      setDeleteAccountDialogOpen(false);
+    },
+  });
 
   // Handle profile form submission
   const onProfileSubmit = (data: ProfileUpdateInput) => {
@@ -227,7 +260,7 @@ export default function ProfilePage() {
           <div className="inline-block rounded-full bg-primary/20 p-3 mb-2">
             <User className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold mb-2">My Profile</h1>
+          <h1 className="text-3xl font-bold mb-2">My Settings</h1>
           <p className="text-muted-foreground max-w-md mx-auto">
             Manage your personal information, notification preferences, and security settings
           </p>
