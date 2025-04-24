@@ -31,10 +31,7 @@ export default function HomePage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-primary/20 text-primary mb-3 animate-pulse-slow">
-              GETTING STARTED
-            </span>
-            <h2 className="text-4xl font-extrabold mb-4 tracking-tight relative inline-block">
+            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto">
               How To <span className="text-primary relative">Play
                 <span className="absolute -top-1 -right-4 text-yellow-400 text-lg">✨</span>
               </span>
@@ -117,11 +114,8 @@ export default function HomePage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1 text-sm font-semibold rounded-full bg-primary/20 text-primary mb-3 animate-pulse-slow">
-              CURRENT OPPORTUNITIES
-            </span>
-            <h2 className="text-4xl font-extrabold mb-4 tracking-tight relative inline-block">
-              <span className="text-primary relative">Live</span>Competitions
+            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto">
+              <span className="text-primary relative">Live</span> Competitions
               <span className="absolute -top-1 -right-5 text-yellow-400 text-lg transform rotate-12">🏆</span>
             </h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg font-light">

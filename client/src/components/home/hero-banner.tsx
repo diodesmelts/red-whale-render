@@ -66,7 +66,7 @@ export function HeroBanner() {
           </h1>
           <p className="mt-8 max-w-md mx-auto text-muted-foreground sm:text-xl md:mt-10 md:text-2xl md:max-w-4xl font-light">
             Your premier destination for discovering, participating in, and winning exclusive
-            <span className="px-2 py-1 mx-1 bg-primary/20 rounded-md text-primary font-semibold">competitions</span>
+            <span className="text-white">competitions</span>
             across multiple platforms.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-6">
