@@ -23,6 +23,11 @@ export function HeroBanner() {
 
   const backgroundImage = heroBannerConfig?.value || "";
   const hasBackgroundImage = backgroundImage && backgroundImage.trim() !== "";
+  
+  // Make sure the URL is absolute for cross-domain compatibility
+  const absoluteBackgroundImage = backgroundImage && !backgroundImage.startsWith('http') 
+    ? `${window.location.origin}${backgroundImage}` 
+    : backgroundImage;
 
   return (
     <section 
@@ -31,7 +36,7 @@ export function HeroBanner() {
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"
       }`}
-      style={hasBackgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}}
+      style={hasBackgroundImage ? { backgroundImage: `url(${absoluteBackgroundImage})` } : {}}
     >
       {/* Add overlay when background image is present */}
       {hasBackgroundImage && (

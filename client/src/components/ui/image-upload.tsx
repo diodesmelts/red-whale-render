@@ -198,7 +198,7 @@ export function ImageUpload({
       {preview && (
         <div className="relative border rounded-md overflow-hidden mt-4">
           <img
-            src={preview}
+            src={preview.startsWith('http') ? preview : `${window.location.origin}${preview}`}
             alt="Image preview"
             className="max-h-[300px] w-auto object-contain mx-auto"
           />

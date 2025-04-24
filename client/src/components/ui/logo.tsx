@@ -35,7 +35,7 @@ export function Logo({ size = "md", className }: LogoProps) {
       <div className={cn("flex-shrink-0", sizeClass[size])}>
         {customLogoUrl ? (
           <img 
-            src={customLogoUrl} 
+            src={customLogoUrl.startsWith('http') ? customLogoUrl : `${window.location.origin}${customLogoUrl}`} 
             alt="Blue Whale Competitions Logo" 
             className={cn(sizeClass[size], "w-auto object-contain")}
           />
