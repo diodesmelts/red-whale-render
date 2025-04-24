@@ -18,6 +18,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: Omit<InsertUser, "confirmPassword" | "agreeToTerms">): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<boolean>;
   promoteToAdmin(id: number): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>; // Added for admin dashboard
   
@@ -148,6 +149,26 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...userData };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    const user = this.users.get(id);
+    if (!user) return false;
+    
+    // Delete user's entries
+    const userEntries = await this.getEntries(id);
+    for (const entry of userEntries) {
+      this.entries.delete(entry.id);
+    }
+    
+    // Delete user's winners
+    const userWinners = await this.getWinners(id);
+    for (const winner of userWinners) {
+      this.winners.delete(winner.id);
+    }
+    
+    // Delete the user
+    return this.users.delete(id);
   }
   
   // Method to promote a user to admin
@@ -527,6 +548,37 @@ export class DatabaseStorage implements IStorage {
   
   async promoteToAdmin(id: number): Promise<User | undefined> {
     return this.updateUser(id, { isAdmin: true });
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    try {
+      // First, find all entries for the user and delete them
+      const userEntries = await this.getEntries(id);
+      for (const entry of userEntries) {
+        await db
+          .delete(entries)
+          .where(eq(entries.id, entry.id));
+      }
+      
+      // Then, find all winners for the user and delete them
+      const userWinners = await this.getWinners(id);
+      for (const winner of userWinners) {
+        await db
+          .delete(winners)
+          .where(eq(winners.id, winner.id));
+      }
+      
+      // Finally, delete the user
+      const result = await db
+        .delete(users)
+        .where(eq(users.id, id));
+      
+      // Return true if the user was deleted
+      return result.count > 0;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return false;
+    }
   }
 
   // Competition operations
