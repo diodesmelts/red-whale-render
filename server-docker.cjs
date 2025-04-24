@@ -14,6 +14,70 @@ const app = express();
 // Parse JSON requests
 app.use(express.json());
 
+// For multipart form data (file uploads)
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for memory storage
+const multerStorage = multer.memoryStorage();
+
+// File filter function for uploads
+const fileFilter = (req, file, cb) => {
+  console.log('Multer fileFilter called with file:', { 
+    fieldname: file.fieldname,
+    originalname: file.originalname,
+    mimetype: file.mimetype
+  });
+  
+  // Accept only image files
+  if (file.mimetype.startsWith('image/')) {
+    console.log('File accepted: Image file detected');
+    cb(null, true);
+  } else {
+    console.error('File rejected: Not an image file');
+    cb(new Error('Only image files are allowed'), false);
+  }
+};
+
+// Configure multer
+const upload = multer({ 
+  storage: multerStorage, 
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
+  },
+  fileFilter
+});
+
+// Setup Cloudinary if credentials are available
+const isCloudinaryConfigured = 
+  process.env.CLOUDINARY_CLOUD_NAME && 
+  process.env.CLOUDINARY_API_KEY && 
+  process.env.CLOUDINARY_API_SECRET;
+
+let cloudinary;
+  
+// Initialize Cloudinary if configured
+if (isCloudinaryConfigured) {
+  cloudinary = require('cloudinary').v2;
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true
+  });
+  console.log('Cloudinary configured for image uploads');
+} else {
+  console.log('Cloudinary not configured, using local storage for uploads');
+}
+
+// Ensure uploads directory exists
+const uploadsDir = 'uploads';
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('Created uploads directory');
+}
+
 // Connect to PostgreSQL for data
 const { Pool } = require('pg');
 const pool = new Pool({
