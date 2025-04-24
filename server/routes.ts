@@ -657,8 +657,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Admin - Delete competition
-  app.delete("/api/admin/competitions/:id", async (req, res) => {
+  // Common handler function for deleting competitions
+  function deleteCompetitionHandler(req: Request, res: Response) {
+    console.log(`🔎 DELETE Competition handler called from route: ${req.path}`);
     // Log authentication information and request details
     console.log('🔍 DELETE competition request received:', {
       isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : 'function-not-available',
@@ -707,39 +708,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📌 Attempting to fetch competition ${id} before deletion`);
       
       // Check if competition exists
-      const competition = await dataStorage.getCompetition(id);
-      
-      if (!competition) {
-        console.log(`❌ Competition ${id} not found for deletion`);
-        return res.status(404).json({ message: "Competition not found" });
-      }
-      
-      console.log(`📌 About to delete competition: ${competition.title} (ID: ${competition.id})`);
-      
-      try {
-        // Allow deleting any competition, even with sold tickets
-        const deleted = await dataStorage.deleteCompetition(id);
-        
-        // Check deletion result
-        if (deleted) {
-          console.log(`✅ Successfully deleted competition ${id}`);
+      dataStorage.getCompetition(id)
+        .then(competition => {
+          if (!competition) {
+            console.log(`❌ Competition ${id} not found for deletion`);
+            return res.status(404).json({ message: "Competition not found" });
+          }
           
-          // Send a proper success response
-          return res.status(204).end();
-        } else {
-          console.log(`⚠️ Competition ${id} not deleted, but no error thrown`);
-          return res.status(400).json({ message: "Unable to delete competition" });
-        }
-      } catch (deleteError: any) {
-        console.error(`❌ Error during competition deletion for ID ${id}:`, deleteError);
-        
-        // More informative error for client
-        return res.status(500).json({ 
-          message: "Failed to delete competition",
-          error: deleteError.message,
-          code: 'DELETION_ERROR'
+          console.log(`📌 About to delete competition: ${competition.title} (ID: ${competition.id})`);
+          
+          // Allow deleting any competition, even with sold tickets
+          dataStorage.deleteCompetition(id)
+            .then(deleted => {
+              // Check deletion result
+              if (deleted) {
+                console.log(`✅ Successfully deleted competition ${id}`);
+                
+                // Send a proper success response
+                return res.status(204).end();
+              } else {
+                console.log(`⚠️ Competition ${id} not deleted, but no error thrown`);
+                return res.status(400).json({ message: "Unable to delete competition" });
+              }
+            })
+            .catch(deleteError => {
+              console.error(`❌ Error during competition deletion for ID ${id}:`, deleteError);
+              
+              // More informative error for client
+              return res.status(500).json({ 
+                message: "Failed to delete competition",
+                error: deleteError.message,
+                code: 'DELETION_ERROR'
+              });
+            });
+        })
+        .catch(error => {
+          // Log full error details for debugging
+          console.error(`❌ Unhandled error in delete competition handler:`, {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            details: error
+          });
+          
+          // Send a more specific error message to client
+          res.status(500).json({ 
+            message: "Server error while processing competition deletion",
+            errorType: error.name || "UnknownError"
+          });
         });
-      }
     } catch (error: any) {
       // Log full error details for debugging
       console.error(`❌ Unhandled error in delete competition handler:`, {
@@ -755,7 +772,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         errorType: error.name || "UnknownError"
       });
     }
-  });
+  }
+  
+  // Register both route formats to handle delete operations
+  app.delete("/api/admin/competitions/:id", (req, res) => deleteCompetitionHandler(req, res));
+  app.delete("/api/competitions/:id", (req, res) => deleteCompetitionHandler(req, res));
   
   // Admin - Get all users
   app.get("/api/admin/users", async (req, res) => {

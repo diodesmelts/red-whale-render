@@ -1,0 +1,156 @@
+     ==> Deploying...
+flg8b
+Cloudinary configured for image uploads
+flg8b
+Copying Vite-built frontend assets in Docker...
+flg8b
+Server running on http://0.0.0.0:10000
+flg8b
+Database connection successful
+     ==> Your service is live 🎉
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8bhsn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8bhsn
+Using customized select query for user
+8bhsn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8bhsn
+🌐 Serving SPA for client route: /assets/index-DUsuOUrz.js
+8bhsn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8bhsn
+Using customized select query for user
+8bhsn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8bhsn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8bhsn
+Using customized select query for user
+8bhsn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8bhsn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8bhsn
+Using customized select query for user
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Fetching site config for key: heroBanner
+8bhsn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+🔒 Current user request received
+flg8b
+Session ID: CIuJMpZ2xlDpHzKLaTQKjCVJyl2Zlyuz
+flg8b
+Is authenticated: true
+flg8b
+✅ User is authenticated: { id: 1, username: 'admin' }
+flg8b
+Sending user data to client: { id: 1, username: 'admin', isAdmin: true }
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Fetching site config for key: siteLogo
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+8bhsn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8bhsn
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8bhsn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8bhsn
+🌐 Serving SPA for client route: /uploads/image-1745509088806-454972230.png
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+8bhsn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8bhsn
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8bhsn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+🌐 Serving SPA for client route: /uploads/image-1745509102068-397408672.png
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+flg8b
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+flg8b
+Using customized select query for user
+flg8b
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }

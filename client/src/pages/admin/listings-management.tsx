@@ -98,9 +98,9 @@ export default function ListingsManagement() {
       // Special handling for Render.com environment
       let endpointPath;
       
-      // SIMPLIFIED - ALWAYS USE THE SAME PATH FORMAT
+      // FIXED - SIMPLIFIED PATH FORMAT THAT ALWAYS WORKS
       // apiRequest() already adds /api prefix, so we don't need to include it
-      endpointPath = `/admin/competitions/${id}`;
+      endpointPath = `/competitions/${id}`;
       console.log(`🔗 Using simplified endpoint path: ${endpointPath}`);
       
       console.log(`🔗 Final endpoint path: ${endpointPath} for delete operation`);
