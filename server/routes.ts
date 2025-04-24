@@ -25,10 +25,19 @@ import { storageService } from './storage-service';
 const multerStorage = multer.memoryStorage();
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
+  console.log('Multer fileFilter called with file:', { 
+    fieldname: file.fieldname,
+    originalname: file.originalname,
+    mimetype: file.mimetype,
+    size: file.size
+  });
+  
   // Accept only image files
   if (file.mimetype.startsWith('image/')) {
+    console.log('File accepted: Image file detected');
     cb(null, true);
   } else {
+    console.error('File rejected: Not an image file');
     cb(new Error('Only image files are allowed'), false);
   }
 };
@@ -227,14 +236,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files statically
   app.use('/uploads', express.static('uploads'));
   
-  // Image upload endpoint
-  app.post('/api/upload', isAuthenticated, upload.single('image'), async (req, res) => {
-    console.log('Processing file upload request');
-    try {
-      if (!req.file) {
-        console.error('No file received in request');
-        return res.status(400).json({ message: 'No file uploaded' });
+  // Image upload endpoint with detailed error handling
+  app.post('/api/upload', 
+    // First middleware: Authentication check
+    (req, res, next) => {
+      console.log('🔒 Upload auth check - isAuthenticated:', req.isAuthenticated ? req.isAuthenticated() : 'function not available');
+      if (req.isAuthenticated && req.isAuthenticated()) {
+        next();
+      } else {
+        console.error('❌ Authentication failed for upload request');
+        return res.status(401).json({ message: 'Unauthorized', details: 'Authentication required' });
       }
+    },
+    // Second middleware: Multer file handler with custom error handling
+    (req, res, next) => {
+      console.log('📁 Starting multer file processing');
+      
+      // Use multer single file upload but with proper error handling
+      upload.single('image')(req, res, (err) => {
+        if (err) {
+          console.error('❌ Multer error:', err);
+          if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ 
+              message: 'File too large',
+              details: 'Maximum file size is 5MB',
+              error: err.message
+            });
+          }
+          return res.status(400).json({ 
+            message: 'File upload error',
+            details: err.message,
+            stack: err.stack
+          });
+        }
+        
+        console.log('✅ Multer processing complete, continuing to handler');
+        next();
+      });
+    },
+    // Final handler: Process the uploaded file
+    async (req, res) => {
+      console.log('🔄 Processing file upload request');
+      try {
+        // Debug info about the request
+        console.log('📑 Request body keys:', Object.keys(req.body));
+        console.log('📑 Request files:', req.files ? 'Present' : 'Not present');
+        console.log('📑 Request file:', req.file ? 'Present' : 'Not present');
+        
+        if (!req.file) {
+          console.error('❌ No file received in request');
+          return res.status(400).json({ 
+            message: 'No file uploaded',
+            details: 'The request was processed but no file was found in the data'
+          });
+        }
       
       console.log('File received:', req.file.originalname, 'Size:', req.file.size, 'bytes', 'Type:', req.file.mimetype);
       
