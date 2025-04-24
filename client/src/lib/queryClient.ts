@@ -97,6 +97,12 @@ export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
+  options?: {
+    body?: FormData | string;
+    headers?: Record<string, string>;
+    processData?: boolean;
+    contentType?: boolean;
+  }
 ): Promise<Response> {
   try {
     // Add the API base URL if provided and the URL doesn't already have http
@@ -116,14 +122,31 @@ export async function apiRequest(
     }
     
     console.log(`🚀 API Request: ${method} ${apiUrl}`);
-    if (data) {
+
+    // Handle FormData or regular JSON data
+    let headers = options?.headers || {};
+    let body: any = undefined;
+    
+    if (options?.body instanceof FormData) {
+      // FormData should not have content-type set (browser will set it with boundary)
+      body = options.body;
+      console.log('Request with FormData:', Array.from((options.body as FormData).keys()));
+    } else if (data) {
+      // Standard JSON data
+      if (options?.contentType !== false) {
+        headers = { ...headers, "Content-Type": "application/json" };
+      }
+      body = options?.body || JSON.stringify(data);
       console.log('Request data:', { ...data, password: data && 'password' in (data as any) ? 'REDACTED' : undefined });
+    } else if (options?.body && !(options.body instanceof FormData)) {
+      // String body provided directly in options
+      body = options.body;
     }
     
     const res = await fetch(apiUrl, {
       method,
-      headers: data ? { "Content-Type": "application/json" } : {},
-      body: data ? JSON.stringify(data) : undefined,
+      headers,
+      body,
       credentials: "include",
     });
 

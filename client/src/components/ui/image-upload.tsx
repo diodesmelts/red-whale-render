@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, X } from "lucide-react";
 import { useDebugOverlay } from "./debug-overlay";
-import { getApiBaseUrl } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
@@ -59,8 +59,7 @@ export function ImageUpload({
     formData.append("image", file);
 
     try {
-      // Use the current window location for proper relative paths
-      // Ensuring we don't double up on api prefixes
+      // Use the apiRequest helper which properly handles API URL routing
       const apiUrl = '/api/upload';
       console.log("Starting upload to:", apiUrl);
       
@@ -76,10 +75,11 @@ export function ImageUpload({
       };
       console.log("Upload request details:", requestInfo);
       
-      const response = await fetch(apiUrl, {
-        method: "POST",
+      // Use apiRequest directly with FormData (no conversion)
+      const response = await apiRequest("POST", apiUrl, undefined, {
         body: formData,
-        credentials: "include", // Important: Include credentials for authenticated requests
+        processData: false, // Don't process the data
+        contentType: false, // Let the browser set the content type for FormData
       });
       
       const responseInfo = {
