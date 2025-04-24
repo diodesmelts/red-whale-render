@@ -9,6 +9,7 @@ import { insertEntrySchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { pool } from "./db"; // Import the pool for direct SQL queries
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Missing Stripe secret key. Payment functionality will not work.');
