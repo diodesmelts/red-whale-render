@@ -68,7 +68,7 @@ export default function CompetitionsManager() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
 
   // Get competitions data
@@ -158,7 +158,7 @@ export default function CompetitionsManager() {
        competition.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
        (competition.brand && competition.brand.toLowerCase().includes(searchQuery.toLowerCase())) ||
        competition.category.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (selectedCategory ? competition.category.toLowerCase() === selectedCategory.toLowerCase() : true) &&
+      (selectedCategory && selectedCategory !== 'all' ? competition.category.toLowerCase() === selectedCategory.toLowerCase() : true) &&
       (activeTab === 'all' ? 
         true : 
         activeTab === 'live' ? 
@@ -249,7 +249,7 @@ export default function CompetitionsManager() {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {Object.values(COMPETITION_CATEGORIES).map((category) => (
                   <SelectItem key={category} value={category} className="capitalize">
                     {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -408,7 +408,7 @@ export default function CompetitionsManager() {
                                   <div className="flex items-center space-x-2">
                                     <Checkbox 
                                       id={`featured-${competition.id}`} 
-                                      checked={competition.isFeatured}
+                                      checked={competition.isFeatured || false}
                                       onCheckedChange={() => handleToggleFeatured(competition.id, !!competition.isFeatured)}
                                     />
                                     <label
@@ -456,7 +456,7 @@ export default function CompetitionsManager() {
                           <TableRow>
                             <TableCell colSpan={6} className="h-96 text-center">
                               <div className="flex flex-col items-center justify-center h-full gap-4">
-                                {searchQuery || selectedCategory ? (
+                                {searchQuery || (selectedCategory && selectedCategory !== 'all') ? (
                                   <>
                                     <div className="p-4 rounded-full bg-muted">
                                       <Search className="h-10 w-10 text-muted-foreground" />
@@ -468,7 +468,7 @@ export default function CompetitionsManager() {
                                     <div className="flex gap-4 mt-4">
                                       <Button variant="outline" onClick={() => {
                                         setSearchQuery('');
-                                        setSelectedCategory('');
+                                        setSelectedCategory('all');
                                       }}>
                                         Clear Filters
                                       </Button>
