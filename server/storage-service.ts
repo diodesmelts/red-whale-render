@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = './uploads';
@@ -129,7 +130,6 @@ export const storageService = {
       );
 
       // Convert buffer to stream and pipe it to the upload stream
-      const Readable = require('stream').Readable;
       const readableStream = new Readable();
       readableStream.push(file);
       readableStream.push(null);
