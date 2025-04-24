@@ -54,7 +54,9 @@ import {
   TicketIcon,
   PoundSterling,
   Star,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw,
+  DatabaseZap
 } from 'lucide-react';
 import { format, isPast, isToday } from 'date-fns';
 import { Competition } from '@shared/schema';
@@ -146,6 +148,28 @@ export default function CompetitionsManager() {
       toast({
         title: 'Error',
         description: `Failed to update featured status: ${error.message}`,
+        variant: 'destructive',
+      });
+    },
+  });
+  
+  // Reset all competitions mutation
+  const resetCompetitionsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/admin/reset-competitions');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/competitions'] });
+      toast({
+        title: 'Competitions Reset',
+        description: 'All competitions have been successfully removed from the database.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Reset Failed',
+        description: `Failed to reset competitions: ${error.message}`,
         variant: 'destructive',
       });
     },
@@ -314,6 +338,27 @@ export default function CompetitionsManager() {
               </Badge>
             </TabsTrigger>
           </TabsList>
+          
+          {/* Reset competitions button */}
+          <div className="flex justify-end">
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (window.confirm('WARNING: This will permanently delete ALL competitions, entries, and winners from the database. This action cannot be undone. Continue?')) {
+                  resetCompetitionsMutation.mutate();
+                }
+              }}
+              disabled={resetCompetitionsMutation.isPending}
+              className="flex items-center gap-2"
+            >
+              {resetCompetitionsMutation.isPending ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <DatabaseZap className="h-4 w-4" />
+              )}
+              Reset All Competitions
+            </Button>
+          </div>
 
           <TabsContent value={activeTab} className="space-y-4">
             <Card>
