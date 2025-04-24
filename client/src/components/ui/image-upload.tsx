@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, X } from "lucide-react";
+import { useDebugOverlay } from "./debug-overlay";
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
@@ -18,6 +19,7 @@ export function ImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string>(currentImageUrl);
   const { toast } = useToast();
+  const { showError, DebugOverlayComponent } = useDebugOverlay();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -64,6 +66,9 @@ export function ImageUpload({
         method: "POST",
         formDataKeys: [...formData.keys()],
         hasImageFile: formData.has('image'),
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
       };
       console.log("Upload request details:", requestInfo);
       
@@ -72,28 +77,49 @@ export function ImageUpload({
         body: formData,
       });
       
-      console.log("Upload response received:", {
+      const responseInfo = {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries([...response.headers.entries()]),
         url: response.url,
         redirected: response.redirected,
         type: response.type,
-      });
+      };
+      console.log("Upload response received:", responseInfo);
 
       if (!response.ok) {
         // Try to get detailed error information from the response
         let errorDetail = "Failed to upload image";
+        let errorData = null;
+        let responseText = "";
+        
         try {
-          const errorData = await response.json();
+          errorData = await response.json();
           errorDetail = errorData.message || errorData.details || errorDetail;
           console.error("Upload error details:", errorData);
         } catch (parseError) {
           console.error("Could not parse error response:", parseError);
           // If we can't parse the error response, use the status text and full URL
           errorDetail = `Failed to upload image (${response.status}: ${response.statusText})`;
-          console.error("Response text:", await response.text().catch(() => "Could not read response text"));
+          try {
+            responseText = await response.text();
+            console.error("Response text:", responseText);
+          } catch (e) {
+            responseText = "Could not read response text";
+            console.error(responseText);
+          }
         }
+        
+        // Show detailed error information in the debug overlay
+        showError({
+          title: `Upload Failed (${response.status}: ${response.statusText})`,
+          message: errorDetail,
+          details: responseText || (errorData ? JSON.stringify(errorData, null, 2) : ""),
+          requestInfo,
+          responseInfo,
+          apiUrl: "/api/upload"
+        });
+        
         throw new Error(errorDetail);
       }
 
@@ -117,9 +143,10 @@ export function ImageUpload({
       
       toast({
         title: errorMessage,
-        description: errorDetail,
+        description: "Check the error details panel for more information",
         variant: "destructive",
       });
+      
       // Reset preview if upload fails
       setPreview(currentImageUrl);
     } finally {
@@ -177,6 +204,9 @@ export function ImageUpload({
           </p>
         </div>
       )}
+      
+      {/* Debug overlay for developer-friendly error information */}
+      <DebugOverlayComponent />
     </div>
   );
 }
