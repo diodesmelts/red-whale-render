@@ -98,21 +98,10 @@ export default function ListingsManagement() {
       // Special handling for Render.com environment
       let endpointPath;
       
-      // Based on your error screenshots, there might be an issue with how the API URL is constructed
-      if (isProduction && isRender) {
-        // CRITICAL FIX FOR RENDER: Use the full API URL to avoid path issues
-        // For Render specifically, we need to ensure we're using the correct URL format
-        console.log('📡 Using Render-specific DELETE endpoint path');
-        
-        // Remove any /api prefix if using apiRequest which already adds it
-        endpointPath = `/admin/competitions/${id}`;
-        
-        console.log(`🔗 Render-specific endpoint path: ${endpointPath}`);
-      } else {
-        // Standard path for non-Render environments
-        endpointPath = `/api/admin/competitions/${id}`;
-        console.log(`🔗 Standard endpoint path: ${endpointPath}`);
-      }
+      // SIMPLIFIED - ALWAYS USE THE SAME PATH FORMAT
+      // apiRequest() already adds /api prefix, so we don't need to include it
+      endpointPath = `/admin/competitions/${id}`;
+      console.log(`🔗 Using simplified endpoint path: ${endpointPath}`);
       
       console.log(`🔗 Final endpoint path: ${endpointPath} for delete operation`);
       
