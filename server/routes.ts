@@ -666,10 +666,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       competitionId: req.params.id,
       userId: req.user?.id || 'no-user',
       userIsAdmin: req.user?.isAdmin || false,
+      url: req.url,
+      originalUrl: req.originalUrl,
+      method: req.method,
+      path: req.path,
       headers: {
         origin: req.headers.origin,
         referer: req.headers.referer,
-        cookie: req.headers.cookie ? 'Present' : 'Not present'
+        cookie: req.headers.cookie ? 'Present' : 'Not present',
+        'content-type': req.headers['content-type'],
+        'user-agent': req.headers['user-agent']
       }
     });
     
@@ -686,9 +692,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const id = parseInt(req.params.id);
+      // Parse the ID with validation
+      let id: number;
+      try {
+        id = parseInt(req.params.id);
+        if (isNaN(id)) {
+          throw new Error("Invalid competition ID");
+        }
+      } catch (parseError) {
+        console.error(`❌ Invalid competition ID format: ${req.params.id}`);
+        return res.status(400).json({ message: "Invalid competition ID format" });
+      }
+      
       console.log(`📌 Attempting to fetch competition ${id} before deletion`);
       
+      // Check if competition exists
       const competition = await dataStorage.getCompetition(id);
       
       if (!competition) {
@@ -698,16 +716,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`📌 About to delete competition: ${competition.title} (ID: ${competition.id})`);
       
-      // Allow deleting any competition, even with sold tickets
-      await dataStorage.deleteCompetition(id);
-      
-      console.log(`✅ Successfully deleted competition ${id}`);
-      
-      // Return success response without additional checks
-      res.status(204).end();
+      try {
+        // Allow deleting any competition, even with sold tickets
+        const deleted = await dataStorage.deleteCompetition(id);
+        
+        // Check deletion result
+        if (deleted) {
+          console.log(`✅ Successfully deleted competition ${id}`);
+          
+          // Send a proper success response
+          return res.status(204).end();
+        } else {
+          console.log(`⚠️ Competition ${id} not deleted, but no error thrown`);
+          return res.status(400).json({ message: "Unable to delete competition" });
+        }
+      } catch (deleteError: any) {
+        console.error(`❌ Error during competition deletion for ID ${id}:`, deleteError);
+        
+        // More informative error for client
+        return res.status(500).json({ 
+          message: "Failed to delete competition",
+          error: deleteError.message,
+          code: 'DELETION_ERROR'
+        });
+      }
     } catch (error: any) {
-      console.error(`❌ Error deleting competition:`, error);
-      res.status(500).json({ message: error.message });
+      // Log full error details for debugging
+      console.error(`❌ Unhandled error in delete competition handler:`, {
+        message: error.message,
+        stack: error.stack,
+        code: error.code,
+        details: error
+      });
+      
+      // Send a more specific error message to client
+      res.status(500).json({ 
+        message: "Server error while processing competition deletion",
+        errorType: error.name || "UnknownError"
+      });
     }
   });
   

@@ -669,11 +669,46 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteCompetition(id: number): Promise<boolean> {
-    // Delete the competition without checking for entries
-    // This allows admins to delete test competitions even if they have sold tickets
-    const deleted = await db.delete(competitions).where(eq(competitions.id, id));
-    // Just return true since we already checked if the competition exists
-    return true;
+    try {
+      console.log(`🔍 DB deletion: Attempting to delete competition with ID: ${id}`);
+      
+      // First check if the competition exists 
+      const competition = await this.getCompetition(id);
+      if (!competition) {
+        console.log(`⚠️ DB deletion: Competition ID ${id} not found`);
+        return false;
+      }
+      
+      // Enhanced error handling for Render environment 
+      try {
+        // Delete the competition directly - no check for entries table
+        const result = await db.delete(competitions).where(eq(competitions.id, id));
+        console.log(`✅ DB deletion: Successfully deleted competition ID: ${id}`, result);
+        return true;
+      } catch (error) {
+        // Log the error for debugging
+        console.error(`❌ DB deletion error for competition ID ${id}:`, error);
+        
+        // Try a different approach if the first one failed
+        // This is a fallback for production environment issues
+        try {
+          console.log(`🔄 DB deletion: Attempting alternative deletion method for ID: ${id}`);
+          
+          // Use a raw SQL query as a last resort if ORM fails
+          const sql = `DELETE FROM "competitions" WHERE "id" = $1`;
+          await db.execute(sql, [id]);
+          
+          console.log(`✅ DB deletion: Successfully deleted competition ID ${id} using raw SQL`);
+          return true;
+        } catch (fallbackError) {
+          console.error(`❌ DB deletion fallback error for ID ${id}:`, fallbackError);
+          throw fallbackError;
+        }
+      }
+    } catch (error) {
+      console.error(`❌ DB deleteCompetition error:`, error);
+      throw error;
+    }
   }
   
   // Entry operations
@@ -853,6 +888,97 @@ export class DatabaseStorage implements IStorage {
         value: "",
         description: "Custom site logo image URL"
       });
+    }
+  }
+  
+  // Method to ensure all required tables exist
+  async ensureTablesExist() {
+    console.log("🔍 Checking if all required database tables exist...");
+    
+    try {
+      // Check if entries table exists
+      const entriesTableExists = await this.tableExists("entries");
+      if (!entriesTableExists) {
+        console.log("⚠️ 'entries' table does not exist. Creating it now...");
+        await this.createEntriesTable();
+        console.log("✅ 'entries' table created successfully");
+      } else {
+        console.log("✅ 'entries' table exists");
+      }
+      
+      // Check if winners table exists
+      const winnersTableExists = await this.tableExists("winners");
+      if (!winnersTableExists) {
+        console.log("⚠️ 'winners' table does not exist. Creating it now...");
+        await this.createWinnersTable();
+        console.log("✅ 'winners' table created successfully");
+      } else {
+        console.log("✅ 'winners' table exists");
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("❌ Error ensuring tables exist:", error);
+      return false;
+    }
+  }
+  
+  // Helper to check if a table exists
+  private async tableExists(tableName: string): Promise<boolean> {
+    try {
+      const result = await pool.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public'
+          AND table_name = $1
+        )
+      `, [tableName]);
+      
+      return result.rows[0].exists;
+    } catch (error) {
+      console.error(`❌ Error checking if table ${tableName} exists:`, error);
+      return false;
+    }
+  }
+  
+  // Create entries table
+  private async createEntriesTable(): Promise<boolean> {
+    try {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS entries (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          competition_id INTEGER NOT NULL,
+          ticket_count INTEGER NOT NULL,
+          payment_status TEXT NOT NULL,
+          stripe_payment_id TEXT,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      return true;
+    } catch (error) {
+      console.error("❌ Error creating entries table:", error);
+      return false;
+    }
+  }
+  
+  // Create winners table
+  private async createWinnersTable(): Promise<boolean> {
+    try {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS winners (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          competition_id INTEGER NOT NULL,
+          entry_id INTEGER,
+          announced_at TIMESTAMP DEFAULT NOW(),
+          claim_status TEXT NOT NULL
+        )
+      `);
+      return true;
+    } catch (error) {
+      console.error("❌ Error creating winners table:", error);
+      return false;
     }
   }
   
