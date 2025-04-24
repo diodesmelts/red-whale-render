@@ -30,7 +30,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 bg-background/90 backdrop-blur-sm z-50 border-b border-border">
+    <nav className="sticky top-0 bg-gradient-to-b from-background/95 to-card/95 backdrop-blur-sm z-50 border-b border-border shadow-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-28">
           <div className="flex items-center">
@@ -44,19 +44,23 @@ export function Navbar() {
             <div className="hidden md:block">
               <div className="ml-10 flex items-center space-x-6">
                 <Link href="/" className={cn(
-                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
-                  location === "/" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                  "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
+                  location === "/" 
+                    ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                 )}>
                   <i className="fas fa-home mr-2"></i> Home
                 </Link>
                 <div className="relative group">
                   <Link href="/competitions" className={cn(
-                    "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
-                    location.includes("/competitions") ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                    "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
+                    location.includes("/competitions") 
+                      ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                   )}>
                     <i className="fas fa-trophy mr-2"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
                   </Link>
-                  <div className="hidden group-hover:block absolute left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-10">
+                  <div className="hidden group-hover:block absolute left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-10 border border-border/60">
                     <Link href="/competitions" className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
                       All Competitions
                     </Link>
@@ -73,22 +77,28 @@ export function Navbar() {
                   </div>
                 </div>
                 <Link href="/how-to-play" className={cn(
-                  "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
-                  location === "/how-to-play" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                  "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
+                  location === "/how-to-play" 
+                    ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                 )}>
                   <i className="fas fa-question-circle mr-2"></i> How to Play
                 </Link>
                 {user && (
                   <>
                     <Link href="/my-entries" className={cn(
-                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
-                      location === "/my-entries" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                      "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
+                      location === "/my-entries" 
+                        ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                        : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                     )}>
                       <i className="fas fa-clipboard-list mr-2"></i> My Entries
                     </Link>
                     <Link href="/my-wins" className={cn(
-                      "px-4 py-3 text-base font-medium hover:text-primary transition duration-150 flex items-center",
-                      location === "/my-wins" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"
+                      "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
+                      location === "/my-wins" 
+                        ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                        : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                     )}>
                       <i className="fas fa-award mr-2"></i> My Wins
                     </Link>
