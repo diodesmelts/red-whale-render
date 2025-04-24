@@ -55,15 +55,12 @@ export default function HomePage() {
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">1</div>
               
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6 group-hover:animate-pulse transition-all duration-300 group-hover:scale-110">
-                <i className="fas fa-search text-primary text-2xl"></i>
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">Browse Competitions</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors mt-4">Browse Competitions</h3>
               <p className="text-muted-foreground font-light text-base">
                 Explore our wide range of exciting competitions across different categories and platforms.
               </p>
               <div className="mt-6 w-full h-2 bg-primary/20 rounded-full overflow-hidden">
-                <div className="h-full w-full bg-primary animate-pulse-slow"></div>
+                <div className="h-full w-full bg-primary"></div>
               </div>
             </div>
             
@@ -72,15 +69,12 @@ export default function HomePage() {
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">2</div>
               
-              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-6 group-hover:animate-pulse transition-all duration-300 group-hover:scale-110">
-                <i className="fas fa-ticket-alt text-purple-500 text-2xl"></i>
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-purple-500 transition-colors">Enter & Follow Steps</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-purple-500 transition-colors mt-4">Enter & Follow Steps</h3>
               <p className="text-muted-foreground font-light text-base">
                 Select a competition and follow the simple entry steps to secure your tickets.
               </p>
               <div className="mt-6 w-full h-2 bg-purple-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-2/3 bg-purple-500 animate-pulse-slow"></div>
+                <div className="h-full w-2/3 bg-purple-500"></div>
               </div>
             </div>
             
@@ -89,15 +83,12 @@ export default function HomePage() {
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">3</div>
               
-              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-6 group-hover:animate-pulse transition-all duration-300 group-hover:scale-110">
-                <i className="fas fa-chart-line text-blue-500 text-2xl"></i>
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-blue-500 transition-colors">Track Entries</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-blue-500 transition-colors mt-4">Track Entries</h3>
               <p className="text-muted-foreground font-light text-base">
                 Monitor your active entries and check competition closing dates on your dashboard.
               </p>
               <div className="mt-6 w-full h-2 bg-blue-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-1/2 bg-blue-500 animate-pulse-slow"></div>
+                <div className="h-full w-1/2 bg-blue-500"></div>
               </div>
             </div>
             
@@ -106,15 +97,12 @@ export default function HomePage() {
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:rotate-12 transition-transform">4</div>
               
-              <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-6 group-hover:animate-pulse transition-all duration-300 group-hover:scale-110">
-                <i className="fas fa-trophy text-orange-500 text-2xl"></i>
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-orange-500 transition-colors">Win & Celebrate</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-orange-500 transition-colors mt-4">Win & Celebrate</h3>
               <p className="text-muted-foreground font-light text-base">
                 Get notified when you win and follow the simple claim process to receive your prize!
               </p>
               <div className="mt-6 w-full h-2 bg-orange-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-1/4 bg-orange-500 animate-pulse-slow"></div>
+                <div className="h-full w-1/4 bg-orange-500"></div>
               </div>
             </div>
           </div>

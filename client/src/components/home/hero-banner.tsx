@@ -54,7 +54,7 @@ export function HeroBanner() {
         <div className="text-center py-12">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-4 relative">
             <span className="relative inline-block">
-              <span className="text-primary animate-pulse-slow">Competition</span>
+              <span className="text-primary">Competition</span>
               <span className="absolute -top-6 -right-6 text-yellow-400 text-3xl transform rotate-12">★</span>
             </span>
             <span className="font-light tracking-wider">Time</span>
