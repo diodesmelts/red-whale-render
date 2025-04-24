@@ -16,8 +16,6 @@ app.use(express.json());
 
 // For multipart form data (file uploads)
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
 // Configure multer for memory storage
 const multerStorage = multer.memoryStorage();
