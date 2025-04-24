@@ -165,15 +165,11 @@ export function Navbar() {
                         )}
                         <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
                           <User className="h-4 w-4 mr-2 text-primary" />
-                          <span>My Profile</span>
+                          <span>My Settings</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Wallet className="h-4 w-4 mr-2 text-green-500" />
                           <span>My Balance</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Settings className="h-4 w-4 mr-2 text-muted-foreground" />
-                          <span>Account Settings</span>
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
