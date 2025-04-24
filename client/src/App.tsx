@@ -1,3 +1,4 @@
+import React from "react";
 import { Switch, Route } from "wouter";
 import { queryClient, getApiBaseUrl } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -25,10 +26,19 @@ import TestRegister from "@/pages/test-register";
 // Admin Pages
 import AdminDashboard from "@/pages/admin/index";
 import CompetitionsManagement from "@/pages/admin/competitions";
-import CreateCompetition from "@/pages/admin/create-competition";
 import UsersManagement from "@/pages/admin/users";
 import AdminSettings from "@/pages/admin/settings";
 import SiteConfigPage from "@/pages/admin/site-config";
+
+// Dynamically import create-competition to avoid TypeScript issues
+const CreateCompetition = () => {
+  const CreateCompPage = React.lazy(() => import("@/pages/admin/create-competition"));
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <CreateCompPage />
+    </React.Suspense>
+  );
+};
 
 import { Layout } from "@/components/layout/layout";
 import { Navbar } from "@/components/layout/navbar";

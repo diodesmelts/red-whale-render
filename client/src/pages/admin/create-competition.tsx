@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { Competition, insertCompetitionSchema } from "@shared/schema";
 import { COMPETITION_CATEGORIES } from "@/lib/constants";
 import { ImageUpload } from "@/components/ui/image-upload";
+import type { CheckedState } from "@radix-ui/react-checkbox";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -202,7 +203,7 @@ export default function CreateCompetition() {
                       <FormItem>
                         <FormLabel>Brand (optional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Brand name" {...field} />
+                          <Input placeholder="Brand name" {...field} value={field.value || ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -218,7 +219,7 @@ export default function CreateCompetition() {
                       <FormControl>
                         <ImageUpload 
                           onImageUploaded={field.onChange}
-                          currentImageUrl={field.value}
+                          currentImageUrl={field.value || ""}
                         />
                       </FormControl>
                       <FormMessage />
