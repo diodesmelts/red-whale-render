@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, X } from "lucide-react";
 import { useDebugOverlay } from "./debug-overlay";
+import { getApiBaseUrl } from "@/lib/queryClient";
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
@@ -58,13 +59,16 @@ export function ImageUpload({
     formData.append("image", file);
 
     try {
-      console.log("Starting upload to:", "/api/upload");
+      // Get the API base URL from our helper function
+      const baseUrl = getApiBaseUrl();
+      const apiUrl = `${baseUrl}/api/upload`;
+      console.log("Starting upload to:", apiUrl);
       
       // Log the request being made for diagnostics
       const requestInfo = {
-        url: "/api/upload",
+        url: apiUrl,
         method: "POST",
-        formDataKeys: [...formData.keys()],
+        formDataKeys: Array.from(formData.keys()), // Use Array.from to avoid TS iterator issue
         hasImageFile: formData.has('image'),
         fileName: file.name,
         fileType: file.type,
@@ -72,15 +76,16 @@ export function ImageUpload({
       };
       console.log("Upload request details:", requestInfo);
       
-      const response = await fetch("/api/upload", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         body: formData,
+        credentials: "include", // Important: Include credentials for authenticated requests
       });
       
       const responseInfo = {
         status: response.status,
         statusText: response.statusText,
-        headers: Object.fromEntries([...response.headers.entries()]),
+        headers: Object.fromEntries(Array.from(response.headers.entries())),
         url: response.url,
         redirected: response.redirected,
         type: response.type,
@@ -117,7 +122,7 @@ export function ImageUpload({
           details: responseText || (errorData ? JSON.stringify(errorData, null, 2) : ""),
           requestInfo,
           responseInfo,
-          apiUrl: "/api/upload"
+          apiUrl: apiUrl
         });
         
         throw new Error(errorDetail);
