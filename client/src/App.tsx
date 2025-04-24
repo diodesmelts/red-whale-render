@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 import { useEffect } from "react";
 import ApiTest from "./api-test";
+import { DebugOverlayProvider } from "@/components/ui/debug-overlay-provider";
 
 // Pages
 import HomePage from "@/pages/home-page";
@@ -103,9 +104,11 @@ function App() {
       <ThemeProvider defaultTheme="dark" storageKey="blue-whale-theme">
         <AuthProvider>
           <TooltipProvider>
-            <Toaster />
-            <ApiConnectivityCheck />
-            <Router />
+            <DebugOverlayProvider>
+              <Toaster />
+              <ApiConnectivityCheck />
+              <Router />
+            </DebugOverlayProvider>
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>

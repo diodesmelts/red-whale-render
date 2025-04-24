@@ -1,4 +1,12 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { SimpleEventEmitter } from './simple-event-emitter';
+
+// Create a global event emitter for error events
+export const errorEventEmitter = new SimpleEventEmitter();
+// Custom event for showing the debug overlay
+export const SHOW_DEBUG_OVERLAY_EVENT = 'show-debug-overlay';
+// Custom event for error reporting
+export const REPORT_ERROR_EVENT = 'report-error';
 
 // Get the API URL based on environment
 export const getApiBaseUrl = () => {
@@ -157,15 +165,43 @@ export async function apiRequest(
       console.error(`❌ API Error: ${res.status} ${res.statusText}`, responseText);
       
       // Format a user-friendly error message
+      let errorMessage = "";
       if (res.status === 401) {
-        throw new Error("Invalid username or password. Please try again.");
+        errorMessage = "Invalid username or password. Please try again.";
       } else if (res.status === 404) {
-        throw new Error("The requested resource was not found.");
+        errorMessage = "The requested resource was not found.";
       } else if (res.status >= 500) {
-        throw new Error("Server error. Please try again later.");
+        errorMessage = "Server error. Please try again later.";
       } else {
-        throw new Error(`${res.status}: ${responseText || res.statusText}`);
+        errorMessage = `${res.status}: ${responseText || res.statusText}`;
       }
+      
+      // Emit error information for debug overlay
+      errorEventEmitter.emit(REPORT_ERROR_EVENT, {
+        title: `API Error: ${res.status} ${res.statusText}`,
+        message: errorMessage,
+        details: responseText,
+        requestInfo: {
+          method,
+          url,
+          apiUrl,
+          data: data ? JSON.stringify(data, null, 2) : null,
+          headers
+        },
+        responseInfo: {
+          status: res.status,
+          statusText: res.statusText,
+          headers: Object.fromEntries(Array.from(res.headers.entries())),
+          raw: responseText
+        },
+        apiUrl: url,
+        finalApiUrl: apiUrl
+      });
+      
+      // Trigger the debug overlay to show
+      document.dispatchEvent(new Event(SHOW_DEBUG_OVERLAY_EVENT));
+      
+      throw new Error(errorMessage);
     }
     
     return res;
@@ -301,6 +337,41 @@ export const getQueryFn: <T>(options: {
       if (!res.ok) {
         const responseText = await res.text();
         console.error(`❌ Query error: ${res.status} ${res.statusText}`, responseText);
+        
+        // Format a user-friendly error message
+        let errorMessage = "";
+        if (res.status === 401) {
+          errorMessage = "Invalid username or password. Please try again.";
+        } else if (res.status === 404) {
+          errorMessage = "The requested resource was not found.";
+        } else if (res.status >= 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = `${res.status}: ${responseText || res.statusText}`;
+        }
+        
+        // Emit error information for debug overlay
+        errorEventEmitter.emit(REPORT_ERROR_EVENT, {
+          title: `Query Error: ${res.status} ${res.statusText}`,
+          message: errorMessage,
+          details: responseText,
+          requestInfo: {
+            method: 'GET',
+            queryKey,
+            apiUrl
+          },
+          responseInfo: {
+            status: res.status,
+            statusText: res.statusText,
+            headers: Object.fromEntries(Array.from(res.headers.entries())),
+            raw: responseText
+          },
+          apiUrl: queryUrl,
+          finalApiUrl: apiUrl
+        });
+        
+        // Trigger the debug overlay to show
+        document.dispatchEvent(new Event(SHOW_DEBUG_OVERLAY_EVENT));
       }
 
       await throwIfResNotOk(res);
@@ -333,7 +404,7 @@ export const getQueryFn: <T>(options: {
           const origin = window.location.origin;
           const pathname = window.location.pathname;
           
-          console.error('🔍 DETAILED QUERY ERROR DIAGNOSTIC:', {
+          const diagnosticInfo = {
             errorMessage: error.message,
             queryKey,
             apiUrl,
@@ -345,7 +416,36 @@ export const getQueryFn: <T>(options: {
             networkStatus: window.navigator.onLine ? 'Online' : 'Offline',
             userAgent: window.navigator.userAgent,
             timestamp: new Date().toISOString()
+          };
+          
+          console.error('🔍 DETAILED QUERY ERROR DIAGNOSTIC:', diagnosticInfo);
+          
+          // Send to debug overlay
+          errorEventEmitter.emit(REPORT_ERROR_EVENT, {
+            title: `Network Error: ${error.message}`,
+            message: `Failed to fetch data from ${queryUrl}`,
+            details: JSON.stringify(diagnosticInfo, null, 2),
+            requestInfo: {
+              method: 'GET',
+              queryKey,
+              apiUrl,
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              }
+            },
+            responseInfo: {
+              error: error.message,
+              stack: error.stack,
+              networkStatus: window.navigator.onLine ? 'Online' : 'Offline'
+            },
+            apiUrl: queryUrl,
+            finalApiUrl: apiUrl,
+            timestamp: new Date().toISOString()
           });
+          
+          // Trigger the debug overlay to show
+          document.dispatchEvent(new Event(SHOW_DEBUG_OVERLAY_EVENT));
           
           if (queryUrl.includes('/api/user')) {
             console.error('USER ENDPOINT ERROR: The user endpoint could not be found or is not responding correctly');

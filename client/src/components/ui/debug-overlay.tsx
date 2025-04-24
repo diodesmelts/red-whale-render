@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { SHOW_DEBUG_OVERLAY_EVENT } from '@/lib/queryClient';
 
 // Type definition for our error details
 type ErrorDetailsType = {
@@ -61,7 +62,7 @@ export function DebugOverlay({ isOpen, onClose, errorDetails }: DebugOverlayProp
         e.preventDefault();
         console.log('Debug key combination pressed - forcing debug overlay open');
         // This will be handled by the parent component
-        document.dispatchEvent(new CustomEvent('show-debug-overlay'));
+        document.dispatchEvent(new Event(SHOW_DEBUG_OVERLAY_EVENT));
       }
     };
 
@@ -229,9 +230,9 @@ export function useDebugOverlay() {
       }
     };
     
-    document.addEventListener('show-debug-overlay', handleShowDebugOverlay);
+    document.addEventListener(SHOW_DEBUG_OVERLAY_EVENT, handleShowDebugOverlay);
     return () => {
-      document.removeEventListener('show-debug-overlay', handleShowDebugOverlay);
+      document.removeEventListener(SHOW_DEBUG_OVERLAY_EVENT, handleShowDebugOverlay);
     };
   }, []);
 
