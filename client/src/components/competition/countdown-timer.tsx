@@ -34,30 +34,33 @@ export function CountdownTimer({
   
   if (variant === "detailed") {
     return (
-      <div className={cn("bg-orange-500 p-4", className)}>
+      <div className={cn(
+        "bg-transparent p-4 border-2 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] rounded-lg", 
+        className
+      )}>
         <div className="flex items-center justify-between">
-          <div className="text-white font-semibold">TIME REMAINING</div>
-          <div className="text-xs bg-white text-orange-500 px-2 py-1 rounded">LIVE</div>
+          <div className="text-blue-400 font-semibold">TIME REMAINING</div>
+          <div className="text-xs bg-blue-500 text-white px-2 py-1 rounded animate-pulse">LIVE</div>
         </div>
         <div className="grid grid-cols-4 gap-2 mt-3">
-          <div className="bg-background rounded p-2 text-center">
-            <div className="text-white text-xl font-bold">{String(timeRemaining.days).padStart(2, '0')}</div>
-            <div className="text-white text-xs">DAYS</div>
+          <div className="bg-background/60 border border-blue-400/30 rounded-lg p-2 text-center backdrop-blur-sm">
+            <div className="text-cyan-400 text-xl font-bold">{String(timeRemaining.days).padStart(2, '0')}</div>
+            <div className="text-blue-300 text-xs font-medium">DAYS</div>
           </div>
-          <div className="bg-background rounded p-2 text-center">
-            <div className="text-white text-xl font-bold">{String(timeRemaining.hours).padStart(2, '0')}</div>
-            <div className="text-white text-xs">HRS</div>
+          <div className="bg-background/60 border border-blue-400/30 rounded-lg p-2 text-center backdrop-blur-sm">
+            <div className="text-cyan-400 text-xl font-bold">{String(timeRemaining.hours).padStart(2, '0')}</div>
+            <div className="text-blue-300 text-xs font-medium">HRS</div>
           </div>
-          <div className="bg-background rounded p-2 text-center">
-            <div className="text-white text-xl font-bold">{String(timeRemaining.minutes).padStart(2, '0')}</div>
-            <div className="text-white text-xs">MIN</div>
+          <div className="bg-background/60 border border-blue-400/30 rounded-lg p-2 text-center backdrop-blur-sm">
+            <div className="text-cyan-400 text-xl font-bold">{String(timeRemaining.minutes).padStart(2, '0')}</div>
+            <div className="text-blue-300 text-xs font-medium">MIN</div>
           </div>
-          <div className="bg-background rounded p-2 text-center">
-            <div className="text-white text-xl font-bold">{String(timeRemaining.seconds).padStart(2, '0')}</div>
-            <div className="text-white text-xs">SEC</div>
+          <div className="bg-background/60 border border-blue-400/30 rounded-lg p-2 text-center backdrop-blur-sm">
+            <div className="text-cyan-400 text-xl font-bold">{String(timeRemaining.seconds).padStart(2, '0')}</div>
+            <div className="text-blue-300 text-xs font-medium">SEC</div>
           </div>
         </div>
-        <div className="text-white text-xs text-center mt-2">
+        <div className="text-blue-200 text-xs text-center mt-2">
           Drawing on {new Date(drawDate).toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'long',
