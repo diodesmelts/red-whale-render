@@ -27,6 +27,7 @@ import CartPage from "@/pages/cart";
 import TermsConditions from "@/pages/terms-conditions";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import CookiePolicy from "@/pages/cookie-policy";
+import FAQsPage from "@/pages/faqs";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/index";
@@ -75,6 +76,7 @@ function Router() {
               <Route path="/terms-conditions" component={TermsConditions} />
               <Route path="/privacy-policy" component={PrivacyPolicy} />
               <Route path="/cookie-policy" component={CookiePolicy} />
+              <Route path="/faqs" component={FAQsPage} />
               
               {/* Admin Routes - protected and require admin role */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
