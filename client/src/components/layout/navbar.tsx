@@ -5,6 +5,7 @@ import { Logo } from "@/components/ui/logo";
 import { Bell, Menu, ChevronDown, User, Shield, ClipboardList, Wallet, Settings, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { CartIcon } from "@/components/cart/cart-icon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -111,10 +112,13 @@ export function Navbar() {
             <div className="ml-4 flex items-center md:ml-6">
               {user ? (
                 <>
-                  <Button variant="ghost" size="icon" className="mr-3 relative">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                  </Button>
+                  <div className="flex items-center space-x-3">
+                    <CartIcon variant="ghost" size="icon" showTooltip={true} />
+                    <Button variant="ghost" size="icon" className="relative">
+                      <Bell className="h-5 w-5" />
+                      <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </Button>
+                  </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="secondary" className="flex items-center bg-primary/30 hover:bg-primary/50">
@@ -272,6 +276,14 @@ export function Navbar() {
                           location === "/my-wins" ? "text-primary" : "text-foreground"
                         )}>
                         <i className="fas fa-award mr-2"></i> My Wins
+                      </Link>
+                      <Link href="/cart" 
+                        onClick={() => setIsMenuOpen(false)}
+                        className={cn(
+                          "flex items-center text-lg font-medium",
+                          location === "/cart" ? "text-primary" : "text-foreground"
+                        )}>
+                        <i className="fas fa-shopping-cart mr-2"></i> My Cart
                       </Link>
                       <div className="border-t border-border pt-4">
                         {user.isAdmin && (
