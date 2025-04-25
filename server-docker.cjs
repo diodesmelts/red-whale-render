@@ -10,10 +10,24 @@ const Stripe = require('stripe');
 // Set up Stripe if API key is available
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2023-10-16"
-  });
-  console.log('✅ Stripe initialized successfully');
+  try {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2023-10-16"
+    });
+    // Perform a lightweight API call to verify the key works
+    stripe.paymentMethods.list({ limit: 1 })
+      .then(() => {
+        console.log('✅ Stripe initialized and API key verified successfully');
+      })
+      .catch(error => {
+        console.error('❌ Stripe API key verification failed:', error.message);
+        // Don't assign null here - leave stripe as the instance
+        // so it will show a proper error on checkout attempts
+      });
+  } catch (error) {
+    console.error('❌ Failed to initialize Stripe:', error.message);
+    // Keep stripe as null so we'll return a helpful error
+  }
 } else {
   console.log('⚠️ No Stripe secret key found in environment variables');
 }
@@ -1193,24 +1207,49 @@ app.post("/api/create-payment-intent", async (req, res) => {
     
     console.log(`💰 Creating payment intent for £${amount} (${amountInPence} pence)`);
     
-    // Create a payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountInPence, // Amount in pence (Stripe requires integer amount)
-      currency: "gbp",
-      metadata: {
-        competitionId, // First competition ID (legacy support)
-        ticketCount,   // First ticket count (legacy support)
-        userId: req.user.id.toString(),
-        cartItemsCount: cartItems.length.toString(),
-        cartTotal: amount.toString()
+    try {
+      // Create a payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amountInPence, // Amount in pence (Stripe requires integer amount)
+        currency: "gbp",
+        metadata: {
+          competitionId, // First competition ID (legacy support)
+          ticketCount,   // First ticket count (legacy support)
+          userId: req.user.id.toString(),
+          cartItemsCount: cartItems.length.toString(),
+          cartTotal: amount.toString()
+        }
+      });
+      
+      console.log(`✅ Payment intent created: ${paymentIntent.id}`);
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (stripeError) {
+      console.error("❌ Stripe API error creating payment intent:", stripeError);
+      
+      // Check for specific Stripe errors
+      if (stripeError.type === 'StripeAuthenticationError') {
+        return res.status(500).json({ 
+          message: "Payment system authentication error",
+          details: "The payment system is experiencing authentication issues. Please contact support."
+        });
+      } else if (stripeError.type === 'StripeInvalidRequestError') {
+        return res.status(400).json({ 
+          message: "Invalid payment request",
+          details: stripeError.message
+        });
+      } else {
+        return res.status(500).json({ 
+          message: "Payment processing error",
+          details: stripeError.message || "There was a problem processing your payment."
+        });
       }
-    });
-    
-    console.log(`✅ Payment intent created: ${paymentIntent.id}`);
-    res.json({ clientSecret: paymentIntent.client_secret });
+    }
   } catch (error) {
-    console.error("❌ Error creating payment intent:", error);
-    res.status(500).json({ message: error.message });
+    console.error("❌ General error creating payment intent:", error);
+    res.status(500).json({ 
+      message: "Server error processing payment",
+      details: error.message 
+    });
   }
 });
 
