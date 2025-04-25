@@ -7,13 +7,26 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { CartItem } from '@/hooks/use-cart';
 
 // Make sure to call loadStripe outside of a component's render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+console.log('Stripe public key status:', stripeKey ? 'Found' : 'Missing');
+
+// Safely load Stripe with error handling
+let stripePromise: ReturnType<typeof loadStripe> | null = null;
+try {
+  if (!stripeKey) {
+    console.error('Missing Stripe public key (VITE_STRIPE_PUBLIC_KEY)');
+  } else {
+    stripePromise = loadStripe(stripeKey);
+  }
+} catch (err) {
+  console.error('Error initializing Stripe:', err);
+}
 
 interface CheckoutFormProps {
   clientSecret: string;
@@ -152,6 +165,21 @@ export function StripeCheckout({
   onSuccess,
   onCancel
 }: StripeCheckoutProps) {
+  const [stripeError, setStripeError] = useState<string | null>(null);
+
+  // Check Stripe initialization
+  useEffect(() => {
+    // After a timeout, check if Stripe was initialized successfully
+    const timer = setTimeout(() => {
+      if (!stripePromise) {
+        console.error("Stripe initialization failed or timed out");
+        setStripeError("Payment system could not be initialized. Please check your payment configuration.");
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const appearance = {
     theme: 'night' as const,
     variables: {
@@ -168,6 +196,69 @@ export function StripeCheckout({
     clientSecret,
     appearance,
   };
+
+  // Show error if Stripe failed to initialize
+  if (stripeError) {
+    return (
+      <div className="bg-card border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
+        <h2 className="text-xl font-semibold mb-1">Complete your purchase</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Total: £{amount.toFixed(2)} for {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
+        </p>
+        
+        <div className="bg-destructive/10 text-destructive p-4 rounded-md mb-4 flex items-start">
+          <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-medium">Payment System Error</p>
+            <p className="text-sm mt-1">{stripeError}</p>
+            <p className="text-sm mt-2">Please check your payment configuration or try again later.</p>
+          </div>
+        </div>
+        
+        <div className="flex justify-between">
+          <Button 
+            type="button"
+            variant="outline" 
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="button"
+            onClick={() => window.location.reload()}
+          >
+            Reload Page
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading message if stripePromise is null but we haven't timed out yet
+  if (!stripePromise) {
+    return (
+      <div className="bg-card border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
+        <h2 className="text-xl font-semibold mb-1">Complete your purchase</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Total: £{amount.toFixed(2)} for {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
+        </p>
+        
+        <div className="flex flex-col items-center justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-sm text-muted-foreground">Initializing payment system...</p>
+        </div>
+        
+        <Button 
+          type="button"
+          variant="outline" 
+          onClick={onCancel}
+          className="w-full mt-4"
+        >
+          Cancel
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
