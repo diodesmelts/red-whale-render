@@ -190,7 +190,6 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto">
               <span className="text-primary relative">Live</span> Competitions
-              <span className="absolute -top-1 -right-5 text-yellow-400 text-lg transform rotate-12">🏆</span>
             </h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg font-light">
               Don't miss your chance to win these <span className="text-primary font-medium">amazing prizes</span>! New competitions added regularly.
