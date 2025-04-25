@@ -32,10 +32,10 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 bg-gradient-to-b from-background/95 to-card/95 backdrop-blur-sm z-50 border-b border-border shadow-sm">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between h-28">
           <div className="flex items-center">
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 pl-2 sm:pl-4">
               <Link href="/">
                 <div className="flex items-center space-x-2 cursor-pointer">
                   <Logo size="lg" />
@@ -109,7 +109,7 @@ export function Navbar() {
             </div>
           </div>
           <div className="hidden md:block">
-            <div className="ml-4 flex items-center md:ml-6">
+            <div className="ml-4 flex items-center md:ml-6 pr-2 sm:pr-4">
               {user ? (
                 <>
                   <div className="flex items-center space-x-3">
