@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { Competition } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 export type CartItem = {
   competitionId: number;
@@ -8,141 +8,160 @@ export type CartItem = {
   imageUrl: string | null;
   ticketPrice: number;
   ticketCount: number;
+  maxTicketsPerUser: number;
 };
 
-interface CartContextType {
+type CartContextType = {
   cartItems: CartItem[];
   cartCount: number;
   cartTotal: number;
-  addToCart: (competition: Competition, ticketCount: number) => void;
+  addToCart: (competition: Competition, quantity: number) => void;
+  updateCartItem: (competitionId: number, quantity: number) => void;
   removeFromCart: (competitionId: number) => void;
-  updateCartItem: (competitionId: number, ticketCount: number) => void;
   clearCart: () => void;
-}
+};
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const CART_STORAGE_KEY = "bluewhale-cart";
 
-// Provider component that wraps parts of the app that need cart access
+export const CartContext = createContext<CartContextType | null>(null);
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
 
-  // Calculate derived values
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
+    } catch (error) {
+      console.error("Failed to load cart from localStorage:", error);
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch (error) {
+      console.error("Failed to save cart to localStorage:", error);
+    }
+  }, [cartItems]);
+
+  // Calculate cart total and count
   const cartCount = cartItems.reduce((total, item) => total + item.ticketCount, 0);
   const cartTotal = cartItems.reduce(
     (total, item) => total + item.ticketPrice * item.ticketCount, 
     0
   );
 
-  // Initialize cart from local storage
-  useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('bw-cart');
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
-      }
-    } catch (error) {
-      console.error('Failed to load cart from local storage:', error);
-    }
-  }, []);
+  const addToCart = (competition: Competition, quantity: number) => {
+    if (quantity <= 0) return;
 
-  // Save cart to local storage on changes
-  useEffect(() => {
-    try {
-      localStorage.setItem('bw-cart', JSON.stringify(cartItems));
-    } catch (error) {
-      console.error('Failed to save cart to local storage:', error);
-    }
-  }, [cartItems]);
+    setCartItems((prevItems) => {
+      // Check if this competition is already in the cart
+      const existingItemIndex = prevItems.findIndex(
+        (item) => item.competitionId === competition.id
+      );
 
-  // Add competition tickets to cart
-  const addToCart = (competition: Competition, ticketCount: number) => {
-    if (ticketCount <= 0) {
-      toast({
-        title: "Invalid quantity",
-        description: "Please select at least 1 ticket",
-        variant: "destructive"
-      });
-      return;
-    }
+      // If the competition exists in the cart, update the quantity
+      if (existingItemIndex >= 0) {
+        const item = prevItems[existingItemIndex];
+        const newQuantity = Math.min(
+          item.ticketCount + quantity,
+          competition.maxTicketsPerUser
+        );
 
-    // Check if this competition is already in the cart
-    const existingIndex = cartItems.findIndex(
-      item => item.competitionId === competition.id
-    );
+        // If we're not adding any more tickets, don't update
+        if (newQuantity === item.ticketCount) {
+          toast({
+            title: "Maximum tickets reached",
+            description: `You can only purchase up to ${competition.maxTicketsPerUser} tickets for this competition.`,
+            variant: "destructive",
+          });
+          return prevItems;
+        }
 
-    if (existingIndex >= 0) {
-      // Competition already in cart, update quantity
-      const existingItem = cartItems[existingIndex];
-      const newQuantity = existingItem.ticketCount + ticketCount;
-      
-      // Check if this would exceed max tickets per user
-      if (newQuantity > competition.maxTicketsPerUser) {
+        const updatedItems = [...prevItems];
+        updatedItems[existingItemIndex] = {
+          ...item,
+          ticketCount: newQuantity,
+        };
+
         toast({
-          title: "Maximum tickets exceeded",
-          description: `You can only purchase up to ${competition.maxTicketsPerUser} tickets for this competition`,
-          variant: "destructive"
+          title: "Cart updated",
+          description: `Updated ${competition.title} ticket quantity to ${newQuantity}.`,
         });
-        return;
+
+        return updatedItems;
       }
 
-      // Update quantity
-      const newCartItems = [...cartItems];
-      newCartItems[existingIndex] = {
-        ...existingItem,
-        ticketCount: newQuantity
-      };
-      setCartItems(newCartItems);
-    } else {
-      // New competition, add to cart
-      const newCartItem: CartItem = {
-        competitionId: competition.id,
-        title: competition.title,
-        imageUrl: competition.imageUrl,
-        ticketPrice: competition.ticketPrice,
-        ticketCount: ticketCount
-      };
-      setCartItems([...cartItems, newCartItem]);
-    }
+      // Otherwise, add as a new item
+      toast({
+        title: "Added to cart",
+        description: `${quantity} ticket${quantity !== 1 ? 's' : ''} for ${competition.title} added to your cart.`,
+      });
 
-    toast({
-      title: "Added to cart",
-      description: `${ticketCount} ticket(s) for ${competition.title} added to your cart`,
+      return [
+        ...prevItems,
+        {
+          competitionId: competition.id,
+          title: competition.title,
+          imageUrl: competition.imageUrl,
+          ticketPrice: competition.ticketPrice,
+          ticketCount: quantity,
+          maxTicketsPerUser: competition.maxTicketsPerUser,
+        },
+      ];
     });
   };
 
-  // Remove competition from cart
-  const removeFromCart = (competitionId: number) => {
-    setCartItems(cartItems.filter(item => item.competitionId !== competitionId));
-    toast({
-      title: "Removed from cart",
-      description: "Item removed from your cart",
-    });
-  };
-
-  // Update quantity for a specific competition
-  const updateCartItem = (competitionId: number, ticketCount: number) => {
-    if (ticketCount <= 0) {
-      // Remove the item if quantity is 0 or negative
+  const updateCartItem = (competitionId: number, quantity: number) => {
+    if (quantity <= 0) {
       removeFromCart(competitionId);
       return;
     }
 
-    setCartItems(
-      cartItems.map(item => 
+    setCartItems((prevItems) => {
+      const item = prevItems.find((item) => item.competitionId === competitionId);
+      if (!item) return prevItems;
+
+      // Make sure we don't exceed the maximum tickets
+      const newQuantity = Math.min(quantity, item.maxTicketsPerUser);
+      
+      if (newQuantity === item.ticketCount) {
+        return prevItems;
+      }
+
+      return prevItems.map((item) =>
         item.competitionId === competitionId
-          ? { ...item, ticketCount }
+          ? { ...item, ticketCount: newQuantity }
           : item
-      )
-    );
+      );
+    });
   };
 
-  // Clear the entire cart
+  const removeFromCart = (competitionId: number) => {
+    setCartItems((prevItems) => {
+      const item = prevItems.find((item) => item.competitionId === competitionId);
+      if (!item) return prevItems;
+
+      toast({
+        title: "Removed from cart",
+        description: `${item.title} removed from your cart.`,
+      });
+
+      return prevItems.filter((item) => item.competitionId !== competitionId);
+    });
+  };
+
   const clearCart = () => {
     setCartItems([]);
     toast({
       title: "Cart cleared",
-      description: "All items have been removed from your cart",
+      description: "All items have been removed from your cart.",
     });
   };
 
@@ -153,9 +172,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cartCount,
         cartTotal,
         addToCart,
-        removeFromCart,
         updateCartItem,
-        clearCart
+        removeFromCart,
+        clearCart,
       }}
     >
       {children}
@@ -163,7 +182,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Custom hook to use the cart context
 export function useCart() {
   const context = useContext(CartContext);
   if (!context) {

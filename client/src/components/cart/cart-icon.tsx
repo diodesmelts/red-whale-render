@@ -12,7 +12,7 @@ type CartIconProps = {
 
 export function CartIcon({ variant = "default", className }: CartIconProps) {
   const { cartCount, cartTotal } = useCart();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
 
   const handleCartClick = () => {
     navigate("/cart");

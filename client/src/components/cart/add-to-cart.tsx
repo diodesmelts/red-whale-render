@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ShoppingCart, Plus, Minus } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Competition } from "@shared/schema";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 
 interface AddToCartProps {
   competition: Competition;
@@ -21,7 +21,7 @@ export function AddToCart({
 }: AddToCartProps) {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
 
   const handleDecrement = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));

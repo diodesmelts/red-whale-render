@@ -65,6 +65,7 @@ function Router() {
               <ProtectedRoute path="/my-entries" component={MyEntries} />
               <ProtectedRoute path="/my-wins" component={MyWins} />
               <ProtectedRoute path="/profile" component={ProfilePage} />
+              <ProtectedRoute path="/cart" component={CartPage} />
               <Route path="/test-register" component={TestRegister} />
               
               {/* Admin Routes - protected and require admin role */}
@@ -119,13 +120,15 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="blue-whale-theme">
         <AuthProvider>
-          <TooltipProvider>
-            <DebugOverlayProvider>
-              <Toaster />
-              <ApiConnectivityCheck />
-              <Router />
-            </DebugOverlayProvider>
-          </TooltipProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <DebugOverlayProvider>
+                <Toaster />
+                <ApiConnectivityCheck />
+                <Router />
+              </DebugOverlayProvider>
+            </TooltipProvider>
+          </CartProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

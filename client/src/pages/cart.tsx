@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useState } from "react";
 import { processImageUrl } from "@/lib/image-utils";
 
@@ -13,7 +13,7 @@ export default function CartPage() {
   const { cartItems, cartTotal, updateCartItem, removeFromCart, clearCart } = useCart();
   const { user } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
 
   // If the user isn't logged in, redirect to auth page

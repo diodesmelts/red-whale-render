@@ -5,37 +5,35 @@
  * in both development and production environments.
  */
 export function processImageUrl(imageUrl: string | null): string {
-  if (!imageUrl) return '';
-  
-  const isProduction = window.location.hostname.includes('bluewhalecompetitions.co.uk');
+  if (!imageUrl) return "";
+
+  // If the image URL is already absolute, return it as is
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+
+  // Get environment information
+  const isProduction = import.meta.env.PROD;
   const hostname = window.location.hostname;
-  const isRender = hostname.includes('onrender.com');
+  const isRender = hostname.includes("render.com") || hostname.includes("bluewhalecompetitions.co.uk");
   const origin = window.location.origin;
-  
-  // Skip processing for already absolute URLs
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-    return imageUrl;
-  }
-  
-  // If Cloudinary URL
-  if (imageUrl.includes('res.cloudinary.com')) {
-    return imageUrl;
-  }
-  
-  // Handle relative URLs - ensure they start with a slash
-  const normalizedPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-  
-  // Log debugging information
-  console.log('🖼️ Processing image URL:', normalizedPath, {
+
+  // Log debugging info
+  console.log("🖼️ Processing image URL:", imageUrl, {
     isProduction,
     hostname,
     isRender,
     origin
   });
-  
-  // Use the current origin to build absolute URL
-  const finalUrl = `${origin}${normalizedPath}`;
-  console.log('🖼️ Final image URL:', finalUrl);
-  
+
+  // Different handling for production vs development
+  let finalUrl = imageUrl;
+
+  // If the path is relative, make it absolute based on the environment
+  if (imageUrl.startsWith("/")) {
+    finalUrl = `${origin}${imageUrl}`;
+  }
+
+  console.log("🖼️ Final image URL:", finalUrl);
   return finalUrl;
 }
