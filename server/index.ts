@@ -89,6 +89,10 @@ app.use((req, res, next) => {
   console.log('🔐 Setting up authentication...');
   setupAuth(app);
   
+  // Register admin routes
+  console.log('🛡️ Registering admin routes...');
+  app.use('/api/admin', adminRouter);
+  
   // Serve uploads directory as static files before registering routes
   const uploadsPath = path.join(process.cwd(), 'uploads');
   console.log('📁 Serving uploads directory from:', uploadsPath);

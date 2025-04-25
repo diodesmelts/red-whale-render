@@ -1106,9 +1106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ received: true });
   });
 
-  // Create a direct reset endpoint for admins - Ultra robust implementation
-  // This endpoint matches the client-side call in client/src/pages/admin/competitions.tsx
-  app.post('/api/admin/reset-competitions', async (req, res) => {
+  // This is a duplicate implementation that should be removed in favor of the one in admin-routes.ts
+  // However, keeping it temporarily to ensure backward compatibility
+  app.post('/api/admin/reset-competitions-legacy', async (req, res) => {
     try {
       // Authentication check
       if (!req.isAuthenticated()) {
