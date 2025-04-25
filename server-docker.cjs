@@ -5,6 +5,18 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
+const Stripe = require('stripe');
+
+// Set up Stripe if API key is available
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-10-16"
+  });
+  console.log('✅ Stripe initialized successfully');
+} else {
+  console.log('⚠️ No Stripe secret key found in environment variables');
+}
 
 // Create Express app
 const app = express();

@@ -202,9 +202,16 @@ export default function CompetitionDetails() {
     try {
       setIsProcessing(true);
       
-      // Create payment intent
+      // Create payment intent - make sure to send amount in pence/cents (Stripe needs integer amount)
+      console.log(`💰 Preparing payment: ${competition.ticketPrice} x ${ticketQuantity} tickets`);
+      
+      // Competition price is stored in pounds, but Stripe needs pence (integer)
+      const totalAmount = Math.round(competition.ticketPrice * ticketQuantity);
+      
+      console.log(`💰 Total amount for payment: £${totalAmount} (${totalAmount * 100} pence)`);
+      
       const paymentRes = await apiRequest("POST", "/api/create-payment-intent", {
-        amount: (competition.ticketPrice * ticketQuantity) / 100,
+        amount: totalAmount,
         competitionId: competition.id,
         ticketCount: ticketQuantity
       });

@@ -597,9 +597,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Competition not found" });
       }
       
+      console.log(`💰 Payment intent request received:`, {
+        amount,
+        competitionId,
+        ticketCount,
+        userId: req.user!.id
+      });
+      
+      // Validate that amount is a positive number
+      if (typeof amount !== 'number' || amount <= 0) {
+        console.error(`❌ Invalid amount for payment: ${amount}`);
+        return res.status(400).json({ message: "Amount must be a positive number" });
+      }
+      
+      // Competition price is in GBP (pounds), but Stripe needs pence (integer)
+      // Multiply by 100 to convert from pounds to pence
+      const amountInPence = Math.round(amount * 100);
+      
+      console.log(`💰 Creating payment intent for £${amount} (${amountInPence} pence)`);
+      
       // Create a payment intent
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100, // Convert to cents
+        amount: amountInPence, // Amount in pence (Stripe requires integer amount)
         currency: "gbp",
         metadata: {
           competitionId,
