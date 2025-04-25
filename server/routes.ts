@@ -597,23 +597,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const { amount, competitionId, ticketCount } = req.body;
-      
-      // Validate the competition exists
-      const competition = await dataStorage.getCompetition(parseInt(competitionId));
-      if (!competition) {
-        return res.status(404).json({ message: "Competition not found" });
-      }
+      const { amount, cartItems } = req.body;
       
       console.log(`💰 Payment intent request received:`, {
         amount,
-        competitionId,
-        ticketCount,
+        cartItems,
         userId: req.user!.id
       });
       
+      // Handle both single competition and cart checkout
+      if (cartItems && Array.isArray(cartItems)) {
+        // Cart checkout - validate all competitions exist
+        for (const item of cartItems) {
+          if (!item.competitionId || typeof item.competitionId !== 'number') {
+            return res.status(400).json({ 
+              message: `Invalid competition ID in cart: ${item.competitionId}` 
+            });
+          }
+          
+          const competition = await dataStorage.getCompetition(item.competitionId);
+          if (!competition) {
+            return res.status(404).json({ 
+              message: `Competition with ID ${item.competitionId} not found` 
+            });
+          }
+        }
+      }
+      
       // Validate that amount is a positive number
-      if (typeof amount !== 'number' || amount <= 0) {
+      if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
         console.error(`❌ Invalid amount for payment: ${amount}`);
         return res.status(400).json({ message: "Amount must be a positive number" });
       }
@@ -629,14 +641,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         amount: amountInPence, // Amount in pence (Stripe requires integer amount)
         currency: "gbp",
         metadata: {
-          competitionId,
-          ticketCount,
+          cartItems: JSON.stringify(cartItems),
           userId: req.user!.id.toString()
         }
       });
       
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
+      console.error('Payment intent creation error:', error);
       res.status(500).json({ message: error.message });
     }
   });
