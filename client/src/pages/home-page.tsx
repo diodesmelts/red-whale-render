@@ -97,24 +97,24 @@ export default function HomePage() {
       </section>
       
       {/* How to Play Section */}
-      <section className="py-20 bg-background relative overflow-hidden">
+      <section className="pt-10 pb-16 bg-background relative overflow-hidden">
         {/* Fun background elements */}
         <div className="absolute -top-16 -left-16 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute top-1/4 right-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-orange-500/5 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto">
               How To <span className="text-primary relative">Play
                 <span className="absolute -top-1 -right-4 text-yellow-400 text-lg">✨</span>
               </span>
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto mb-8 text-lg font-light">
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-6 text-lg font-light">
               Just <span className="text-primary font-medium">four simple steps</span> to start winning amazing prizes!
             </p>
             <Link href="/how-to-play">
-              <Button className="mb-16 inline-flex items-center px-6 py-3 text-base shine-btn shadow-lg shadow-primary/20">
+              <Button className="mb-6 inline-flex items-center px-6 py-3 text-base shine-btn shadow-lg shadow-primary/20">
                 Detailed Guide <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
