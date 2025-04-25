@@ -628,6 +628,120 @@ app.delete('/api/admin/competitions/:id', async (req, res) => {
   }
 });
 
+// Admin - Create new competition
+app.post('/api/admin/competitions', async (req, res) => {
+  try {
+    // Check admin authentication
+    if (!req.isAuthenticated() || !req.user.isAdmin) {
+      console.log('❌ Unauthorized competition creation attempt');
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    
+    console.log('📝 Attempting to create competition:', req.body);
+    
+    // Check if competitions table exists
+    try {
+      console.log('🔍 Checking database schema...');
+      const tablesQuery = `
+        SELECT tablename 
+        FROM pg_catalog.pg_tables 
+        WHERE schemaname = 'public' 
+        AND tablename = 'competitions';
+      `;
+      
+      const { rows: tables } = await pool.query(tablesQuery);
+      
+      if (tables.length === 0) {
+        console.error('❌ Competitions table does not exist');
+        return res.status(500).json({ 
+          message: 'Unable to create competition - database schema issue'
+        });
+      }
+      
+      // Validate required fields
+      const { 
+        title, description, imageUrl, ticketPrice, 
+        totalTickets, maxTicketsPerUser, prizeValue 
+      } = req.body;
+      
+      if (!title || !description || !imageUrl || !ticketPrice || !totalTickets) {
+        return res.status(400).json({ 
+          message: 'Missing required fields' 
+        });
+      }
+      
+      // Create new competition with transaction
+      await pool.query('BEGIN');
+      
+      const insertQuery = `
+        INSERT INTO competitions (
+          title, description, image_url, ticket_price, 
+          total_tickets, max_tickets_per_user, prize_value,
+          category, brand, is_live, is_featured, 
+          start_date, end_date
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+        ) RETURNING 
+          id, title, description, image_url as "imageUrl", 
+          ticket_price as "ticketPrice", total_tickets as "totalTickets", 
+          max_tickets_per_user as "maxTicketsPerUser", prize_value as "prizeValue",
+          category, brand, is_live as "isLive", is_featured as "isFeatured", 
+          start_date as "startDate", end_date as "endDate",
+          created_at as "createdAt", updated_at as "updatedAt"
+      `;
+      
+      const startDate = req.body.startDate || new Date();
+      const endDate = req.body.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+      
+      const values = [
+        title,
+        description,
+        imageUrl,
+        ticketPrice,
+        totalTickets,
+        maxTicketsPerUser || 10,
+        prizeValue || 0,
+        req.body.category || 'Other',
+        req.body.brand || '',
+        req.body.isLive || false,
+        req.body.isFeatured || false,
+        startDate,
+        endDate
+      ];
+      
+      const result = await pool.query(insertQuery, values);
+      
+      // Commit the transaction
+      await pool.query('COMMIT');
+      
+      const newCompetition = result.rows[0];
+      console.log('✅ Competition created successfully:', { id: newCompetition.id, title: newCompetition.title });
+      
+      return res.status(201).json(newCompetition);
+    } catch (error) {
+      console.error('❌ Error checking schema or creating competition:', error);
+      
+      // Rollback any transaction in progress
+      try {
+        await pool.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('Error during transaction rollback:', rollbackError);
+      }
+      
+      return res.status(500).json({ 
+        message: 'Failed to create competition',
+        error: error.message
+      });
+    }
+  } catch (err) {
+    console.error('❌ Critical error creating competition:', err);
+    return res.status(500).json({ 
+      message: 'A server error occurred while creating the competition',
+      error: err.message
+    });
+  }
+});
+
 // Reset competitions endpoint for admin
 app.post('/api/admin/reset-competitions', async (req, res) => {
   try {
