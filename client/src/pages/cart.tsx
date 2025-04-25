@@ -59,22 +59,22 @@ export default function CartPage() {
 
   const createEntriesMutation = useMutation({
     mutationFn: async () => {
-      return await Promise.all(
-        cartItems.map(async (item) => {
-          const entryRes = await apiRequest("POST", "/api/entries", {
-            competitionId: item.competitionId,
-            ticketCount: item.ticketCount,
-            paymentStatus: "completed",
-            stripePaymentId: `stripe_payment_${Date.now()}`
-          });
-          
-          if (!entryRes.ok) {
-            throw new Error(`Failed to create entry for ${item.title}`);
-          }
-          
-          return entryRes.json();
-        })
-      );
+      // Send the entire cart in a single request
+      const stripePaymentId = `stripe_payment_${Date.now()}`;
+      const entryRes = await apiRequest("POST", "/api/entries", {
+        paymentStatus: "completed",
+        stripePaymentId,
+        cartItems: cartItems.map(item => ({
+          competitionId: item.competitionId,
+          ticketCount: item.ticketCount
+        }))
+      });
+      
+      if (!entryRes.ok) {
+        throw new Error("Failed to create entries");
+      }
+      
+      return entryRes.json();
     },
     onSuccess: () => {
       toast({

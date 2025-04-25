@@ -1151,12 +1151,11 @@ app.post("/api/create-payment-intent", async (req, res) => {
   }
 
   try {
-    const { amount, competitionId, ticketCount } = req.body;
+    const { amount, cartItems } = req.body;
     
     console.log("💰 Payment intent request details:", { 
       amount, 
-      competitionId, 
-      ticketCount,
+      cartItems,
       userId: req.user.id 
     });
     
@@ -1166,15 +1165,26 @@ app.post("/api/create-payment-intent", async (req, res) => {
       return res.status(400).json({ message: "Amount must be a positive number" });
     }
     
-    // Validate the competition exists
-    const competitionResult = await pool.query(
-      'SELECT * FROM competitions WHERE id = $1',
-      [competitionId]
-    );
-    
-    if (competitionResult.rows.length === 0) {
-      console.log(`❌ Competition ${competitionId} not found`);
-      return res.status(404).json({ message: "Competition not found" });
+    // Extract competition IDs from cart items
+    let competitionId, ticketCount;
+    if (cartItems && cartItems.length > 0) {
+      // Use the first item for metadata (we'll store the full cart in a session)
+      competitionId = cartItems[0].competitionId;
+      ticketCount = cartItems[0].ticketCount;
+      
+      // Validate at least the first competition exists
+      const competitionResult = await pool.query(
+        'SELECT * FROM competitions WHERE id = $1',
+        [competitionId]
+      );
+      
+      if (competitionResult.rows.length === 0) {
+        console.log(`❌ Competition ${competitionId} not found`);
+        return res.status(404).json({ message: "Competition not found" });
+      }
+    } else {
+      console.error('❌ No cart items provided');
+      return res.status(400).json({ message: "No cart items provided" });
     }
     
     // Competition price is in GBP (pounds), but Stripe needs pence (integer)
@@ -1188,9 +1198,11 @@ app.post("/api/create-payment-intent", async (req, res) => {
       amount: amountInPence, // Amount in pence (Stripe requires integer amount)
       currency: "gbp",
       metadata: {
-        competitionId,
-        ticketCount,
-        userId: req.user.id.toString()
+        competitionId, // First competition ID (legacy support)
+        ticketCount,   // First ticket count (legacy support)
+        userId: req.user.id.toString(),
+        cartItemsCount: cartItems.length.toString(),
+        cartTotal: amount.toString()
       }
     });
     
@@ -1209,8 +1221,71 @@ app.post("/api/entries", async (req, res) => {
   }
   
   try {
-    const { competitionId, ticketCount, paymentStatus, stripePaymentId } = req.body;
+    // Check if we've received multiple entries (cart checkout) or a single entry
+    const { competitionId, ticketCount, paymentStatus, stripePaymentId, cartItems } = req.body;
     
+    // If we have cart items, process them as multiple entries
+    if (cartItems && Array.isArray(cartItems) && cartItems.length > 0) {
+      console.log('Processing multiple entries from cart:', cartItems.length);
+      
+      const entries = [];
+      
+      // Process each cart item as an entry
+      for (const item of cartItems) {
+        const itemCompId = item.competitionId;
+        const itemTicketCount = item.ticketCount;
+        
+        // Validate the competition exists
+        const competitionResult = await pool.query(
+          'SELECT * FROM competitions WHERE id = $1',
+          [itemCompId]
+        );
+        
+        if (competitionResult.rows.length === 0) {
+          console.error(`Competition ${itemCompId} not found for cart item`);
+          continue; // Skip this item but continue processing others
+        }
+        
+        // Insert the entry
+        const result = await pool.query(`
+          INSERT INTO entries (
+            user_id, competition_id, ticket_count, payment_status, stripe_payment_id
+          ) VALUES ($1, $2, $3, $4, $5)
+          RETURNING *
+        `, [
+          req.user.id,
+          itemCompId,
+          itemTicketCount,
+          paymentStatus,
+          stripePaymentId || null
+        ]);
+        
+        // Update the competition's tickets sold count
+        await pool.query(`
+          UPDATE competitions
+          SET tickets_sold = tickets_sold + $1
+          WHERE id = $2
+        `, [itemTicketCount, itemCompId]);
+        
+        // Transform the entry data
+        const entry = result.rows[0];
+        entries.push({
+          id: entry.id,
+          userId: entry.user_id,
+          competitionId: entry.competition_id,
+          ticketCount: entry.ticket_count,
+          paymentStatus: entry.payment_status,
+          stripePaymentId: entry.stripe_payment_id,
+          createdAt: entry.created_at.toISOString()
+        });
+      }
+      
+      console.log(`Successfully created ${entries.length} entries from cart`);
+      res.status(201).json(entries);
+      return;
+    }
+    
+    // Legacy single entry code path
     // Validate required fields
     if (!competitionId || !ticketCount || !paymentStatus) {
       return res.status(400).json({ 
