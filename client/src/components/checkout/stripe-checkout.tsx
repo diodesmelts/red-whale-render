@@ -86,12 +86,16 @@ function CheckoutForm({ clientSecret, onSuccess, onCancel }: CheckoutFormProps) 
       <PaymentElement 
         id="payment-element"
         options={{
-          paymentMethodOrder: ['card', 'apple_pay'],
+          paymentMethodOrder: ['card'],
           defaultValues: {
             billingDetails: {
               name: '',
             }
           },
+          wallets: {
+            applePay: 'auto',
+            googlePay: 'auto'
+          }
         }}
       />
       
@@ -154,8 +158,9 @@ export function StripeCheckout({
   const options = {
     clientSecret,
     appearance,
-    paymentMethodCreation: 'manual',
-    paymentMethodTypes: ['card', 'apple_pay'],
+    // Apple Pay is handled through the 'card' payment method in Stripe Elements
+    // It will automatically show when available in supported browsers with proper certificates
+    paymentMethodTypes: ['card'],
   };
 
   return (
