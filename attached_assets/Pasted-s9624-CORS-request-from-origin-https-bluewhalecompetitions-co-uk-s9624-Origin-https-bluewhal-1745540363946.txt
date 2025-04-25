@@ -1,0 +1,224 @@
+s9624
+CORS request from origin: https://bluewhalecompetitions.co.uk
+s9624
+Origin https://bluewhalecompetitions.co.uk is allowed by CORS
+s9624
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+s9624
+Using customized select query for user
+s9624
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+s9624
+🧹 Starting competition reset process...
+s9624
+🔄 Attempt 1: Using SQL transaction
+s9624
+🗑️ Deleting entries...
+s9624
+❌ Transaction method failed: error: relation "entries" does not exist
+s9624
+    at /app/node_modules/pg-pool/index.js:45:11
+s9624
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+s9624
+    at async /app/server-docker.cjs:587:7 {
+s9624
+  length: 106,
+s9624
+  severity: 'ERROR',
+s9624
+  code: '42P01',
+s9624
+  detail: undefined,
+s9624
+  hint: undefined,
+s9624
+  position: '13',
+s9624
+  internalPosition: undefined,
+s9624
+  internalQuery: undefined,
+s9624
+  where: undefined,
+s9624
+  schema: undefined,
+s9624
+  table: undefined,
+s9624
+  column: undefined,
+s9624
+  dataType: undefined,
+s9624
+  constraint: undefined,
+s9624
+  file: 'parse_relation.c',
+s9624
+  line: '1449',
+s9624
+  routine: 'parserOpenTable'
+s9624
+}
+s9624
+↩️ Transaction rolled back
+s9624
+🔄 Attempt 2: Using CASCADE operations
+s9624
+🗑️ Force deleting competitions with CASCADE...
+s9624
+❌ CASCADE operation failed: error: relation "entries" does not exist
+s9624
+    at /app/node_modules/pg-pool/index.js:45:11
+s9624
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+s9624
+    at async /app/server-docker.cjs:635:7 {
+s9624
+  length: 105,
+s9624
+  severity: 'ERROR',
+s9624
+  code: '42P01',
+s9624
+  detail: undefined,
+s9624
+  hint: undefined,
+s9624
+  position: undefined,
+s9624
+  internalPosition: undefined,
+s9624
+  internalQuery: undefined,
+s9624
+  where: undefined,
+s9624
+  schema: undefined,
+s9624
+  table: undefined,
+s9624
+  column: undefined,
+s9624
+  dataType: undefined,
+s9624
+  constraint: undefined,
+s9624
+  file: 'namespace.c',
+s9624
+  line: '434',
+s9624
+  routine: 'RangeVarGetRelidExtended'
+s9624
+}
+s9624
+❌ All reset approaches failed
+s9624
+CORS request from origin: https://bluewhalecompetitions.co.uk
+s9624
+Origin https://bluewhalecompetitions.co.uk is allowed by CORS
+s9624
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+s9624
+Using customized select query for user
+s9624
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+s9624
+🧹 Starting competition reset process...
+s9624
+🔄 Attempt 1: Using SQL transaction
+s9624
+🗑️ Deleting entries...
+s9624
+❌ Transaction method failed: error: relation "entries" does not exist
+s9624
+    at /app/node_modules/pg-pool/index.js:45:11
+s9624
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+s9624
+    at async /app/server-docker.cjs:587:7 {
+s9624
+  length: 106,
+s9624
+  severity: 'ERROR',
+s9624
+  code: '42P01',
+s9624
+  detail: undefined,
+s9624
+  hint: undefined,
+s9624
+  position: '13',
+s9624
+  internalPosition: undefined,
+s9624
+  internalQuery: undefined,
+s9624
+  where: undefined,
+s9624
+  schema: undefined,
+s9624
+  table: undefined,
+s9624
+  column: undefined,
+s9624
+  dataType: undefined,
+s9624
+  constraint: undefined,
+s9624
+  file: 'parse_relation.c',
+s9624
+  line: '1449',
+s9624
+  routine: 'parserOpenTable'
+s9624
+}
+s9624
+↩️ Transaction rolled back
+s9624
+🔄 Attempt 2: Using CASCADE operations
+s9624
+🗑️ Force deleting competitions with CASCADE...
+s9624
+❌ CASCADE operation failed: error: relation "entries" does not exist
+s9624
+    at /app/node_modules/pg-pool/index.js:45:11
+s9624
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+s9624
+    at async /app/server-docker.cjs:635:7 {
+s9624
+  length: 105,
+s9624
+  severity: 'ERROR',
+s9624
+  code: '42P01',
+s9624
+  detail: undefined,
+s9624
+  hint: undefined,
+s9624
+  position: undefined,
+s9624
+  internalPosition: undefined,
+s9624
+  internalQuery: undefined,
+s9624
+  where: undefined,
+s9624
+  schema: undefined,
+s9624
+  table: undefined,
+s9624
+  column: undefined,
+s9624
+  dataType: undefined,
+s9624
+  constraint: undefined,
+s9624
+  file: 'namespace.c',
+s9624
+  line: '434',
+s9624
+  routine: 'RangeVarGetRelidExtended'
+s9624
+}
+s9624
+❌ All reset approaches failed
