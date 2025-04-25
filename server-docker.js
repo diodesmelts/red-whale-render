@@ -413,11 +413,15 @@ app.post('/api/admin/competitions', isAdmin, async (req, res) => {
         drawDate, category
       });
       
-      if (!title || !description || !imageUrl || !ticketPrice || !totalTickets || !drawDate || !category) {
+      // Special handling for imageUrl - allow empty string to be replaced with a default image
+      const processedImageUrl = !imageUrl || imageUrl === '' 
+        ? 'https://bluewhalecompetitions.co.uk/assets/default-competition-image.jpg' 
+        : imageUrl;
+      
+      if (!title || !description || !ticketPrice || !totalTickets || !drawDate || !category) {
         const missingFields = [];
         if (!title) missingFields.push('title');
         if (!description) missingFields.push('description');
-        if (!imageUrl) missingFields.push('imageUrl');
         if (!ticketPrice) missingFields.push('ticketPrice');
         if (!totalTickets) missingFields.push('totalTickets');
         if (!drawDate) missingFields.push('drawDate');
@@ -457,7 +461,7 @@ app.post('/api/admin/competitions', isAdmin, async (req, res) => {
       const values = [
         title,
         description,
-        imageUrl,
+        processedImageUrl, // Use the processed URL that handles empty strings
         ticketPrice,
         totalTickets,
         maxTicketsPerUser || 10,
