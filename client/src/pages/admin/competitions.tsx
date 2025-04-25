@@ -168,6 +168,7 @@ export default function CompetitionsManager() {
   // Reset all competitions mutation
   const resetCompetitionsMutation = useMutation({
     mutationFn: async () => {
+      // The actual route is defined in routes.ts - it's a direct endpoint, not using admin-routes.ts
       const response = await apiRequest('POST', '/api/admin/reset-competitions');
       return response.json();
     },
