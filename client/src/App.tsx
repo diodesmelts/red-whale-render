@@ -29,6 +29,7 @@ import CompetitionsManagement from "@/pages/admin/competitions";
 import UsersManagement from "@/pages/admin/users";
 import AdminSettings from "@/pages/admin/settings";
 import SiteConfigPage from "@/pages/admin/site-config";
+import DevTools from "@/pages/admin/dev-tools";
 
 // Dynamically import create-competition to avoid TypeScript issues
 const CreateCompetition = () => {
@@ -71,6 +72,7 @@ function Router() {
               <ProtectedRoute path="/admin/users" component={UsersManagement} adminRequired={true} />
               <ProtectedRoute path="/admin/settings" component={AdminSettings} adminRequired={true} />
               <ProtectedRoute path="/admin/site-config" component={SiteConfigPage} adminRequired={true} />
+              <ProtectedRoute path="/admin/dev-tools" component={DevTools} adminRequired={true} />
               
               {/* Fallback to 404 */}
               <Route component={NotFound} />
