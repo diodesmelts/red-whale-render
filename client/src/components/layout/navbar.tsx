@@ -44,10 +44,17 @@ export function Navbar() {
         </div>
       </div>
       
-      {/* Main navbar */}
-      <div className="bg-gradient-to-r from-background/95 via-[rgba(123,57,237,0.03)] to-background/95 backdrop-blur-sm border-b border-border shadow-sm">
+      {/* Main navbar with more dynamic background */}
+      <div className="bg-gradient-to-r from-background/90 via-[rgba(123,57,237,0.08)] to-background/90 backdrop-blur-md border-b border-primary/10 shadow-sm relative overflow-hidden">
         <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          {/* No decorative elements as per user request */}
+          {/* Subtle dynamic light effects */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-10 left-1/4 w-[500px] h-[300px] bg-primary/5 rounded-full blur-[80px] opacity-50"></div>
+            <div className="absolute -bottom-20 right-1/4 w-[300px] h-[200px] bg-pink-500/5 rounded-full blur-[60px] opacity-40"></div>
+            
+            {/* Animated light beam */}
+            <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-pulse-slow"></div>
+          </div>
           
           <div className="flex items-center justify-between h-28 relative z-10">
             <div className="flex items-center">
