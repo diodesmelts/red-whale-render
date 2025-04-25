@@ -33,7 +33,7 @@ export function HeroBanner() {
 
   return (
     <section 
-      className={`relative pt-24 pb-28 overflow-hidden ${
+      className={`relative pt-16 pb-28 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"
@@ -57,7 +57,7 @@ export function HeroBanner() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center py-8">
+        <div className="text-center py-4">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-4 relative">
             <span className="relative inline-block">
               {hasBackgroundImage ? (
@@ -74,12 +74,12 @@ export function HeroBanner() {
             )}
             <span className="absolute -bottom-2 -right-2 text-pink-400 text-2xl transform -rotate-6">✦</span>
           </h1>
-          <p className={`mt-8 max-w-md mx-auto sm:text-xl md:mt-10 md:text-2xl md:max-w-4xl font-light ${
+          <p className={`mt-6 max-w-md mx-auto sm:text-xl md:mt-8 md:text-xl md:max-w-3xl font-light ${
             hasBackgroundImage ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" : "text-white"
           }`}>
             Your premier destination for discovering, participating in, and winning exclusive competitions across multiple platforms.
           </p>
-          <div className="mt-12 flex flex-wrap justify-center gap-6">
+          <div className="mt-8 flex flex-wrap justify-center gap-6">
             <Link href="/competitions">
               <Button size="lg" className="group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-primary/20">
                 <Search className="mr-3 h-6 w-6 animate-pulse-slow" /> View Competitions
