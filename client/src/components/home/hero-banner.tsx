@@ -33,14 +33,16 @@ export function HeroBanner() {
 
   return (
     <section 
-      className={`relative pt-32 pb-40 overflow-hidden ${
+      className={`relative pt-28 pb-36 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"
       }`}
-      style={hasBackgroundImage ? { backgroundImage: `url(${absoluteBackgroundImage})` } : {}}
+      style={hasBackgroundImage ? { 
+        backgroundImage: `linear-gradient(rgba(0, 0, 30, 0.05), rgba(0, 0, 30, 0.05)), url(${absoluteBackgroundImage})` 
+      } : {}}
     >
-      {/* No overlay for background image */}
+      {/* Darkening filter with blue hue (5%) */}
 
       {/* Confetti elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

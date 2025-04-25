@@ -55,7 +55,7 @@ export function Navbar() {
             {/* Removed animated light beam as per user's request */}
           </div>
           
-          <div className="flex items-center justify-between h-28 relative z-10">
+          <div className="flex items-center justify-between h-24 relative z-10">
             <div className="flex items-center">
               <div className="flex-shrink-0 pl-2 sm:pl-4">
                 <Link href="/">
