@@ -387,16 +387,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/competitions/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const competition = await dataStorage.getCompetition(id);
+      console.log(`🔍 GET competition request for ID: ${req.params.id}`);
       
-      if (!competition) {
-        return res.status(404).json({ message: "Competition not found" });
+      // Validate ID
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        console.error(`❌ Invalid competition ID: ${req.params.id}`);
+        return res.status(400).json({ message: "Invalid competition ID" });
       }
       
-      res.json(competition);
+      // Log request details for diagnostic purposes
+      console.log(`📝 Request context:`, {
+        id: id,
+        userAgent: req.headers['user-agent'],
+        isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : null,
+        sessionID: req.sessionID || 'no-session'
+      });
+      
+      try {
+        // Get competition with enhanced error handling
+        const competition = await dataStorage.getCompetition(id);
+        
+        if (!competition) {
+          console.log(`⚠️ Competition not found with ID: ${id}`);
+          return res.status(404).json({ message: "Competition not found" });
+        }
+        
+        // Log success with minimal data for verification
+        console.log(`✅ Successfully retrieved competition: ID=${id}, Title="${competition.title}"`);
+        
+        // Send response
+        return res.json(competition);
+      } catch (storageError: any) {
+        console.error(`❌ Storage error fetching competition ID ${id}:`, storageError);
+        
+        // Attempt to use raw SQL as a last resort
+        try {
+          console.log(`🔄 Attempting fallback using direct SQL for competition ID: ${id}`);
+          const { pool } = await import('./db');
+          
+          // Get available columns dynamically
+          const columnInfoResult = await pool.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'competitions'
+          `);
+          
+          const availableColumns = columnInfoResult.rows.map(row => row.column_name);
+          console.log(`📋 Available columns in competitions table:`, availableColumns);
+          
+          // Build dynamic query
+          const columnList = availableColumns.join(', ');
+          const result = await pool.query(`
+            SELECT ${columnList}
+            FROM competitions 
+            WHERE id = $1
+          `, [id]);
+          
+          if (result.rows.length === 0) {
+            console.log(`⚠️ Competition not found with fallback method, ID: ${id}`);
+            return res.status(404).json({ message: "Competition not found" });
+          }
+          
+          console.log(`✅ Successfully retrieved competition with fallback method: ID=${id}`);
+          return res.json(result.rows[0]);
+        } catch (sqlError: any) {
+          console.error(`❌ SQL fallback error for competition ID ${id}:`, sqlError);
+          return res.status(500).json({ 
+            message: "Could not load competition details", 
+            details: "Database error",
+            errorId: Date.now()
+          });
+        }
+      }
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      console.error(`❌ Unexpected error processing competition request:`, error);
+      return res.status(500).json({ 
+        message: "Could not load competition details",
+        errorId: Date.now()
+      });
     }
   });
 

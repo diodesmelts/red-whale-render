@@ -589,12 +589,61 @@ export class DatabaseStorage implements IStorage {
 
   // Competition operations
   async getCompetition(id: number): Promise<Competition | undefined> {
-    const [competition] = await db
-      .select()
-      .from(competitions)
-      .where(eq(competitions.id, id))
-      .limit(1);
-    return competition;
+    try {
+      // First try standard Drizzle ORM approach
+      const [competition] = await db
+        .select()
+        .from(competitions)
+        .where(eq(competitions.id, id))
+        .limit(1);
+      
+      if (competition) {
+        return competition;
+      }
+      
+      // If the standard approach fails, try a more resilient method using raw SQL
+      // This handles schema differences between environments
+      console.log(`🔄 Using fallback SQL query for competition ID: ${id}`);
+      
+      try {
+        const { pool } = await import('./db');
+        
+        // Get column information from the database to make a dynamic query
+        const columnInfoResult = await pool.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_name = 'competitions'
+        `);
+        
+        const availableColumns = columnInfoResult.rows.map(row => row.column_name);
+        console.log(`📊 Available columns in competitions table:`, availableColumns);
+        
+        // Build a dynamic SELECT statement based on available columns
+        const columnList = availableColumns.join(', ');
+        
+        // Execute the dynamic query
+        const result = await pool.query(`
+          SELECT ${columnList}
+          FROM competitions
+          WHERE id = $1
+          LIMIT 1
+        `, [id]);
+        
+        if (result.rows.length > 0) {
+          console.log(`✅ Successfully retrieved competition with ID ${id} using fallback SQL`);
+          return result.rows[0];
+        }
+        
+        console.log(`❓ No competition found with ID ${id} using fallback method`);
+        return undefined;
+      } catch (sqlError) {
+        console.error(`❌ SQL fallback method failed:`, sqlError);
+        throw sqlError; // Re-throw to be caught by the outer try-catch
+      }
+    } catch (error) {
+      console.error(`❌ Error retrieving competition with ID ${id}:`, error);
+      throw error; // Re-throw to be handled by the route handler
+    }
   }
   
   async listCompetitions(options: { 

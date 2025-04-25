@@ -1,0 +1,67 @@
+CORS request from origin: undefined
+8lxp5
+Allowing request with no origin
+8lxp5
+CORS request from origin: undefined
+8lxp5
+Allowing request with no origin
+8lxp5
+CORS request from origin: undefined
+8lxp5
+Allowing request with no origin
+8lxp5
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8lxp5
+Using customized select query for user
+8lxp5
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8lxp5
+Fetching site config for key: heroBanner
+8lxp5
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8lxp5
+Using customized select query for user
+8lxp5
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8lxp5
+CORS request from origin: undefined
+8lxp5
+Allowing request with no origin
+8lxp5
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8lxp5
+Using customized select query for user
+8lxp5
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8lxp5
+CORS request from origin: undefined
+8lxp5
+Allowing request with no origin
+8lxp5
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8lxp5
+Using customized select query for user
+8lxp5
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8lxp5
+🌐 Serving SPA for client route: /uploads/image-1745541494425-635966326.png
+8lxp5
+CORS request from origin: undefined
+8lxp5
+Allowing request with no origin
+8lxp5
+CORS request from origin: undefined
+8lxp5
+Allowing request with no origin
+8lxp5
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8lxp5
+Using customized select query for user
+8lxp5
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+8lxp5
+Using customized select query for user
+8lxp5
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+8lxp5
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
