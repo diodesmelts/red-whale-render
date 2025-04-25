@@ -438,27 +438,69 @@ app.post('/api/admin/competitions', isAdmin, async (req, res) => {
       // Create new competition with transaction
       await pool.query('BEGIN');
       
-      const insertQuery = `
-        INSERT INTO competitions (
-          title, description, image_url, ticket_price, 
-          total_tickets, max_tickets_per_user, prize_value,
-          category, brand, is_live, is_featured, 
-          start_date, end_date, draw_date
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-        ) RETURNING 
-          id, title, description, image_url as "imageUrl", 
-          ticket_price as "ticketPrice", total_tickets as "totalTickets", 
-          max_tickets_per_user as "maxTicketsPerUser", prize_value as "prizeValue",
-          category, brand, is_live as "isLive", is_featured as "isFeatured", 
-          start_date as "startDate", end_date as "endDate", draw_date as "drawDate",
-          created_at as "createdAt", updated_at as "updatedAt"
+      // Check competition table schema to determine available columns
+      console.log('🔍 Checking competition table schema for column structure...');
+      const schemaQuery = `
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'competitions'
+        AND table_schema = 'public'
       `;
       
+      const { rows: columns } = await pool.query(schemaQuery);
+      const columnNames = columns.map(col => col.column_name);
+      console.log('📋 Available columns in competitions table:', columnNames);
+      
+      // Determine if start_date and end_date columns exist
+      const hasStartDate = columnNames.includes('start_date');
+      const hasEndDate = columnNames.includes('end_date');
+      
+      // Build query dynamically based on available columns
+      let insertColumns = [
+        'title', 'description', 'image_url', 'ticket_price', 
+        'total_tickets', 'max_tickets_per_user', 'prize_value',
+        'category', 'brand', 'is_live', 'is_featured', 'draw_date'
+      ];
+      
+      // Add optional columns if they exist
+      if (hasStartDate) insertColumns.push('start_date');
+      if (hasEndDate) insertColumns.push('end_date');
+      
+      // Build placeholder string ($1, $2, etc) based on number of columns
+      const placeholders = insertColumns.map((_, idx) => `$${idx + 1}`).join(', ');
+      
+      // Build returning clause based on available columns
+      let returningClauses = [
+        'id', 'title', 'description', 'image_url as "imageUrl"', 
+        'ticket_price as "ticketPrice"', 'total_tickets as "totalTickets"', 
+        'max_tickets_per_user as "maxTicketsPerUser"', 'prize_value as "prizeValue"',
+        'category', 'brand', 'is_live as "isLive"', 'is_featured as "isFeatured"',
+        'draw_date as "drawDate"'
+      ];
+      
+      // Add timestamps if they exist
+      if (columnNames.includes('created_at')) returningClauses.push('created_at as "createdAt"');
+      if (columnNames.includes('updated_at')) returningClauses.push('updated_at as "updatedAt"');
+      
+      // Add optional date columns if they exist
+      if (hasStartDate) returningClauses.push('start_date as "startDate"');
+      if (hasEndDate) returningClauses.push('end_date as "endDate"');
+      
+      const insertQuery = `
+        INSERT INTO competitions (
+          ${insertColumns.join(', ')}
+        ) VALUES (
+          ${placeholders}
+        ) RETURNING 
+          ${returningClauses.join(', ')}
+      `;
+      
+      // Prepare values for dynamic columns
       const startDate = req.body.startDate || new Date();
       const endDate = req.body.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
       
-      const values = [
+      // Build values array based on columns
+      let values = [
         title,
         description,
         processedImageUrl, // Use the processed URL that handles empty strings
@@ -470,10 +512,18 @@ app.post('/api/admin/competitions', isAdmin, async (req, res) => {
         req.body.brand || '',
         req.body.isLive || false,
         req.body.isFeatured || false,
-        startDate,
-        endDate,
-        drawDate // Add the draw date required by the database schema
+        drawDate // Draw date is required
       ];
+      
+      // Add optional date columns if they exist in the schema
+      if (hasStartDate) values.push(startDate);
+      if (hasEndDate) values.push(endDate);
+      
+      console.log('📊 SQL insert parameters:', { 
+        columnCount: insertColumns.length,
+        valueCount: values.length,
+        columns: insertColumns
+      });
       
       const result = await pool.query(insertQuery, values);
       
