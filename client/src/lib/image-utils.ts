@@ -1,39 +1,38 @@
 /**
- * Processes an image URL to ensure it's properly formatted based on the environment
- * 
- * This handles relative paths, ensuring they point to the correct location
- * in both development and production environments.
+ * This utility provides functions for handling image URLs across environments
+ */
+
+/**
+ * Processes an image URL to ensure it works properly in both development and production environments
+ * - In development: Converts relative URLs to absolute using the current origin
+ * - In production: Uses the URL as-is (assuming it's already absolute)
  */
 export function processImageUrl(imageUrl: string | null): string {
-  if (!imageUrl) return "";
-
-  // If the image URL is already absolute, return it as is
-  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+  if (!imageUrl) {
+    return "https://placehold.co/400x300/1a1f2b/FFFFFF/png?text=No+Image"; 
+  }
+  
+  // Log the image processing for debugging
+  console.log(`🖼️ Processing image URL: "${imageUrl}"`, {
+    isProduction: window.location.hostname.includes('bluewhalecompetitions.co.uk'),
+    hostname: window.location.hostname,
+    isRender: window.location.hostname.includes('onrender.com'),
+    origin: window.location.origin
+  });
+  
+  // If the URL is already absolute (starts with http), use it as is
+  if (imageUrl.startsWith('http')) {
+    console.log(`🖼️ Using absolute URL as is: "${imageUrl}"`);
     return imageUrl;
   }
-
-  // Get environment information
-  const isProduction = import.meta.env.PROD;
-  const hostname = window.location.hostname;
-  const isRender = hostname.includes("render.com") || hostname.includes("bluewhalecompetitions.co.uk");
-  const origin = window.location.origin;
-
-  // Log debugging info
-  console.log("🖼️ Processing image URL:", imageUrl, {
-    isProduction,
-    hostname,
-    isRender,
-    origin
-  });
-
-  // Different handling for production vs development
-  let finalUrl = imageUrl;
-
-  // If the path is relative, make it absolute based on the environment
-  if (imageUrl.startsWith("/")) {
-    finalUrl = `${origin}${imageUrl}`;
+  
+  // If it's a relative URL starting with /uploads, make it absolute
+  if (imageUrl.startsWith('/uploads/')) {
+    const absoluteUrl = `${window.location.origin}${imageUrl}`;
+    console.log(`🖼️ Final image URL: "${absoluteUrl}"`);
+    return absoluteUrl;
   }
-
-  console.log("🖼️ Final image URL:", finalUrl);
-  return finalUrl;
+  
+  // For any other case, return the URL as-is
+  return imageUrl;
 }

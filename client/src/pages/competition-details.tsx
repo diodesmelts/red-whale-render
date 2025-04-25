@@ -12,6 +12,8 @@ import { ChevronLeft, Expand, Heart, ShieldCheck, Plus, Minus, CreditCard, Apple
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
+import { AddToCart } from "@/components/cart/add-to-cart";
+import { CartIcon } from "@/components/cart/cart-icon";
 
 export default function CompetitionDetails() {
   const [location, navigate] = useLocation();
@@ -463,18 +465,15 @@ export default function CompetitionDetails() {
                 <CountdownTimer drawDate={competition.drawDate} variant="detailed" />
                 
                 <div className="p-6">
-                  <Button 
-                    onClick={handleBuyTickets}
-                    disabled={isProcessing}
-                    className={cn(
-                      "w-full py-3 mb-4 font-bold text-white shine-btn group relative overflow-hidden",
-                      getCategoryThemeColor()
-                    )}
-                  >
-                    <div className="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
-                    <i className="fas fa-ticket-alt mr-2"></i> 
-                    {isProcessing ? "Processing..." : "GET YOUR TICKETS"}
-                  </Button>
+                  {/* Add to Cart button */}
+                  <div className="mb-4">
+                    <AddToCart 
+                      competition={competition}
+                      layout="column"
+                      buttonVariant="default"
+                      withNavigation={false}
+                    />
+                  </div>
                   
                   <div className="flex items-center justify-between mb-4">
                     <div className={`text-${competition.category === "family" ? "yellow" : competition.category === "appliances" ? "pink" : "green"}-400 text-2xl font-bold`}>
@@ -520,17 +519,14 @@ export default function CompetitionDetails() {
                     </div>
                   </div>
                   
-                  <Button 
-                    onClick={handleBuyTickets}
-                    disabled={isProcessing}
-                    className={cn(
-                      "w-full py-3 font-bold text-white shine-btn group relative overflow-hidden",
-                      getCategoryThemeColor()
-                    )}
-                  >
-                    <div className="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
-                    {isProcessing ? "Processing..." : "GET TICKETS NOW"}
-                  </Button>
+                  <div className="mb-4">
+                    <AddToCart 
+                      competition={competition}
+                      layout="column"
+                      buttonVariant="default"
+                      withNavigation={true}
+                    />
+                  </div>
                   
                   <div className="text-center mt-2 text-muted-foreground text-xs">
                     Max {competition.maxTicketsPerUser} tickets per person
