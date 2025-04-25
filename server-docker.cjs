@@ -245,6 +245,61 @@ app.get('/api/competitions', async (req, res) => {
   }
 });
 
+// Get single competition by ID endpoint
+app.get('/api/competitions/:id', async (req, res) => {
+  try {
+    // Add detailed logging for debugging
+    const id = req.params.id;
+    console.log(`🔍 Production GET competition request for ID: ${id}`);
+    console.log(`📝 Request context:`, {
+      id,
+      userAgent: req.headers['user-agent'],
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+      origin: req.headers.origin || 'no-origin',
+      sessionID: req.sessionID || 'no-session'
+    });
+    
+    const result = await pool.query(
+      `SELECT * FROM competitions WHERE id = $1`,
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      console.log(`❌ Competition not found: ID=${id}`);
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Transform the data to match our API format (same as in the list endpoint)
+    const comp = result.rows[0];
+    const competition = {
+      id: comp.id,
+      title: comp.title,
+      description: comp.description,
+      imageUrl: comp.image_url,
+      category: comp.category,
+      prizeValue: parseFloat(comp.prize_value),
+      ticketPrice: parseFloat(comp.ticket_price),
+      totalTickets: parseInt(comp.total_tickets),
+      ticketsSold: parseInt(comp.tickets_sold || 0),
+      maxTicketsPerUser: parseInt(comp.max_tickets_per_user),
+      brand: comp.brand,
+      drawDate: comp.draw_date.toISOString(),
+      isLive: comp.is_live,
+      isFeatured: comp.is_featured,
+      createdAt: comp.created_at.toISOString()
+    };
+    
+    console.log(`✅ Successfully retrieved competition: ID=${id}, Title="${comp.title}"`);
+    res.json(competition);
+  } catch (err) {
+    console.error(`❌ Error fetching competition ${req.params.id}:`, err);
+    res.status(500).json({ 
+      message: 'Failed to fetch competition details',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
 // Authentication and user APIs
 const crypto = require('crypto');
 const passport = require('passport');
