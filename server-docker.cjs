@@ -9,6 +9,39 @@ const fs = require('fs');
 // Create Express app
 const app = express();
 
+// Set up CORS for all routes
+const cors = require('cors');
+
+// Determine allowed origins
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
+  process.env.ALLOWED_ORIGINS.split(',') : 
+  ['http://localhost:3000', 'https://bluewhalecompetitions.co.uk'];
+
+console.log('Allowed CORS origins:', allowedOrigins);
+console.log('Environment:', process.env.NODE_ENV);
+
+// Configure CORS
+app.use(cors({
+  origin: (origin, callback) => {
+    console.log('CORS request from origin:', origin);
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      console.log('Allowing request with no origin');
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.replit.dev') || origin.endsWith('.onrender.com')) {
+      console.log(`Origin ${origin} is allowed by CORS`);
+      return callback(null, true);
+    }
+    
+    console.log(`Origin ${origin} is NOT allowed by CORS`);
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true
+}));
+
 // We'll set up the session later with the PgSessionStore
 
 // Parse JSON requests
