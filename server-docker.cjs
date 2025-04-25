@@ -152,6 +152,16 @@ const checkDbConnection = async () => {
         is_featured BOOLEAN NOT NULL DEFAULT FALSE,
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
+      
+      CREATE TABLE IF NOT EXISTS entries (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        competition_id INTEGER NOT NULL REFERENCES competitions(id),
+        ticket_count INTEGER NOT NULL,
+        payment_status VARCHAR(50) NOT NULL DEFAULT 'pending',
+        stripe_payment_id VARCHAR(255),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
     `);
     
     // Check if we have competitions, if not seed with some
@@ -1124,6 +1134,173 @@ app.post('/api/logout', (req, res) => {
     }
     res.sendStatus(200);
   });
+});
+
+// Create payment intent endpoint
+app.post("/api/create-payment-intent", async (req, res) => {
+  console.log("💰 Payment intent request received");
+  
+  if (!req.isAuthenticated()) {
+    console.log("❌ Unauthorized payment intent request");
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  if (!stripe) {
+    console.log("❌ Stripe is not configured");
+    return res.status(500).json({ message: "Stripe is not configured" });
+  }
+
+  try {
+    const { amount, competitionId, ticketCount } = req.body;
+    
+    console.log("💰 Payment intent request details:", { 
+      amount, 
+      competitionId, 
+      ticketCount,
+      userId: req.user.id 
+    });
+    
+    // Validate that amount is a positive number
+    if (typeof amount !== 'number' || amount <= 0) {
+      console.error(`❌ Invalid amount for payment: ${amount}`);
+      return res.status(400).json({ message: "Amount must be a positive number" });
+    }
+    
+    // Validate the competition exists
+    const competitionResult = await pool.query(
+      'SELECT * FROM competitions WHERE id = $1',
+      [competitionId]
+    );
+    
+    if (competitionResult.rows.length === 0) {
+      console.log(`❌ Competition ${competitionId} not found`);
+      return res.status(404).json({ message: "Competition not found" });
+    }
+    
+    // Competition price is in GBP (pounds), but Stripe needs pence (integer)
+    // Multiply by 100 to convert from pounds to pence
+    const amountInPence = Math.round(amount * 100);
+    
+    console.log(`💰 Creating payment intent for £${amount} (${amountInPence} pence)`);
+    
+    // Create a payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amountInPence, // Amount in pence (Stripe requires integer amount)
+      currency: "gbp",
+      metadata: {
+        competitionId,
+        ticketCount,
+        userId: req.user.id.toString()
+      }
+    });
+    
+    console.log(`✅ Payment intent created: ${paymentIntent.id}`);
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error("❌ Error creating payment intent:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Create competition entry endpoint
+app.post("/api/entries", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
+  try {
+    const { competitionId, ticketCount, paymentStatus, stripePaymentId } = req.body;
+    
+    // Validate required fields
+    if (!competitionId || !ticketCount || !paymentStatus) {
+      return res.status(400).json({ 
+        message: "competitionId, ticketCount, and paymentStatus are required" 
+      });
+    }
+    
+    // Validate the competition exists
+    const competitionResult = await pool.query(
+      'SELECT * FROM competitions WHERE id = $1',
+      [competitionId]
+    );
+    
+    if (competitionResult.rows.length === 0) {
+      return res.status(404).json({ message: "Competition not found" });
+    }
+    
+    // Insert the entry
+    const result = await pool.query(`
+      INSERT INTO entries (
+        user_id, competition_id, ticket_count, payment_status, stripe_payment_id
+      ) VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `, [
+      req.user.id,
+      competitionId,
+      ticketCount,
+      paymentStatus,
+      stripePaymentId || null
+    ]);
+    
+    // Update the competition's tickets sold count
+    await pool.query(`
+      UPDATE competitions
+      SET tickets_sold = tickets_sold + $1
+      WHERE id = $2
+    `, [ticketCount, competitionId]);
+    
+    // Transform the entry data
+    const entry = result.rows[0];
+    const entryResponse = {
+      id: entry.id,
+      userId: entry.user_id,
+      competitionId: entry.competition_id,
+      ticketCount: entry.ticket_count,
+      paymentStatus: entry.payment_status,
+      stripePaymentId: entry.stripe_payment_id,
+      createdAt: entry.created_at.toISOString()
+    };
+    
+    res.status(201).json(entryResponse);
+  } catch (error) {
+    console.error("Error creating entry:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get user entries endpoint
+app.get("/api/entries", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
+  try {
+    const result = await pool.query(`
+      SELECT e.*, c.title as competition_title, c.image_url
+      FROM entries e
+      JOIN competitions c ON e.competition_id = c.id
+      WHERE e.user_id = $1
+      ORDER BY e.created_at DESC
+    `, [req.user.id]);
+    
+    // Transform the entries data
+    const entries = result.rows.map(entry => ({
+      id: entry.id,
+      userId: entry.user_id,
+      competitionId: entry.competition_id,
+      competitionTitle: entry.competition_title,
+      competitionImageUrl: entry.image_url,
+      ticketCount: entry.ticket_count,
+      paymentStatus: entry.payment_status,
+      stripePaymentId: entry.stripe_payment_id,
+      createdAt: entry.created_at.toISOString()
+    }));
+    
+    res.json(entries);
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // Current user endpoint
