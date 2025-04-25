@@ -530,7 +530,7 @@ async function ensureUsersTable() {
 // Initialize users table
 ensureUsersTable().catch(console.error);
 
-// Admin competition deletion endpoint - EMERGENCY PATCH
+// Admin competition deletion endpoint
 app.delete('/api/admin/competitions/:id', async (req, res) => {
   try {
     // Check admin authentication
@@ -540,84 +540,95 @@ app.delete('/api/admin/competitions/:id', async (req, res) => {
     }
     
     const { id } = req.params;
-    console.log(`🗑️ EMERGENCY PATCH: Admin delete request for competition ID: ${id}`);
+    console.log(`🗑️ Admin delete request for competition ID: ${id}`);
     
-    // DIRECT APPROACH: Skip all checks and just delete the competition
+    // Check which tables exist in the database
+    console.log('🔍 Checking database schema...');
+    const tablesQuery = `
+      SELECT tablename 
+      FROM pg_catalog.pg_tables 
+      WHERE schemaname = 'public' 
+      AND tablename IN ('competitions', 'entries', 'winners');
+    `;
+    
+    const { rows: tables } = await pool.query(tablesQuery);
+    const tableNames = tables.map(t => t.tablename);
+    
+    console.log('📋 Available tables:', tableNames);
+    
+    // Begin transaction
+    await pool.query('BEGIN');
+    
     try {
-      // Directly delete the competition
-      console.log(`⚠️ EMERGENCY PATCH: Directly deleting competition ID: ${id}`);
-      const result = await pool.query('DELETE FROM competitions WHERE id = $1 RETURNING *', [id]);
-      
-      if (result.rows.length === 0) {
-        console.log(`❌ EMERGENCY PATCH: Competition ID ${id} not found for deletion`);
-        return res.status(404).json({ message: 'Competition not found' });
+      // Only attempt to delete from tables that exist
+      if (tableNames.includes('entries')) {
+        console.log(`🗑️ Deleting entries for competition ID: ${id}`);
+        await pool.query('DELETE FROM entries WHERE competition_id = $1', [id]);
       }
       
-      console.log(`✅ EMERGENCY PATCH: Successfully deleted competition ID: ${id}`);
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Competition deleted successfully using emergency patch' 
-      });
-    } catch (error) {
-      console.error('❌ EMERGENCY PATCH: Deletion error:', error);
+      if (tableNames.includes('winners')) {
+        console.log(`🗑️ Deleting winners for competition ID: ${id}`);
+        await pool.query('DELETE FROM winners WHERE competition_id = $1', [id]);
+      }
       
-      // ULTRA FALLBACK: Try to determine what tables exist
+      if (tableNames.includes('competitions')) {
+        console.log(`🗑️ Deleting competition ID: ${id}`);
+        const result = await pool.query('DELETE FROM competitions WHERE id = $1 RETURNING *', [id]);
+        
+        if (result.rows.length === 0) {
+          // Competition not found, but we'll commit the transaction anyway to clean any related data
+          await pool.query('COMMIT');
+          console.log(`❌ Competition ID ${id} not found for deletion`);
+          return res.status(404).json({ message: 'Competition not found' });
+        }
+      } else {
+        // If competitions table doesn't exist, there's nothing to delete
+        await pool.query('COMMIT');
+        console.log('⚠️ No competitions table found in database');
+        return res.status(404).json({ message: 'Competitions table not found in database' });
+      }
+      
+      // Commit the transaction if we get here
+      await pool.query('COMMIT');
+      console.log(`✅ Successfully deleted competition ID: ${id}`);
+      return res.status(200).json({ success: true, message: 'Competition deleted successfully' });
+    } catch (err) {
+      // Rollback the transaction if anything fails
+      console.error('❌ Error during deletion transaction:', err);
+      await pool.query('ROLLBACK');
+      
+      // Try a direct approach just for competitions table
       try {
-        const tablesQuery = `
-          SELECT tablename 
-          FROM pg_catalog.pg_tables 
-          WHERE schemaname = 'public';
-        `;
-        
-        const { rows: tables } = await pool.query(tablesQuery);
-        const allTables = tables.map(t => t.tablename);
-        
-        console.log('📋 EMERGENCY PATCH: All tables in database:', allTables);
-        
-        // Try with double quotes
-        if (allTables.includes('competitions')) {
-          try {
-            const deleteResult = await pool.query('DELETE FROM "competitions" WHERE id = $1', [id]);
-            return res.status(200).json({ 
-              success: true, 
-              message: 'Competition deleted using ultra fallback approach.',
-              tables: allTables
-            });
-          } catch (ultraError) {
-            return res.status(500).json({ 
-              success: false, 
-              message: 'All emergency approaches failed to delete competition',
-              error: ultraError.message,
-              tables: allTables
-            });
-          }
-        } else {
-          return res.status(404).json({ 
-            success: false, 
-            message: 'No competitions table found. Tables present: ' + allTables.join(', '),
-            tables: allTables
+        if (tableNames.includes('competitions')) {
+          console.log(`🔄 Attempting direct competition deletion for ID: ${id}`);
+          await pool.query('DELETE FROM competitions WHERE id = $1', [id]);
+          console.log(`✅ Direct deletion successful for competition ID: ${id}`);
+          return res.status(200).json({ 
+            success: true, 
+            message: 'Competition deleted using direct method' 
           });
         }
-      } catch (tablesError) {
-        return res.status(500).json({ 
-          success: false, 
-          message: 'Emergency patch failed and could not query tables',
-          error: error.message,
-          tablesError: tablesError.message
-        });
+      } catch (directErr) {
+        console.error('❌ Direct deletion also failed:', directErr);
       }
+      
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to delete competition', 
+        error: err.message 
+      });
     }
   } catch (err) {
-    console.error('❌ Critical error in emergency patch:', err);
+    console.error('❌ Critical error deleting competition:', err);
     return res.status(500).json({ 
       success: false, 
-      message: 'Catastrophic failure in emergency delete process',
-      error: err.message
+      message: 'Failed to delete competition due to a server error', 
+      error: err.message 
     });
   }
 });
 
-// Reset competitions endpoint for admin - EMERGENCY PATCH
+// Reset competitions endpoint for admin
 app.post('/api/admin/reset-competitions', async (req, res) => {
   try {
     // Check admin authentication
@@ -626,73 +637,96 @@ app.post('/api/admin/reset-competitions', async (req, res) => {
       return res.status(403).json({ message: 'Admin access required' });
     }
     
-    console.log('🧹 Starting EMERGENCY PATCH competition reset process...');
+    console.log('🧹 Starting competition reset process...');
     
-    // DIRECT APPROACH: Skip all checks and just delete competitions
+    // Check which tables exist in the database
     try {
-      console.log('⚠️ EMERGENCY PATCH: Attempting direct competitions deletion');
-      // Try a direct delete on competitions table only
-      await pool.query('DELETE FROM competitions');
-      console.log('✅ EMERGENCY PATCH: Competitions deleted successfully');
+      console.log('🔍 Checking database schema...');
+      const tablesQuery = `
+        SELECT tablename 
+        FROM pg_catalog.pg_tables 
+        WHERE schemaname = 'public' 
+        AND tablename IN ('competitions', 'entries', 'winners');
+      `;
       
-      // Try to reset the sequence
-      try {
-        await pool.query('ALTER SEQUENCE IF EXISTS competitions_id_seq RESTART WITH 1');
-      } catch (seqError) {
-        console.error('Non-critical error resetting sequence:', seqError.message);
-      }
+      const { rows: tables } = await pool.query(tablesQuery);
+      const tableNames = tables.map(t => t.tablename);
       
-      return res.status(200).json({ 
-        success: true, 
-        message: 'All competitions have been deleted using emergency patch.'
-      });
-    } catch (error) {
-      console.error('❌ EMERGENCY PATCH: Error during direct approach:', error);
+      console.log('📋 Available tables:', tableNames);
       
-      // ULTRA FALLBACK: Try to determine what tables exist and report back
-      try {
-        const tablesQuery = `
-          SELECT tablename 
-          FROM pg_catalog.pg_tables 
-          WHERE schemaname = 'public';
-        `;
+      // Only delete from competitions table if it exists
+      if (tableNames.includes('competitions')) {
+        console.log('🔄 Deleting from competitions table');
         
-        const { rows: tables } = await pool.query(tablesQuery);
-        const allTables = tables.map(t => t.tablename);
+        // Start a transaction
+        await pool.query('BEGIN');
         
-        console.log('📋 EMERGENCY PATCH: All tables in database:', allTables);
-        
-        // See if competitions exists
-        if (allTables.includes('competitions')) {
-          // Try one more time with just pure SQL
-          try {
-            await pool.query('DELETE FROM "competitions"');
-            return res.status(200).json({ 
-              success: true, 
-              message: 'Competitions deleted using ultra fallback approach.',
-              tables: allTables
-            });
-          } catch (ultraError) {
-            return res.status(500).json({ 
-              success: false, 
-              message: 'Emergency ultra fallback also failed',
-              error: ultraError.message,
-              tables: allTables
-            });
-          }
-        } else {
-          return res.status(200).json({ 
-            success: true, 
-            message: 'No competitions table found in database. Tables present: ' + allTables.join(', '),
-            tables: allTables
-          });
+        // Delete from entries if it exists
+        if (tableNames.includes('entries')) {
+          console.log('🗑️ Deleting entries...');
+          await pool.query('DELETE FROM entries');
+          console.log('✓ Entries deleted');
         }
-      } catch (tablesError) {
+        
+        // Delete from winners if it exists
+        if (tableNames.includes('winners')) {
+          console.log('🗑️ Deleting winners...');
+          await pool.query('DELETE FROM winners');
+          console.log('✓ Winners deleted');
+        }
+        
+        // Now safe to delete competitions
+        console.log('🗑️ Deleting competitions...');
+        await pool.query('DELETE FROM competitions');
+        console.log('✓ Competitions deleted');
+        
+        // Reset sequences that might exist
+        if (tableNames.includes('entries')) {
+          await pool.query('ALTER SEQUENCE IF EXISTS entries_id_seq RESTART WITH 1');
+        }
+        
+        if (tableNames.includes('winners')) {
+          await pool.query('ALTER SEQUENCE IF EXISTS winners_id_seq RESTART WITH 1'); 
+        }
+        
+        await pool.query('ALTER SEQUENCE IF EXISTS competitions_id_seq RESTART WITH 1');
+        
+        // Commit transaction
+        await pool.query('COMMIT');
+        console.log('✅ Reset completed successfully');
+        
+        return res.status(200).json({ 
+          success: true, 
+          message: 'All competitions have been successfully deleted.'
+        });
+      } 
+      else {
+        // Plan B: If no competitions table exists but the database is responding,
+        // consider it a "success" since there's nothing to delete
+        console.log('⚠️ No competitions table found in database');
+        return res.status(200).json({ 
+          success: true, 
+          message: 'No competitions table found in database. Nothing to delete.'
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error during database reset:', error);
+      
+      // Try an aggressive fallback - just delete from competitions if it exists
+      try {
+        console.log('🔄 Using fallback approach - direct DELETE');
+        await pool.query('DELETE FROM competitions WHERE 1=1');
+        
+        return res.status(200).json({ 
+          success: true, 
+          message: 'Competitions deleted using fallback approach.'
+        });
+      } catch (fallbackError) {
+        console.error('❌ Fallback approach failed:', fallbackError);
+        
         return res.status(500).json({ 
           success: false, 
-          message: 'Emergency patch failed and could not query tables',
-          error: error.message,
-          tablesError: tablesError.message
+          message: 'All reset approaches failed. Database might have a different schema than expected.'
         });
       }
     }
@@ -700,7 +734,7 @@ app.post('/api/admin/reset-competitions', async (req, res) => {
     console.error('❌ Catastrophic error in reset process:', outerError);
     return res.status(500).json({ 
       success: false, 
-      message: 'A severe error occurred during the emergency patch process.',
+      message: 'A severe error occurred during the reset process.',
       error: outerError.message
     });
   }
