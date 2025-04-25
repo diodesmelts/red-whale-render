@@ -477,7 +477,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const validatedData = insertEntrySchema.parse(req.body);
+      // Create a modified request body that includes the userId from the session
+      const modifiedBody = {
+        ...req.body,
+        userId: req.user!.id
+      };
+      
+      // Validate the data with the userId included
+      const validatedData = insertEntrySchema.parse(modifiedBody);
       
       // Verify competition exists and has tickets available
       const competition = await dataStorage.getCompetition(validatedData.competitionId);
@@ -511,12 +518,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: req.user!.id,
         competitionId: validatedData.competitionId,
         ticketCount: validatedData.ticketCount,
-        paymentStatus: "pending",
+        paymentStatus: validatedData.paymentStatus,
         stripePaymentId: validatedData.stripePaymentId
       });
       
       res.status(201).json(entry);
     } catch (error: any) {
+      console.error("Entry creation error:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors });
       }
