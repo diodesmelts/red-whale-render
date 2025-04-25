@@ -33,7 +33,7 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50">
       {/* Announcement strip */}
-      <div className="bg-purple-600 text-white py-1.5 shadow-sm">
+      <div className="bg-[#7B39ED] text-white py-1.5 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 text-center text-sm font-medium">
           <span className="inline-flex items-center">
             <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,9 +45,18 @@ export function Navbar() {
       </div>
       
       {/* Main navbar */}
-      <div className="bg-gradient-to-b from-background/95 to-card/95 backdrop-blur-sm border-b border-border shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex items-center justify-between h-28">
+      <div className="bg-gradient-to-r from-background/95 via-[rgba(123,57,237,0.03)] to-background/95 backdrop-blur-sm border-b border-border shadow-sm">
+        <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
+          {/* Decorative elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-8 left-[10%] w-48 h-48 bg-[#7B39ED]/5 rounded-full blur-3xl opacity-40"></div>
+            <div className="absolute bottom-0 right-[15%] w-32 h-32 bg-pink-500/5 rounded-full blur-3xl opacity-40"></div>
+            <div className="absolute top-16 right-1/4 w-4 h-4 bg-yellow-400/20 rounded-full"></div>
+            <div className="absolute top-24 left-1/3 w-3 h-3 bg-green-400/20 rounded-full"></div>
+            <div className="absolute bottom-12 left-[20%] w-5 h-5 bg-blue-400/20 rounded-full"></div>
+          </div>
+          
+          <div className="flex items-center justify-between h-28 relative z-10">
             <div className="flex items-center">
               <div className="flex-shrink-0 pl-2 sm:pl-4">
                 <Link href="/">
@@ -98,6 +107,14 @@ export function Navbar() {
                       : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                   )}>
                     <i className="fas fa-question-circle mr-2"></i> How to Play
+                  </Link>
+                  <Link href="/faqs" className={cn(
+                    "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
+                    location === "/faqs" 
+                      ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                  )}>
+                    <i className="fas fa-info-circle mr-2"></i> FAQs
                   </Link>
                   {user && (
                     <>
@@ -272,6 +289,14 @@ export function Navbar() {
                         location === "/how-to-play" ? "text-primary" : "text-foreground"
                       )}>
                       <i className="fas fa-question-circle mr-2"></i> How to Play
+                    </Link>
+                    <Link href="/faqs" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className={cn(
+                        "flex items-center text-lg font-medium",
+                        location === "/faqs" ? "text-primary" : "text-foreground"
+                      )}>
+                      <i className="fas fa-info-circle mr-2"></i> FAQs
                     </Link>
                     {user ? (
                       <>
