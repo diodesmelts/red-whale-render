@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { AuthProvider } from "@/hooks/use-auth";
+import { CartProvider } from "@/hooks/use-cart";
 import { ProtectedRoute } from "./lib/protected-route";
 import { useEffect } from "react";
 import ApiTest from "./api-test";
@@ -22,6 +23,7 @@ import MyEntries from "@/pages/my-entries";
 import MyWins from "@/pages/my-wins";
 import ProfilePage from "@/pages/profile";
 import TestRegister from "@/pages/test-register";
+import CartPage from "@/pages/cart";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/index";
