@@ -23,14 +23,72 @@ export default function CompetitionDetails() {
   // Extract competition ID from the URL
   const competitionId = location.split("/")[2];
   
-  // Fetch competition details with enhanced error handling
+  // Determine API base URL based on environment
+  const getApiBaseUrl = () => {
+    const isProduction = window.location.hostname.includes('bluewhalecompetitions.co.uk');
+    
+    // Log environment details for debugging
+    console.log("🔌 API URL Determination:", {
+      mode: process.env.NODE_ENV,
+      isProduction,
+      hostname: window.location.hostname,
+      origin: window.location.origin,
+      protocol: window.location.protocol,
+      port: window.location.port
+    });
+    
+    if (isProduction) {
+      // In production, we should try both relative and absolute URLs
+      // Default to relative URL first since that should work if path handling is correct
+      console.log("🔌 Production environment - using relative URL prefix");
+      return '';
+    } else {
+      // In development, use relative URLs
+      console.log("🔌 Development environment - using API on same origin (empty prefix)");
+      return '';
+    }
+  };
+  
+  // Fetch competition details with enhanced error handling and retry logic
   const { data: competition, isLoading, error } = useQuery<Competition>({
     queryKey: [`/api/competitions/${competitionId}`],
     queryFn: async () => {
       try {
+        const baseUrl = getApiBaseUrl();
         console.log(`🔍 Fetching competition: ID=${competitionId}`);
         
-        const res = await fetch(`/api/competitions/${competitionId}`);
+        // Try with relative URL first
+        const apiUrl = `${baseUrl}/api/competitions/${competitionId}`;
+        console.log(`🔍 Attempting to fetch from: ${apiUrl}`);
+        
+        let res;
+        try {
+          res = await fetch(apiUrl, {
+            headers: {
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache'
+            },
+            credentials: 'include' // Send cookies for auth
+          });
+        } catch (fetchError) {
+          console.error(`❌ Initial fetch failed:`, fetchError);
+          // If we're in production and the relative URL failed, try with absolute URL
+          if (window.location.hostname.includes('bluewhalecompetitions.co.uk')) {
+            console.log(`🔄 Trying absolute URL as fallback...`);
+            const absoluteUrl = `${window.location.origin}/api/competitions/${competitionId}`;
+            console.log(`🔍 Attempting to fetch from: ${absoluteUrl}`);
+            res = await fetch(absoluteUrl, {
+              headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
+              },
+              credentials: 'include' // Send cookies for auth
+            });
+          } else {
+            throw fetchError; // Re-throw in development
+          }
+        }
+        
         console.log(`📦 Response status: ${res.status}, ok: ${res.ok}`);
         
         if (!res.ok) {
@@ -50,6 +108,27 @@ export default function CompetitionDetails() {
         }
         
         const data = await res.json();
+        
+        // Process image URLs for production environment
+        if (data && data.imageUrl) {
+          const isProduction = window.location.hostname.includes('bluewhalecompetitions.co.uk');
+          const { hostname, origin } = window.location;
+          const isRender = hostname.includes('onrender.com');
+          
+          console.log(`🖼️ Processing image URL: "${data.imageUrl}"`, { 
+            isProduction, 
+            hostname, 
+            isRender,
+            origin 
+          });
+          
+          // If image URL is relative, make it absolute
+          if (data.imageUrl.startsWith('/uploads/')) {
+            data.imageUrl = `${origin}${data.imageUrl}`;
+            console.log(`🖼️ Final image URL: "${data.imageUrl}"`);
+          }
+        }
+        
         console.log(`✅ Successfully loaded competition data, title: "${data.title}"`);
         return data;
       } catch (err: any) {
@@ -58,8 +137,8 @@ export default function CompetitionDetails() {
         throw err; // Re-throw so React Query can handle it
       }
     },
-    retry: 2, // Retry failed requests up to 2 times
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff
+    retry: 3, // Retry failed requests up to 3 times
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 15000), // Exponential backoff up to 15 seconds
   });
   
   // Handle error state with more details
