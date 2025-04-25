@@ -122,15 +122,15 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Red Whale Competitions. All rights reserved.
           </div>
           <div className="flex space-x-6">
-            <a href="#" className="text-muted-foreground hover:text-primary text-sm">
+            <Link href="/terms-conditions" className="text-muted-foreground hover:text-primary text-sm">
               Terms & Conditions
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary text-sm">
+            </Link>
+            <Link href="/privacy-policy" className="text-muted-foreground hover:text-primary text-sm">
               Privacy Policy
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary text-sm">
+            </Link>
+            <Link href="/cookie-policy" className="text-muted-foreground hover:text-primary text-sm">
               Cookie Policy
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -24,6 +24,9 @@ import MyWins from "@/pages/my-wins";
 import ProfilePage from "@/pages/profile";
 import TestRegister from "@/pages/test-register";
 import CartPage from "@/pages/cart";
+import TermsConditions from "@/pages/terms-conditions";
+import PrivacyPolicy from "@/pages/privacy-policy";
+import CookiePolicy from "@/pages/cookie-policy";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/index";
@@ -67,6 +70,11 @@ function Router() {
               <ProtectedRoute path="/profile" component={ProfilePage} />
               <ProtectedRoute path="/cart" component={CartPage} />
               <Route path="/test-register" component={TestRegister} />
+              
+              {/* Policy Pages */}
+              <Route path="/terms-conditions" component={TermsConditions} />
+              <Route path="/privacy-policy" component={PrivacyPolicy} />
+              <Route path="/cookie-policy" component={CookiePolicy} />
               
               {/* Admin Routes - protected and require admin role */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
