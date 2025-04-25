@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { db } from './db';
 import { competitions, entries, winners } from '@shared/schema';
+import { eq, desc } from 'drizzle-orm';
 
 // Create a router
 const adminRouter = Router();
@@ -139,6 +140,215 @@ adminRouter.post('/reset-competitions', isAdmin, async (req, res) => {
       message: 'A severe error occurred during the reset process.', 
       error: error.message 
     });
+  }
+});
+
+// Create Test Competitions (Dev Environment Only)
+// This endpoint is only for local testing in Replit
+adminRouter.post('/dev-create-test-competitions', isAdmin, async (req, res) => {
+  // Check if this is a development environment
+  const isDev = process.env.NODE_ENV !== 'production';
+  
+  if (!isDev) {
+    return res.status(403).json({ 
+      message: 'This endpoint is only available in development environments'
+    });
+  }
+  
+  try {
+    console.log('🧪 Creating test competitions for development...');
+    
+    // Delete any existing competitions first
+    console.log('🧹 Clearing existing test data...');
+    await db.delete(entries);
+    await db.delete(winners);
+    await db.delete(competitions);
+    console.log('✅ Existing data cleared');
+    
+    // Create test competitions with properly formatted dates
+    const testCompetitions = [
+      {
+        title: "PlayStation 5 Console",
+        description: "Win a brand new PlayStation 5 console with controller and games!",
+        imageUrl: "/uploads/image-1745416110136-244748299.png",
+        ticketPrice: 5,
+        totalTickets: 1000,
+        maxTicketsPerUser: 25,
+        prizeValue: 500,
+        category: "ELECTRONICS",
+        brand: "Sony",
+        isLive: true,
+        isFeatured: true,
+        drawDate: new Date("2025-06-01") // Must be a Date object for Drizzle
+      },
+      {
+        title: "MacBook Pro M3",
+        description: "Win a brand new MacBook Pro with M3 chip!",
+        imageUrl: "/uploads/image-1745528670330-21249645.png",
+        ticketPrice: 10,
+        totalTickets: 750,
+        maxTicketsPerUser: 15,
+        prizeValue: 2000,
+        category: "ELECTRONICS",
+        brand: "Apple",
+        isLive: true,
+        isFeatured: true,
+        drawDate: new Date("2025-05-15") // Must be a Date object for Drizzle
+      },
+      {
+        title: "Ninja Air Fryer",
+        description: "Win the latest Ninja Air Fryer, perfect for healthy cooking!",
+        imageUrl: "/uploads/image-1745595843618-675484257.png",
+        ticketPrice: 3,
+        totalTickets: 500,
+        maxTicketsPerUser: 10,
+        prizeValue: 150,
+        category: "APPLIANCES",
+        brand: "Ninja",
+        isLive: true,
+        isFeatured: false,
+        drawDate: new Date("2025-04-29") // Must be a Date object for Drizzle
+      }
+    ];
+    
+    // Insert the test competitions
+    const results = [];
+    for (const comp of testCompetitions) {
+      console.log(`📌 Creating test competition: ${comp.title}`);
+      
+      try {
+        const result = await db.insert(competitions).values(comp).returning();
+        results.push(result[0]);
+        console.log(`✅ Created competition: ${comp.title} with ID ${result[0].id}`);
+      } catch (error) {
+        console.error(`❌ Error creating competition ${comp.title}:`, error);
+        // Continue with other competitions even if one fails
+      }
+    }
+    
+    // Return success with created competitions
+    return res.status(201).json({
+      message: `Successfully created ${results.length} test competitions`,
+      competitions: results
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error creating test competitions:', error);
+    return res.status(500).json({
+      message: 'Failed to create test competitions',
+      error: error.message
+    });
+  }
+});
+
+// Create a single test competition
+adminRouter.post('/dev-create-competition', isAdmin, async (req, res) => {
+  // Check if this is a development environment
+  const isDev = process.env.NODE_ENV !== 'production';
+  
+  if (!isDev) {
+    return res.status(403).json({ 
+      message: 'This endpoint is only available in development environments'
+    });
+  }
+  
+  try {
+    const {
+      title,
+      description,
+      imageUrl,
+      ticketPrice,
+      totalTickets,
+      maxTicketsPerUser,
+      prizeValue,
+      category,
+      brand,
+      isLive,
+      isFeatured,
+      drawDate: drawDateString // String from request
+    } = req.body;
+    
+    console.log('📌 Dev competition create data:', req.body);
+    
+    // Validate required fields
+    if (!title || !description || !ticketPrice || !totalTickets || !drawDateString) {
+      return res.status(400).json({ 
+        message: 'Missing required fields: title, description, ticketPrice, totalTickets, and drawDate are required' 
+      });
+    }
+    
+    // Convert drawDate string to Date object
+    const drawDate = new Date(drawDateString);
+    
+    // Create the competition with a proper date object
+    const competitionData = {
+      title,
+      description,
+      imageUrl: imageUrl || '/default-competition-image.png',
+      ticketPrice: Number(ticketPrice),
+      totalTickets: Number(totalTickets),
+      maxTicketsPerUser: maxTicketsPerUser ? Number(maxTicketsPerUser) : 10,
+      prizeValue: prizeValue ? Number(prizeValue) : 0,
+      category: category || 'APPLIANCES',
+      brand: brand || '',
+      isLive: isLive || false,
+      isFeatured: isFeatured || false,
+      drawDate // Proper Date object for Drizzle
+    };
+    
+    console.log('📌 Attempting to create competition with proper date format:', {
+      ...competitionData,
+      drawDate: competitionData.drawDate.toISOString() // Show it's a proper Date object
+    });
+    
+    const result = await db.insert(competitions).values(competitionData).returning();
+    
+    console.log(`✅ Successfully created competition: ${title} with ID ${result[0].id}`);
+    
+    return res.status(201).json(result[0]);
+  } catch (error: any) {
+    console.error('❌ Error creating competition:', error);
+    return res.status(500).json({
+      message: 'Failed to create competition',
+      error: error.message
+    });
+  }
+});
+
+// Get competitions
+adminRouter.get('/competitions', isAdmin, async (req, res) => {
+  try {
+    const result = await db.select().from(competitions).orderBy(desc(competitions.createdAt));
+    res.json(result);
+  } catch (error: any) {
+    console.error('Error fetching competitions:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delete a competition
+adminRouter.delete('/competitions/:id', isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    // Start with entries referencing this competition
+    await db.delete(entries).where(eq(entries.competitionId, numId));
+    
+    // Then delete winners related to this competition
+    await db.delete(winners).where(eq(winners.competitionId, numId));
+    
+    // Finally delete the competition itself
+    const result = await db.delete(competitions).where(eq(competitions.id, numId)).returning();
+    
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    res.json({ success: true, message: 'Competition deleted successfully' });
+  } catch (error: any) {
+    console.error('Error deleting competition:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 
