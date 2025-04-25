@@ -61,23 +61,23 @@ export function HeroBanner() {
           <h1 className="text-5xl md:text-7xl font-extrabold mb-4 relative">
             <span className="relative inline-block">
               {hasBackgroundImage ? (
-                <span className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Competition</span>
+                <span className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Let's have a</span>
               ) : (
-                <span className="text-white">Competition</span>
+                <span className="text-white">Let's have a</span>
               )}
               <span className="absolute -top-6 -right-6 text-yellow-400 text-3xl transform rotate-12">★</span>
             </span>
             {hasBackgroundImage ? (
-              <span className="font-light tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Time</span>
+              <span className="font-light tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"> whale of a time</span>
             ) : (
-              <span className="font-light tracking-wider">Time</span>
+              <span className="font-light tracking-wider"> whale of a time</span>
             )}
             <span className="absolute -bottom-2 -right-2 text-pink-400 text-2xl transform -rotate-6">✦</span>
           </h1>
           <p className={`mt-6 max-w-md mx-auto sm:text-xl md:mt-8 md:text-xl md:max-w-3xl font-light ${
             hasBackgroundImage ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" : "text-white"
           }`}>
-            Your premier destination for discovering, participating in, and winning exclusive competitions across multiple platforms.
+            Crazy odds. High win rates. Investing in fun!
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-6">
             <Link href="/competitions">
