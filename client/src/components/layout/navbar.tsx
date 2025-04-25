@@ -32,8 +32,8 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50">
-      {/* Announcement strip */}
-      <div className="bg-[#7B39ED] text-white py-1.5 shadow-sm">
+      {/* Announcement strip with darker purple */}
+      <div className="bg-[#5B1ECB] text-white py-1.5 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 text-center text-sm font-medium">
           <span className="inline-flex items-center">
             <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
