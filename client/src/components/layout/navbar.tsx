@@ -52,8 +52,7 @@ export function Navbar() {
             <div className="absolute -top-10 left-1/4 w-[500px] h-[300px] bg-primary/5 rounded-full blur-[80px] opacity-50"></div>
             <div className="absolute -bottom-20 right-1/4 w-[300px] h-[200px] bg-pink-500/5 rounded-full blur-[60px] opacity-40"></div>
             
-            {/* Animated light beam */}
-            <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-pulse-slow"></div>
+            {/* Removed animated light beam as per user's request */}
           </div>
           
           <div className="flex items-center justify-between h-28 relative z-10">
