@@ -83,7 +83,17 @@ function CheckoutForm({ clientSecret, onSuccess, onCancel }: CheckoutFormProps) 
 
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
-      <PaymentElement id="payment-element" />
+      <PaymentElement 
+        id="payment-element"
+        options={{
+          paymentMethodOrder: ['card', 'apple_pay'],
+          defaultValues: {
+            billingDetails: {
+              name: '',
+            }
+          },
+        }}
+      />
       
       {message && (
         <div className="mt-4 p-3 bg-muted rounded-md text-sm">
@@ -144,6 +154,8 @@ export function StripeCheckout({
   const options = {
     clientSecret,
     appearance,
+    paymentMethodCreation: 'manual',
+    paymentMethodTypes: ['card', 'apple_pay'],
   };
 
   return (
