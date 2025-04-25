@@ -68,9 +68,9 @@ export function HeroBanner() {
               <span className="absolute -top-6 -right-6 text-yellow-400 text-3xl transform rotate-12">★</span>
             </span>
             {hasBackgroundImage ? (
-              <span className="font-light tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"> whale of a time</span>
+              <span className="font-light tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"> <span className="font-bold">whale</span> of a time</span>
             ) : (
-              <span className="font-light tracking-wider"> whale of a time</span>
+              <span className="font-light tracking-wider"> <span className="font-bold">whale</span> of a time</span>
             )}
             <span className="absolute -bottom-2 -right-2 text-pink-400 text-2xl transform -rotate-6">✦</span>
           </h1>
