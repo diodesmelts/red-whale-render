@@ -1,0 +1,73 @@
+CORS request from origin: undefined
+djkdh
+Allowing request with no origin
+djkdh
+CORS request from origin: undefined
+djkdh
+Allowing request with no origin
+djkdh
+CORS request from origin: undefined
+djkdh
+Allowing request with no origin
+djkdh
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+djkdh
+Using customized select query for user
+djkdh
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+djkdh
+Using customized select query for user
+djkdh
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+djkdh
+🌐 Serving SPA for client route: /uploads/image-1745595127657-628316543.png
+djkdh
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+djkdh
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+djkdh
+Using customized select query for user
+djkdh
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+djkdh
+🌐 Serving SPA for client route: /uploads/image-1745541494425-635966326.png
+djkdh
+CORS request from origin: undefined
+djkdh
+Allowing request with no origin
+djkdh
+CORS request from origin: undefined
+djkdh
+Allowing request with no origin
+djkdh
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+djkdh
+Using customized select query for user
+djkdh
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+djkdh
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+djkdh
+Using customized select query for user
+djkdh
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+djkdh
+CORS request from origin: undefined
+djkdh
+Allowing request with no origin
+djkdh
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+djkdh
+Using customized select query for user
+djkdh
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+djkdh
+CORS request from origin: undefined
+djkdh
+Allowing request with no origin
+djkdh
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+djkdh
+Using customized select query for user
+djkdh
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
