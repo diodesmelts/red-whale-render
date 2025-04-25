@@ -1,0 +1,76 @@
+    ==> Deploying...
+n8hll
+- /app/server-docker.cjs
+n8hll
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+n8hll
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+n8hll
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+n8hll
+    at require (node:internal/modules/helpers:182:18)
+n8hll
+    at Object.<anonymous> (/app/server-docker.cjs:8:16)
+n8hll
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+n8hll
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+n8hll
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+n8hll
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+n8hll
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+n8hll
+  code: 'MODULE_NOT_FOUND',
+n8hll
+  requireStack: [ '/app/server-docker.cjs' ]
+n8hll
+}
+n8hll
+n8hll
+Node.js v20.19.1
+     ==> Exited with status 1
+     ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+n8hll
+node:internal/modules/cjs/loader:1215
+n8hll
+  throw err;
+n8hll
+  ^
+n8hll
+n8hll
+Error: Cannot find module 'stripe'
+n8hll
+Require stack:
+n8hll
+- /app/server-docker.cjs
+n8hll
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+n8hll
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+n8hll
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+n8hll
+    at require (node:internal/modules/helpers:182:18)
+n8hll
+    at Object.<anonymous> (/app/server-docker.cjs:8:16)
+n8hll
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+n8hll
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+n8hll
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+n8hll
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+n8hll
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+n8hll
+  code: 'MODULE_NOT_FOUND',
+n8hll
+  requireStack: [ '/app/server-docker.cjs' ]
+n8hll
+}
+n8hll
+n8hll
+Node.js v20.19.1
