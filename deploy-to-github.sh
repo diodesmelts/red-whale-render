@@ -6,7 +6,12 @@ echo "🚀 Starting GitHub deployment process..."
 # Configuration
 REPO_URL="https://github.com/diodesmelts/RedWhale.git"
 BRANCH="main"
-COMMIT_MESSAGE="Fix admin endpoints in Docker deployment files for competition management"
+COMMIT_MESSAGE="Fix: Add resilient competition loading for Get Tickets button
+
+- Added fallback SQL query support when Drizzle ORM fails due to schema differences
+- Made storage method and route handler more resilient with dynamic column detection
+- Added Dev Tools page in admin dashboard for development environment only
+- Enhanced error handling and detailed logging for improved diagnostics"
 
 # Check if GitHub token is available
 if [ -z "$GITHUB_TOKEN" ]; then

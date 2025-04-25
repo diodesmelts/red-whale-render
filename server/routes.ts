@@ -449,7 +449,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(404).json({ message: "Competition not found" });
           }
           
-          console.log(`✅ Successfully retrieved competition with fallback method: ID=${id}`);
+          // Log success with additional details for monitoring
+          console.log(`✅ Successfully retrieved competition with fallback method: ID=${id}, Title="${result.rows[0].title}" (Production fix)`);
           return res.json(result.rows[0]);
         } catch (sqlError: any) {
           console.error(`❌ SQL fallback error for competition ID ${id}:`, sqlError);
