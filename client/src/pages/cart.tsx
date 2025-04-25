@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { processImageUrl } from "@/lib/image-utils";
+import { CheckoutModal } from "@/components/checkout/checkout-modal";
 
 export default function CartPage() {
   const { cartItems, cartTotal, updateCartItem, removeFromCart, clearCart } = useCart();
@@ -15,6 +16,8 @@ export default function CartPage() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   // If the user isn't logged in, redirect to auth page
   if (!user) {
@@ -22,10 +25,8 @@ export default function CartPage() {
     return null;
   }
 
-  const checkoutMutation = useMutation({
+  const createPaymentIntentMutation = useMutation({
     mutationFn: async () => {
-      setIsProcessing(true);
-      
       // Create payment intent for the total cart amount
       const paymentRes = await apiRequest("POST", "/api/create-payment-intent", {
         amount: cartTotal,
@@ -35,16 +36,36 @@ export default function CartPage() {
         }))
       });
       
-      const { clientSecret } = await paymentRes.json();
+      if (!paymentRes.ok) {
+        const error = await paymentRes.json();
+        throw new Error(error.message || "Failed to create payment intent");
+      }
       
-      // For demo purposes, create entries for each cart item
-      const entries = await Promise.all(
+      return await paymentRes.json();
+    },
+    onSuccess: (data) => {
+      setClientSecret(data.clientSecret);
+      setIsCheckoutOpen(true);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Checkout initialization failed",
+        description: error.message || "Failed to initialize checkout",
+        variant: "destructive",
+      });
+      setIsProcessing(false);
+    }
+  });
+
+  const createEntriesMutation = useMutation({
+    mutationFn: async () => {
+      return await Promise.all(
         cartItems.map(async (item) => {
           const entryRes = await apiRequest("POST", "/api/entries", {
             competitionId: item.competitionId,
             ticketCount: item.ticketCount,
             paymentStatus: "completed",
-            stripePaymentId: "demo_payment_" + Date.now()
+            stripePaymentId: `stripe_payment_${Date.now()}`
           });
           
           if (!entryRes.ok) {
@@ -54,8 +75,6 @@ export default function CartPage() {
           return entryRes.json();
         })
       );
-      
-      return { entries, clientSecret };
     },
     onSuccess: () => {
       toast({
@@ -69,13 +88,14 @@ export default function CartPage() {
     },
     onError: (error: any) => {
       toast({
-        title: "Checkout failed",
-        description: error.message || "Failed to process your purchase",
+        title: "Entry creation failed",
+        description: error.message || "Your payment was processed but we couldn't create your entries",
         variant: "destructive",
       });
     },
     onSettled: () => {
       setIsProcessing(false);
+      setIsCheckoutOpen(false);
     }
   });
 
@@ -89,7 +109,8 @@ export default function CartPage() {
       return;
     }
     
-    checkoutMutation.mutate();
+    setIsProcessing(true);
+    createPaymentIntentMutation.mutate();
   };
 
   return (
@@ -215,6 +236,19 @@ export default function CartPage() {
               </Button>
             </div>
           </div>
+          
+          {/* Stripe Checkout Modal */}
+          <CheckoutModal
+            isOpen={isCheckoutOpen}
+            onClose={() => {
+              setIsCheckoutOpen(false);
+              setIsProcessing(false);
+            }}
+            onSuccess={() => createEntriesMutation.mutate()}
+            clientSecret={clientSecret}
+            amount={cartTotal}
+            cartItems={cartItems}
+          />
         </>
       )}
     </div>
