@@ -33,7 +33,7 @@ export function HeroBanner() {
 
   return (
     <section 
-      className={`relative py-48 overflow-hidden ${
+      className={`relative py-32 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"
@@ -55,7 +55,7 @@ export function HeroBanner() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center py-12">
+        <div className="text-center py-8">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-4 relative">
             <span className="relative inline-block">
               {hasBackgroundImage ? (

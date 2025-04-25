@@ -22,6 +22,74 @@ export default function HomePage() {
       {/* Hero Section */}
       <HeroBanner />
       
+      {/* Hot Picks Section - Overlapping with Hero Banner */}
+      <section className="relative z-20 -mt-16 mb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
+              Hot Picks for <span className="text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+              <span className="absolute -top-1 -right-4 text-yellow-400 text-lg">🔥</span>
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Hot Pick 1 */}
+            <div className="bg-card rounded-xl border-2 border-primary/50 shadow-[0_0_25px_rgba(123,57,237,0.5)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(123,57,237,0.7)] group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+              <div className="p-6 relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold text-primary">PlayStation 5</h3>
+                  <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">Featured</span>
+                </div>
+                <p className="text-muted-foreground text-sm mb-4">Win the latest generation PlayStation console with controller and games!</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-medium text-muted-foreground">Ends in 3 days</span>
+                  <Link href="/competitions/1">
+                    <Button size="sm" variant="outline" className="border-primary text-primary hover:bg-primary/10">View</Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
+            {/* Hot Pick 2 */}
+            <div className="bg-card rounded-xl border-2 border-pink-500/50 shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.7)] group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent"></div>
+              <div className="p-6 relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold text-pink-500">Kitchen Makeover</h3>
+                  <span className="px-2 py-1 bg-pink-500/10 text-pink-500 text-xs rounded-full font-medium">Popular</span>
+                </div>
+                <p className="text-muted-foreground text-sm mb-4">Transform your kitchen with this amazing appliance bundle!</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-medium text-muted-foreground">Ends in 5 days</span>
+                  <Link href="/competitions/2">
+                    <Button size="sm" variant="outline" className="border-pink-500 text-pink-500 hover:bg-pink-500/10">View</Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
+            {/* Hot Pick 3 */}
+            <div className="bg-card rounded-xl border-2 border-green-500/50 shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent"></div>
+              <div className="p-6 relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold text-green-500">£1,000 Cash</h3>
+                  <span className="px-2 py-1 bg-green-500/10 text-green-500 text-xs rounded-full font-medium">Trending</span>
+                </div>
+                <p className="text-muted-foreground text-sm mb-4">Win £1,000 cash deposited directly to your account!</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-medium text-muted-foreground">Ends in 2 days</span>
+                  <Link href="/competitions/3">
+                    <Button size="sm" variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/10">View</Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
       {/* How to Play Section */}
       <section className="py-20 bg-background relative overflow-hidden">
         {/* Fun background elements */}
