@@ -158,9 +158,6 @@ export function StripeCheckout({
   const options = {
     clientSecret,
     appearance,
-    // Apple Pay is handled through the 'card' payment method in Stripe Elements
-    // It will automatically show when available in supported browsers with proper certificates
-    paymentMethodTypes: ['card'],
   };
 
   return (
