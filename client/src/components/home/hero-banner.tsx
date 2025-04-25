@@ -33,7 +33,7 @@ export function HeroBanner() {
 
   return (
     <section 
-      className={`relative pt-28 pb-36 overflow-hidden ${
+      className={`relative pt-24 pb-28 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"
