@@ -640,6 +640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amountInPence, // Amount in pence (Stripe requires integer amount)
         currency: "gbp",
+        payment_method_types: ['card'],
         metadata: {
           cartItems: JSON.stringify(cartItems),
           userId: req.user!.id.toString()

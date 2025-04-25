@@ -94,6 +94,14 @@ function CheckoutForm({ clientSecret, onSuccess, onCancel }: CheckoutFormProps) 
           wallets: {
             applePay: 'auto',
             googlePay: 'auto'
+          },
+          business: {
+            name: 'Blue Whale Competitions'
+          },
+          fields: {
+            billingDetails: {
+              name: 'auto'
+            }
           }
         }}
       />
