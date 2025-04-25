@@ -33,7 +33,7 @@ export function HeroBanner() {
 
   return (
     <section 
-      className={`relative py-32 overflow-hidden ${
+      className={`relative pt-32 pb-40 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"

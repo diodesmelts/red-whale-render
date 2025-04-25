@@ -23,18 +23,20 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* Hot Picks Section - Overlapping with Hero Banner */}
-      <section className="relative z-20 -mt-16 mb-16">
+      <section className="relative z-20 -mt-36 mb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
               Hot Picks for <span className="text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-              <span className="absolute -top-1 -right-4 text-yellow-400 text-lg">🔥</span>
+              <span className="absolute -top-1 -right-4 text-yellow-400 text-lg animate-pulse-slow">🔥</span>
             </h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Hot Pick 1 */}
-            <div className="bg-card rounded-xl border-2 border-primary/50 shadow-[0_0_25px_rgba(123,57,237,0.5)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(123,57,237,0.7)] group relative overflow-hidden">
+            <div className="bg-card rounded-xl border-2 border-primary/50 shadow-[0_0_25px_rgba(123,57,237,0.5)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(123,57,237,0.8)] hover:-translate-y-2 group relative overflow-hidden transform">
+              <div className="absolute -right-6 -top-6 w-12 h-12 bg-primary/30 blur-xl rounded-full"></div>
+              <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-primary/20 blur-xl rounded-full"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
               <div className="p-6 relative z-10">
                 <div className="flex justify-between items-start mb-4">
@@ -52,7 +54,9 @@ export default function HomePage() {
             </div>
             
             {/* Hot Pick 2 */}
-            <div className="bg-card rounded-xl border-2 border-pink-500/50 shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.7)] group relative overflow-hidden">
+            <div className="bg-card rounded-xl border-2 border-pink-500/50 shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(236,72,153,0.8)] hover:-translate-y-2 group relative overflow-hidden transform">
+              <div className="absolute -right-6 -top-6 w-12 h-12 bg-pink-500/30 blur-xl rounded-full"></div>
+              <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-pink-500/20 blur-xl rounded-full"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent"></div>
               <div className="p-6 relative z-10">
                 <div className="flex justify-between items-start mb-4">
@@ -70,7 +74,9 @@ export default function HomePage() {
             </div>
             
             {/* Hot Pick 3 */}
-            <div className="bg-card rounded-xl border-2 border-green-500/50 shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] group relative overflow-hidden">
+            <div className="bg-card rounded-xl border-2 border-green-500/50 shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(34,197,94,0.8)] hover:-translate-y-2 group relative overflow-hidden transform">
+              <div className="absolute -right-6 -top-6 w-12 h-12 bg-green-500/30 blur-xl rounded-full"></div>
+              <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-green-500/20 blur-xl rounded-full"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent"></div>
               <div className="p-6 relative z-10">
                 <div className="flex justify-between items-start mb-4">
