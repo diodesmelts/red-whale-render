@@ -6,6 +6,7 @@ import { Competition } from "@shared/schema";
 import { ChevronRight, Search } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { HeroBanner } from "@/components/home/hero-banner";
+import { CountdownTimer } from "@/components/countdown-timer";
 
 export default function HomePage() {
   const { data: featuredCompetitions, isLoading } = useQuery<Competition[]>({
@@ -26,10 +27,12 @@ export default function HomePage() {
       <section className="relative z-20 -mt-32 mb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
-              Hot Picks for <span className="text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-              <span className="absolute -top-1 -right-4 text-yellow-400 text-lg animate-pulse-slow">🔥</span>
-            </h2>
+            <div className="inline-block bg-black/30 px-8 py-3 rounded-full backdrop-blur-sm border border-primary/20 shadow-[0_0_15px_rgba(123,57,237,0.4)]">
+              <h2 className="text-3xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
+                Hot Picks for <span className="text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                <span className="absolute -top-1 -right-4 text-yellow-400 text-lg animate-pulse-slow">🔥</span>
+              </h2>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -45,7 +48,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-muted-foreground text-sm mb-4">Win the latest generation PlayStation console with controller and games!</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium text-muted-foreground">Ends in 3 days</span>
+                  <CountdownTimer days={3} color="primary" />
                   <Link href="/competitions/1">
                     <Button size="sm" variant="outline" className="border-primary text-primary hover:bg-primary/10">View</Button>
                   </Link>
@@ -65,7 +68,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-muted-foreground text-sm mb-4">Transform your kitchen with this amazing appliance bundle!</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium text-muted-foreground">Ends in 5 days</span>
+                  <CountdownTimer days={5} color="pink" />
                   <Link href="/competitions/2">
                     <Button size="sm" variant="outline" className="border-pink-500 text-pink-500 hover:bg-pink-500/10">View</Button>
                   </Link>
@@ -85,7 +88,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-muted-foreground text-sm mb-4">Win £1,000 cash deposited directly to your account!</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium text-muted-foreground">Ends in 2 days</span>
+                  <CountdownTimer days={2} color="green" />
                   <Link href="/competitions/3">
                     <Button size="sm" variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/10">View</Button>
                   </Link>
