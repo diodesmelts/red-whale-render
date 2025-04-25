@@ -40,10 +40,7 @@ export function HeroBanner() {
       }`}
       style={hasBackgroundImage ? { backgroundImage: `url(${absoluteBackgroundImage})` } : {}}
     >
-      {/* Add overlay when background image is present */}
-      {hasBackgroundImage && (
-        <div className="absolute inset-0 bg-black/60"></div>
-      )}
+      {/* No overlay for background image */}
 
       {/* Confetti elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -61,13 +58,23 @@ export function HeroBanner() {
         <div className="text-center py-12">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-4 relative">
             <span className="relative inline-block">
-              <span className="text-white">Competition</span>
+              {hasBackgroundImage ? (
+                <span className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Competition</span>
+              ) : (
+                <span className="text-white">Competition</span>
+              )}
               <span className="absolute -top-6 -right-6 text-yellow-400 text-3xl transform rotate-12">★</span>
             </span>
-            <span className="font-light tracking-wider">Time</span>
+            {hasBackgroundImage ? (
+              <span className="font-light tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Time</span>
+            ) : (
+              <span className="font-light tracking-wider">Time</span>
+            )}
             <span className="absolute -bottom-2 -right-2 text-pink-400 text-2xl transform -rotate-6">✦</span>
           </h1>
-          <p className="mt-8 max-w-md mx-auto text-white sm:text-xl md:mt-10 md:text-2xl md:max-w-4xl font-light">
+          <p className={`mt-8 max-w-md mx-auto sm:text-xl md:mt-10 md:text-2xl md:max-w-4xl font-light ${
+            hasBackgroundImage ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" : "text-white"
+          }`}>
             Your premier destination for discovering, participating in, and winning exclusive competitions across multiple platforms.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-6">
@@ -77,9 +84,15 @@ export function HeroBanner() {
               </Button>
             </Link>
             <Link href="/my-entries">
-              <Button size="lg" variant="outline" className="border-primary border-2 text-primary hover:bg-primary/10 px-8 py-6 text-lg font-semibold group">
-                <ClipboardList className="mr-3 h-6 w-6 group-hover:animate-wiggle" /> My Entries
-              </Button>
+              {hasBackgroundImage ? (
+                <Button size="lg" variant="secondary" className="bg-white/90 hover:bg-white border-2 border-white text-primary hover:text-primary px-8 py-6 text-lg font-semibold group shadow-lg">
+                  <ClipboardList className="mr-3 h-6 w-6 group-hover:animate-wiggle" /> My Entries
+                </Button>
+              ) : (
+                <Button size="lg" variant="outline" className="border-primary border-2 text-primary hover:bg-primary/10 px-8 py-6 text-lg font-semibold group">
+                  <ClipboardList className="mr-3 h-6 w-6 group-hover:animate-wiggle" /> My Entries
+                </Button>
+              )}
             </Link>
           </div>
         </div>
