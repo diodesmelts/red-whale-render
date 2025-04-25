@@ -27,27 +27,79 @@ export default function CartPage() {
 
   const createPaymentIntentMutation = useMutation({
     mutationFn: async () => {
-      // Create payment intent for the total cart amount
-      const paymentRes = await apiRequest("POST", "/api/create-payment-intent", {
+      console.log('Creating payment intent with cart data:', {
         amount: cartTotal,
-        cartItems: cartItems.map(item => ({
-          competitionId: item.competitionId,
-          ticketCount: item.ticketCount
+        itemCount: cartItems.length,
+        cartItemsSummary: cartItems.map(item => ({
+          id: item.competitionId,
+          title: item.title,
+          price: item.ticketPrice,
+          quantity: item.ticketCount,
+          subtotal: item.ticketPrice * item.ticketCount
         }))
       });
       
-      if (!paymentRes.ok) {
-        const error = await paymentRes.json();
-        throw new Error(error.message || "Failed to create payment intent");
+      try {
+        // Create payment intent for the total cart amount
+        const paymentRes = await apiRequest("POST", "/api/create-payment-intent", {
+          amount: cartTotal,
+          cartItems: cartItems.map(item => ({
+            competitionId: item.competitionId,
+            ticketCount: item.ticketCount
+          }))
+        });
+        
+        // If we get a response, log status and headers for debugging
+        console.log('Payment intent API response status:', paymentRes.status);
+        
+        if (!paymentRes.ok) {
+          let errorData;
+          try {
+            errorData = await paymentRes.json();
+            console.error('Payment intent creation failed:', errorData);
+          } catch (parseError) {
+            console.error('Failed to parse error response:', parseError);
+            console.error('Response text:', await paymentRes.text());
+            throw new Error(`Payment service error (${paymentRes.status}): Could not process request`);
+          }
+          
+          throw new Error(errorData.message || `Payment service error (${paymentRes.status})`);
+        }
+        
+        const data = await paymentRes.json();
+        console.log('Payment intent created successfully:', {
+          hasClientSecret: !!data.clientSecret,
+          clientSecretPrefix: data.clientSecret ? 
+            `${data.clientSecret.substring(0, 10)}...` : 'missing'
+        });
+        
+        return data;
+      } catch (error) {
+        console.error('Exception during payment intent creation:', error);
+        if (error instanceof Error) {
+          throw error;
+        } else {
+          throw new Error('Unknown error during checkout initialization');
+        }
       }
-      
-      return await paymentRes.json();
     },
     onSuccess: (data) => {
+      if (!data.clientSecret) {
+        console.error('Payment intent response missing client secret');
+        toast({
+          title: "Checkout initialization failed",
+          description: "Invalid response from payment service",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
       setClientSecret(data.clientSecret);
       setIsCheckoutOpen(true);
     },
     onError: (error: any) => {
+      console.error('Payment intent mutation error:', error);
       toast({
         title: "Checkout initialization failed",
         description: error.message || "Failed to initialize checkout",

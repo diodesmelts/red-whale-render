@@ -16,16 +16,53 @@ import { CartItem } from '@/hooks/use-cart';
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 console.log('Stripe public key status:', stripeKey ? 'Found' : 'Missing');
 
-// Safely load Stripe with error handling
+// Enhanced debugging for Stripe initialization
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
+
+// Log environment information
+console.log('Environment:', {
+  mode: import.meta.env.MODE,
+  isProduction: import.meta.env.PROD,
+  baseUrl: import.meta.env.BASE_URL,
+  isStripeKeyPresent: !!stripeKey,
+  stripeKeyPrefix: stripeKey ? stripeKey.substring(0, 7) + '...' : 'missing',
+  currentUrl: window.location.href,
+  host: window.location.host
+});
+
 try {
   if (!stripeKey) {
     console.error('Missing Stripe public key (VITE_STRIPE_PUBLIC_KEY)');
   } else {
-    stripePromise = loadStripe(stripeKey);
+    console.log('Attempting to initialize Stripe with key prefix:', stripeKey.substring(0, 7) + '...');
+    
+    // Initialize Stripe with detailed error handling
+    stripePromise = loadStripe(stripeKey)
+      .then(stripe => {
+        console.log('Stripe initialization successful:', !!stripe);
+        return stripe;
+      })
+      .catch(error => {
+        console.error('Stripe initialization failed with error:', error);
+        if (error instanceof Error) {
+          console.error('Error details:', {
+            message: error.message,
+            name: error.name,
+            stack: error.stack
+          });
+        }
+        return null;
+      });
   }
 } catch (err) {
-  console.error('Error initializing Stripe:', err);
+  console.error('Exception during Stripe setup:', err);
+  if (err instanceof Error) {
+    console.error('Error details:', {
+      message: err.message,
+      name: err.name,
+      stack: err.stack
+    });
+  }
 }
 
 interface CheckoutFormProps {
