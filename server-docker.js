@@ -359,6 +359,40 @@ app.get('/api/competitions', async (req, res) => {
   }
 });
 
+// Get single competition by ID endpoint
+app.get('/api/competitions/:id', async (req, res) => {
+  try {
+    // Add detailed logging for debugging
+    const id = req.params.id;
+    console.log(`🔍 GET competition request for ID: ${id}`);
+    console.log(`📝 Request context:`, {
+      id,
+      userAgent: req.headers['user-agent'],
+      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+      sessionID: req.sessionID
+    });
+    
+    const result = await pool.query(
+      `SELECT * FROM competitions WHERE id = $1`,
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      console.log(`❌ Competition not found: ID=${id}`);
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    console.log(`✅ Successfully retrieved competition: ID=${id}, Title="${result.rows[0].title}"`);
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(`❌ Error fetching competition ${req.params.id}:`, err);
+    res.status(500).json({ 
+      message: 'Failed to fetch competition details',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
 // Authentication middleware for protected routes
 function isAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
