@@ -447,7 +447,7 @@ app.post('/api/admin/competitions', isAdmin, async (req, res) => {
           ticket_price as "ticketPrice", total_tickets as "totalTickets", 
           max_tickets_per_user as "maxTicketsPerUser", prize_value as "prizeValue",
           category, brand, is_live as "isLive", is_featured as "isFeatured", 
-          start_date as "startDate", end_date as "endDate",
+          start_date as "startDate", end_date as "endDate", draw_date as "drawDate",
           created_at as "createdAt", updated_at as "updatedAt"
       `;
       
@@ -467,7 +467,8 @@ app.post('/api/admin/competitions', isAdmin, async (req, res) => {
         req.body.isLive || false,
         req.body.isFeatured || false,
         startDate,
-        endDate
+        endDate,
+        drawDate // Add the draw date required by the database schema
       ];
       
       const result = await pool.query(insertQuery, values);
