@@ -112,18 +112,20 @@ function CheckoutForm({ clientSecret, onSuccess, onCancel }: CheckoutFormProps) 
         </div>
       )}
       
-      <div className="flex justify-between mt-4">
+      <div className="flex flex-col sm:flex-row justify-between mt-4 gap-3">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
           disabled={isLoading}
+          className="w-full sm:w-auto order-2 sm:order-1"
         >
           Cancel
         </Button>
         <Button 
           type="submit" 
           disabled={isLoading || !stripe || !elements}
+          className="w-full sm:w-auto order-1 sm:order-2"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -168,9 +170,9 @@ export function StripeCheckout({
   };
 
   return (
-    <div className="bg-card border rounded-lg p-6 shadow-lg max-w-md mx-auto">
+    <div className="bg-card border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
       <h2 className="text-xl font-semibold mb-1">Complete your purchase</h2>
-      <p className="text-sm text-muted-foreground mb-6">
+      <p className="text-sm text-muted-foreground mb-4 sm:mb-6">
         Total: £{amount.toFixed(2)} for {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
       </p>
       
