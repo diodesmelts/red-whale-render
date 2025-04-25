@@ -58,7 +58,7 @@ export function HeroBanner() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center py-4">
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-4 relative">
+          <h1 className="text-5xl md:text-7xl font-light mb-4 relative">
             <span className="relative inline-block">
               {hasBackgroundImage ? (
                 <span className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Let's have a</span>
@@ -68,9 +68,9 @@ export function HeroBanner() {
               <span className="absolute -top-6 -right-6 text-yellow-400 text-3xl transform rotate-12">★</span>
             </span>
             {hasBackgroundImage ? (
-              <span className="font-light tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"> <span className="font-bold">whale</span> of a time</span>
+              <span className="font-light tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"> <span className="font-extrabold">whale</span> of a time</span>
             ) : (
-              <span className="font-light tracking-wider"> <span className="font-bold">whale</span> of a time</span>
+              <span className="font-light tracking-wider"> <span className="font-extrabold">whale</span> of a time</span>
             )}
             <span className="absolute -bottom-2 -right-2 text-pink-400 text-2xl transform -rotate-6">✦</span>
           </h1>
