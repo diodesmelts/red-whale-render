@@ -661,12 +661,31 @@ app.post('/api/admin/competitions', async (req, res) => {
       // Validate required fields
       const { 
         title, description, imageUrl, ticketPrice, 
-        totalTickets, maxTicketsPerUser, prizeValue 
+        totalTickets, maxTicketsPerUser, prizeValue,
+        drawDate, category
       } = req.body;
       
-      if (!title || !description || !imageUrl || !ticketPrice || !totalTickets) {
+      console.log('📋 Validating incoming data:', { 
+        title, description, imageUrl, ticketPrice, 
+        totalTickets, maxTicketsPerUser, prizeValue,
+        drawDate, category
+      });
+      
+      if (!title || !description || !imageUrl || !ticketPrice || !totalTickets || !drawDate || !category) {
+        const missingFields = [];
+        if (!title) missingFields.push('title');
+        if (!description) missingFields.push('description');
+        if (!imageUrl) missingFields.push('imageUrl');
+        if (!ticketPrice) missingFields.push('ticketPrice');
+        if (!totalTickets) missingFields.push('totalTickets');
+        if (!drawDate) missingFields.push('drawDate');
+        if (!category) missingFields.push('category');
+        
+        console.error('❌ Missing required fields:', missingFields);
+        
         return res.status(400).json({ 
-          message: 'Missing required fields' 
+          message: 'Missing required fields',
+          missingFields 
         });
       }
       
@@ -678,15 +697,15 @@ app.post('/api/admin/competitions', async (req, res) => {
           title, description, image_url, ticket_price, 
           total_tickets, max_tickets_per_user, prize_value,
           category, brand, is_live, is_featured, 
-          start_date, end_date
+          start_date, end_date, draw_date
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
         ) RETURNING 
           id, title, description, image_url as "imageUrl", 
           ticket_price as "ticketPrice", total_tickets as "totalTickets", 
           max_tickets_per_user as "maxTicketsPerUser", prize_value as "prizeValue",
           category, brand, is_live as "isLive", is_featured as "isFeatured", 
-          start_date as "startDate", end_date as "endDate",
+          start_date as "startDate", end_date as "endDate", draw_date as "drawDate",
           created_at as "createdAt", updated_at as "updatedAt"
       `;
       
@@ -706,7 +725,8 @@ app.post('/api/admin/competitions', async (req, res) => {
         req.body.isLive || false,
         req.body.isFeatured || false,
         startDate,
-        endDate
+        endDate,
+        drawDate // Add the draw date required by the database schema
       ];
       
       const result = await pool.query(insertQuery, values);
