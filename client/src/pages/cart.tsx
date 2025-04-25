@@ -1,6 +1,6 @@
-import { useCart } from "@/hooks/use-cart";
-import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+import { useCart } from "@/hooks/use-cart"; 
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";

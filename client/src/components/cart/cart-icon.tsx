@@ -1,82 +1,76 @@
 import { ShoppingCart } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-type CartIconProps = {
-  variant?: "default" | "subtle" | "icon-only";
-  className?: string;
-};
+interface CartIconProps {
+  variant?: "default" | "outline" | "secondary" | "ghost";
+  size?: "default" | "sm" | "lg" | "icon";
+  showTooltip?: boolean;
+}
 
-export function CartIcon({ variant = "default", className }: CartIconProps) {
+export function CartIcon({ 
+  variant = "ghost", 
+  size = "icon",
+  showTooltip = true
+}: CartIconProps) {
   const { cartCount, cartTotal } = useCart();
   const [, navigate] = useLocation();
 
-  const handleCartClick = () => {
-    navigate("/cart");
-  };
-
-  if (variant === "icon-only") {
-    return (
-      <div className={cn("relative", className)}>
-        <Button 
-          onClick={handleCartClick} 
-          variant="ghost" 
-          size="icon" 
+  return (
+    <>
+      {showTooltip ? (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={variant}
+                size={size}
+                className="relative"
+                onClick={() => navigate("/cart")}
+                aria-label={`Shopping cart with ${cartCount} items`}
+              >
+                <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
+                {cartCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-xs"
+                  >
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {cartCount === 0
+                  ? "Your cart is empty"
+                  : `${cartCount} item${cartCount !== 1 ? "s" : ""} - £${cartTotal.toFixed(2)}`}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <Button
+          variant={variant}
+          size={size}
           className="relative"
-          aria-label="Shopping cart"
+          onClick={() => navigate("/cart")}
+          aria-label={`Shopping cart with ${cartCount} items`}
         >
-          <ShoppingCart className="h-5 w-5" />
+          <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
           {cartCount > 0 && (
             <Badge 
-              className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
-              variant="destructive"
+              variant="destructive" 
+              className="absolute -top-2 -right-2 h-5 min-w-5 p-0 flex items-center justify-center rounded-full text-xs"
             >
-              {cartCount > 99 ? "99+" : cartCount}
+              {cartCount}
             </Badge>
           )}
         </Button>
-      </div>
-    );
-  }
-
-  if (variant === "subtle") {
-    return (
-      <Button 
-        onClick={handleCartClick} 
-        variant="ghost" 
-        size="sm"
-        className={cn("gap-2", className)}
-      >
-        <ShoppingCart className="h-4 w-4" />
-        {cartCount > 0 ? (
-          <span>
-            {cartCount} {cartCount === 1 ? "item" : "items"}
-          </span>
-        ) : (
-          <span>Cart</span>
-        )}
-      </Button>
-    );
-  }
-
-  return (
-    <Button 
-      onClick={handleCartClick} 
-      variant="outline" 
-      size="sm"
-      className={cn("gap-2", className)}
-    >
-      <ShoppingCart className="h-4 w-4" />
-      {cartCount > 0 ? (
-        <span>
-          {cartCount} {cartCount === 1 ? "item" : "items"} (£{cartTotal.toFixed(2)})
-        </span>
-      ) : (
-        <span>Cart</span>
       )}
-    </Button>
+    </>
   );
 }
