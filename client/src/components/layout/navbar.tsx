@@ -47,14 +47,7 @@ export function Navbar() {
       {/* Main navbar */}
       <div className="bg-gradient-to-r from-background/95 via-[rgba(123,57,237,0.03)] to-background/95 backdrop-blur-sm border-b border-border shadow-sm">
         <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          {/* Decorative elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-8 left-[10%] w-48 h-48 bg-[#7B39ED]/5 rounded-full blur-3xl opacity-40"></div>
-            <div className="absolute bottom-0 right-[15%] w-32 h-32 bg-pink-500/5 rounded-full blur-3xl opacity-40"></div>
-            <div className="absolute top-16 right-1/4 w-4 h-4 bg-yellow-400/20 rounded-full"></div>
-            <div className="absolute top-24 left-1/3 w-3 h-3 bg-green-400/20 rounded-full"></div>
-            <div className="absolute bottom-12 left-[20%] w-5 h-5 bg-blue-400/20 rounded-full"></div>
-          </div>
+          {/* No decorative elements as per user request */}
           
           <div className="flex items-center justify-between h-28 relative z-10">
             <div className="flex items-center">
@@ -152,7 +145,7 @@ export function Navbar() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" className="flex items-center bg-primary/30 hover:bg-primary/50">
+                        <Button variant="secondary" className="flex items-center bg-primary/30 hover:bg-primary/50 shadow-[0_0_8px_rgba(123,57,237,0.5)] border border-primary/40 transition-all hover:shadow-[0_0_12px_rgba(123,57,237,0.7)]">
                           <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center mr-2">
                             <span className="font-semibold text-sm">
                               {user.displayName ? user.displayName[0].toUpperCase() : user.username[0].toUpperCase()}
@@ -227,10 +220,15 @@ export function Navbar() {
                   </>
                 ) : (
                   <div className="flex items-center space-x-3">
-                    <Button variant="outline" onClick={() => window.location.href = '/auth'} className="px-5 py-2 h-auto">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => window.location.href = '/auth'} 
+                      className="px-5 py-2 h-auto shadow-[0_0_8px_rgba(123,57,237,0.4)] border-primary/30 transition-all hover:shadow-[0_0_12px_rgba(123,57,237,0.5)]">
                       Login
                     </Button>
-                    <Button onClick={() => window.location.href = '/auth?tab=register'} className="px-5 py-2 h-auto">
+                    <Button 
+                      onClick={() => window.location.href = '/auth?tab=register'} 
+                      className="px-5 py-2 h-auto shadow-[0_0_8px_rgba(123,57,237,0.5)] transition-all hover:shadow-[0_0_12px_rgba(123,57,237,0.7)]">
                       Register
                     </Button>
                   </div>
@@ -368,10 +366,10 @@ export function Navbar() {
                     ) : (
                       <div className="flex flex-col space-y-3">
                         <Link href="/auth" onClick={() => setIsMenuOpen(false)}>
-                          <Button className="w-full">Login</Button>
+                          <Button className="w-full shadow-[0_0_8px_rgba(123,57,237,0.5)] transition-all hover:shadow-[0_0_12px_rgba(123,57,237,0.7)]">Login</Button>
                         </Link>
                         <Link href="/auth?tab=register" onClick={() => setIsMenuOpen(false)}>
-                          <Button variant="outline" className="w-full">Register</Button>
+                          <Button variant="outline" className="w-full shadow-[0_0_8px_rgba(123,57,237,0.4)] border-primary/30 transition-all hover:shadow-[0_0_12px_rgba(123,57,237,0.5)]">Register</Button>
                         </Link>
                       </div>
                     )}

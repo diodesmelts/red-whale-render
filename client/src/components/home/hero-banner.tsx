@@ -98,16 +98,7 @@ export function HeroBanner() {
         </div>
       </div>
       
-      {/* Keep decorative elements when no background image */}
-      {!hasBackgroundImage && (
-        <>
-          <div className="absolute top-20 left-10 w-20 h-20 bg-yellow-500/20 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-10 right-10 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl"></div>
-          <div className="absolute top-40 right-20 w-16 h-16 bg-green-500/20 rounded-full blur-xl"></div>
-          <div className="absolute bottom-40 left-20 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"></div>
-          <div className="absolute top-60 left-[40%] w-16 h-16 bg-purple-500/20 rounded-full blur-xl"></div>
-        </>
-      )}
+      {/* No background circles as per user request */}
 
       {/* Loading indicator */}
       {isLoading && (
