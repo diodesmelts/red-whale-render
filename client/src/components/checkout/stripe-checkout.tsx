@@ -86,7 +86,6 @@ function CheckoutForm({ clientSecret, onSuccess, onCancel }: CheckoutFormProps) 
       <PaymentElement 
         id="payment-element"
         options={{
-          paymentMethodOrder: ['card'],
           defaultValues: {
             billingDetails: {
               name: '',
