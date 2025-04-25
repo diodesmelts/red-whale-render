@@ -1,0 +1,87 @@
+==> Deploying...
+     ==> Exited with status 1
+     ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+dx9zl
+node:internal/modules/cjs/loader:1215
+dx9zl
+  throw err;
+dx9zl
+  ^
+dx9zl
+dx9zl
+Error: Cannot find module 'cors'
+dx9zl
+Require stack:
+dx9zl
+- /app/server-docker.cjs
+dx9zl
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+dx9zl
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+dx9zl
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+dx9zl
+    at require (node:internal/modules/helpers:182:18)
+dx9zl
+    at Object.<anonymous> (/app/server-docker.cjs:13:14)
+dx9zl
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+dx9zl
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+dx9zl
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+dx9zl
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+dx9zl
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+dx9zl
+  code: 'MODULE_NOT_FOUND',
+dx9zl
+  requireStack: [ '/app/server-docker.cjs' ]
+dx9zl
+}
+dx9zl
+dx9zl
+Node.js v20.19.1
+dx9zl
+node:internal/modules/cjs/loader:1215
+dx9zl
+  throw err;
+dx9zl
+  ^
+dx9zl
+dx9zl
+Error: Cannot find module 'cors'
+dx9zl
+Require stack:
+dx9zl
+- /app/server-docker.cjs
+dx9zl
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+dx9zl
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+dx9zl
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+dx9zl
+    at require (node:internal/modules/helpers:182:18)
+dx9zl
+    at Object.<anonymous> (/app/server-docker.cjs:13:14)
+dx9zl
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+dx9zl
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+dx9zl
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+dx9zl
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+dx9zl
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+dx9zl
+  code: 'MODULE_NOT_FOUND',
+dx9zl
+  requireStack: [ '/app/server-docker.cjs' ]
+dx9zl
+}
+dx9zl
+dx9zl
+Node.js v20.19.1
