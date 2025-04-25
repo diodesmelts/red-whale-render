@@ -1,7 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Search, ClipboardList } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { SiteConfig } from "@shared/schema";
 import { getImageUrl } from "@/lib/utils";
@@ -79,24 +76,7 @@ export function HeroBanner() {
           }`}>
             Crazy odds. High win rates. Investing in fun!
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-6">
-            <Link href="/competitions">
-              <Button size="lg" className="group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-primary/20">
-                <Search className="mr-3 h-6 w-6 animate-pulse-slow" /> View Competitions
-              </Button>
-            </Link>
-            <Link href="/my-entries">
-              {hasBackgroundImage ? (
-                <Button size="lg" variant="secondary" className="bg-white/90 hover:bg-white border-2 border-white text-primary hover:text-primary px-8 py-6 text-lg font-semibold group shadow-lg">
-                  <ClipboardList className="mr-3 h-6 w-6 group-hover:animate-wiggle" /> My Entries
-                </Button>
-              ) : (
-                <Button size="lg" variant="outline" className="border-primary border-2 text-primary hover:bg-primary/10 px-8 py-6 text-lg font-semibold group">
-                  <ClipboardList className="mr-3 h-6 w-6 group-hover:animate-wiggle" /> My Entries
-                </Button>
-              )}
-            </Link>
-          </div>
+          {/* Buttons removed as requested */}
         </div>
       </div>
       
