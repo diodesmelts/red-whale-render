@@ -23,26 +23,69 @@ export default function CompetitionDetails() {
   // Extract competition ID from the URL
   const competitionId = location.split("/")[2];
   
-  // Fetch competition details
+  // Fetch competition details with enhanced error handling
   const { data: competition, isLoading, error } = useQuery<Competition>({
     queryKey: [`/api/competitions/${competitionId}`],
     queryFn: async () => {
-      const res = await fetch(`/api/competitions/${competitionId}`);
-      if (!res.ok) throw new Error("Failed to fetch competition details");
-      return res.json();
-    }
+      try {
+        console.log(`🔍 Fetching competition: ID=${competitionId}`);
+        
+        const res = await fetch(`/api/competitions/${competitionId}`);
+        console.log(`📦 Response status: ${res.status}, ok: ${res.ok}`);
+        
+        if (!res.ok) {
+          // Try to get error response as JSON first
+          let errorDetail;
+          try {
+            const errorResponse = await res.json();
+            errorDetail = errorResponse.message || `HTTP error ${res.status}`;
+            console.error(`❌ API error response: ${JSON.stringify(errorResponse)}`);
+          } catch (jsonError) {
+            // If can't parse JSON, use status text
+            errorDetail = res.statusText || `HTTP error ${res.status}`;
+            console.error(`❌ API error response (not JSON): ${res.statusText}`);
+          }
+          
+          throw new Error(`Failed to fetch competition details: ${errorDetail}`);
+        }
+        
+        const data = await res.json();
+        console.log(`✅ Successfully loaded competition data, title: "${data.title}"`);
+        return data;
+      } catch (err: any) {
+        // Catch network errors or other issues outside of fetch response handling
+        console.error(`❌ Error fetching competition ${competitionId}:`, err);
+        throw err; // Re-throw so React Query can handle it
+      }
+    },
+    retry: 2, // Retry failed requests up to 2 times
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff
   });
   
-  // Handle error state
+  // Handle error state with more details
   useEffect(() => {
     if (error) {
+      console.error('Competition details error:', error);
+      
+      // Determine environment for debugging info
+      const isProduction = window.location.hostname.includes('bluewhalecompetitions.co.uk');
+      const errorInfo = isProduction ? 
+        "Production environment detected" : 
+        "Development environment detected";
+      
+      // Log API URL being used
+      const apiUrl = isProduction ? 
+        `https://${window.location.hostname}/api/competitions/${competitionId}` : 
+        `/api/competitions/${competitionId}`;
+      console.log(`🔌 API URL: ${apiUrl}`);
+      
       toast({
-        title: "Error",
-        description: "Could not load competition details",
+        title: "Error Loading Competition",
+        description: `${error.message || "Could not load competition details"} (${errorInfo})`,
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+  }, [error, toast, competitionId]);
   
   // Handle ticket quantity changes
   const increaseQuantity = () => {
@@ -145,12 +188,46 @@ export default function CompetitionDetails() {
   }
   
   if (!competition) {
+    // Create a more detailed error message for debugging
+    const isProduction = window.location.hostname.includes('bluewhalecompetitions.co.uk');
+    const errorMessage = error ? 
+      (error instanceof Error ? error.message : String(error)) : 
+      "Competition details could not be loaded";
+    
+    // Only show technical details in development environment
+    const showDebugInfo = !isProduction;
+    
     return (
-      <div className="flex-grow flex items-center justify-center flex-col p-6">
-        <h2 className="text-2xl font-bold mb-4">Competition Not Found</h2>
-        <p className="text-muted-foreground mb-6">The competition you're looking for doesn't exist or has been removed.</p>
+      <div className="flex-grow flex items-center justify-center flex-col p-6 max-w-3xl mx-auto">
+        <div className="bg-destructive/10 w-full p-6 rounded-lg mb-6 border border-destructive/20">
+          <h2 className="text-2xl font-bold mb-4 text-destructive">Error Loading Competition</h2>
+          <p className="text-foreground mb-6">
+            There was a problem loading the competition details. This may be due to:
+          </p>
+          <ul className="list-disc pl-6 mb-6 space-y-2 text-muted-foreground">
+            <li>The competition ID ({competitionId}) may be invalid</li>
+            <li>The competition may have been removed</li>
+            <li>There might be a temporary connection issue with our server</li>
+          </ul>
+          
+          {showDebugInfo && error && (
+            <div className="bg-muted p-3 rounded text-xs font-mono mt-4 mb-4 overflow-auto max-h-[200px]">
+              <div className="text-foreground font-semibold mb-2">Debug Information:</div>
+              <p className="text-muted-foreground whitespace-pre-wrap break-all">
+                {errorMessage}
+              </p>
+              <div className="mt-2 text-foreground font-semibold">API URL:</div>
+              <p className="text-muted-foreground">{
+                isProduction ? 
+                  `https://${window.location.hostname}/api/competitions/${competitionId}` : 
+                  `/api/competitions/${competitionId}`
+              }</p>
+            </div>
+          )}
+        </div>
+        
         <Link href="/competitions">
-          <Button>Browse All Competitions</Button>
+          <Button size="lg">Browse All Competitions</Button>
         </Link>
       </div>
     );
