@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Clock, Ticket } from "lucide-react";
+import { Loader2, Clock, Ticket, Trophy } from "lucide-react";
 import { SiteConfig, Competition } from "@shared/schema";
 import { getImageUrl } from "@/lib/utils";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
+import { Progress } from "@/components/ui/progress";
 
 export function HeroBanner() {
   const { data: heroBannerConfig, isLoading: isLoadingBanner } = useQuery<SiteConfig>({
@@ -25,7 +26,25 @@ export function HeroBanner() {
     retryDelay: 1000, // Wait 1 second between retries
   });
 
-  // Fetch featured competition for the banner
+  // Fetch hero banner title from site config
+  const { data: heroBannerTitle, isLoading: isLoadingTitle } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config", "heroBannerTitle"],
+    queryFn: async () => {
+      const res = await fetch("/api/site-config/heroBannerTitle");
+      if (!res.ok) {
+        if (res.status === 404) {
+          return { key: "heroBannerTitle", value: "Turbo Cash Instants. Up to £1,000 cash!" };
+        }
+        throw new Error("Failed to fetch hero banner title");
+      }
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 3,
+    retryDelay: 1000,
+  });
+
+  // Fetch competitions for the banner
   const { data: competitions, isLoading: isLoadingCompetitions } = useQuery<Competition[]>({
     queryKey: ["/api/competitions"],
     queryFn: async () => {
@@ -38,8 +57,12 @@ export function HeroBanner() {
     staleTime: 60 * 1000, // Cache for 1 minute
   });
 
-  // Find featured cash competition
-  const featuredCashCompetition = competitions?.find(
+  // First priority: Competition with pushToHeroBanner flag
+  // Second priority: Featured cash competition
+  // Third priority: Any live cash competition
+  const heroBannerCompetition = competitions?.find(
+    comp => comp.pushToHeroBanner && comp.isLive
+  ) || competitions?.find(
     comp => comp.category === "cash" && comp.isLive && comp.isFeatured
   ) || competitions?.find(
     comp => comp.category === "cash" && comp.isLive
@@ -63,7 +86,19 @@ export function HeroBanner() {
     }
   };
 
-  const isLoading = isLoadingBanner || isLoadingCompetitions;
+  // Calculate the percentage of tickets sold
+  const calculateTicketPercentage = (sold: number, total: number): number => {
+    if (total === 0) return 0;
+    return Math.min(100, Math.round((sold / total) * 100));
+  };
+
+  const isLoading = isLoadingBanner || isLoadingCompetitions || isLoadingTitle;
+  const title = heroBannerTitle?.value || "Turbo Cash Instants. Up to £1,000 cash!";
+
+  // Split the title to highlight parts if it contains a period
+  const titleParts = title.split('.');
+  const mainTitle = titleParts[0].trim();
+  const highlightText = titleParts.length > 1 ? titleParts.slice(1).join('.').trim() : '';
 
   return (
     <section 
@@ -73,7 +108,7 @@ export function HeroBanner() {
           : "bg-gradient-to-b from-background to-background/70"
       }`}
       style={hasBackgroundImage ? { 
-        backgroundImage: `linear-gradient(rgba(0, 0, 30, 0.05), rgba(0, 0, 30, 0.05)), url(${absoluteBackgroundImage})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 30, 0.15), rgba(0, 0, 30, 0.15)), url(${absoluteBackgroundImage})`,
         zIndex: -1
       } : {}}
     >
@@ -96,38 +131,68 @@ export function HeroBanner() {
             WIN
           </div>
           
-          {/* Main Title */}
+          {/* Main Title - Using title from site config */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6 relative">
             <span className={hasBackgroundImage ? "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-white"}>
-              Turbo Cash Instants. <span className="text-yellow-400">Up to £1,000 cash!</span>
+              {mainTitle}
+              {highlightText && (
+                <span className="text-yellow-400"> {highlightText}</span>
+              )}
             </span>
             <span className="absolute -top-6 right-8 text-yellow-400 text-3xl transform rotate-12">★</span>
             <span className="absolute -bottom-2 left-1/4 text-pink-400 text-2xl transform -rotate-6">✦</span>
           </h1>
           
           {/* Competition Details */}
-          {featuredCashCompetition && !isLoading ? (
-            <div className="mt-8 bg-black/30 backdrop-blur-sm p-6 rounded-xl inline-block max-w-2xl mx-auto border border-white/10 shadow-xl">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-                <div className="flex flex-col items-center sm:items-start">
-                  <div className="flex items-center text-white mb-2">
-                    <Ticket className="h-5 w-5 mr-2 text-primary" />
-                    <span className="text-xl font-semibold">
-                      £{(featuredCashCompetition.ticketPrice / 100).toFixed(2)} per ticket
-                    </span>
-                  </div>
-                  <div className="flex items-center text-white">
-                    <Clock className="h-5 w-5 mr-2 text-primary" />
-                    <span className="text-lg">
-                      Draw {formatTimeRemaining(featuredCashCompetition.drawDate)}
-                    </span>
-                  </div>
+          {heroBannerCompetition && !isLoading ? (
+            <div className="mt-8 bg-black/40 backdrop-blur-sm p-6 rounded-xl inline-block max-w-2xl mx-auto border border-white/10 shadow-xl">
+              <div className="flex flex-col gap-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-2">{heroBannerCompetition.title}</h2>
                 </div>
-                <Link to={`/competitions/${featuredCashCompetition.id}`}>
-                  <Button size="lg" className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 text-white font-bold px-8 text-lg">
-                    Enter Competition
-                  </Button>
-                </Link>
+                
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+                  <div className="flex flex-col w-full sm:w-auto">
+                    <div className="flex items-center text-white mb-2">
+                      <Ticket className="h-5 w-5 mr-2 text-primary" />
+                      <span className="text-xl font-semibold">
+                        £{(heroBannerCompetition.ticketPrice / 100).toFixed(2)} per ticket
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-white mb-2">
+                      <Clock className="h-5 w-5 mr-2 text-primary" />
+                      <span className="text-lg">
+                        Draw {formatTimeRemaining(heroBannerCompetition.drawDate)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-col text-white mb-2 w-full max-w-xs">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-sm flex items-center">
+                          <Trophy className="h-4 w-4 mr-1 text-primary" />
+                          Tickets Sold:
+                        </span>
+                        <span className="text-sm font-medium">
+                          {heroBannerCompetition.ticketsSold} / {heroBannerCompetition.totalTickets}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={calculateTicketPercentage(
+                          heroBannerCompetition.ticketsSold, 
+                          heroBannerCompetition.totalTickets
+                        )}
+                        className="h-2 bg-gray-700"
+                      />
+                    </div>
+                  </div>
+                  
+                  <Link to={`/competitions/${heroBannerCompetition.id}`}>
+                    <Button size="lg" className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 text-white font-bold px-8 text-lg">
+                      Enter Competition
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           ) : (

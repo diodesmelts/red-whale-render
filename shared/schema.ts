@@ -36,6 +36,7 @@ export const competitions = pgTable("competitions", {
   drawDate: timestamp("draw_date").notNull(),
   isLive: boolean("is_live").default(true),
   isFeatured: boolean("is_featured").default(false),
+  pushToHeroBanner: boolean("push_to_hero_banner").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
