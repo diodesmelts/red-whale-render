@@ -41,11 +41,14 @@ export default function HomePage() {
               <div className="absolute -right-6 -top-6 w-12 h-12 bg-primary/30 blur-xl rounded-full"></div>
               <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-primary/20 blur-xl rounded-full"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+              
+              {/* Colored header */}
+              <div className="bg-gradient-to-r from-primary to-primary/80 p-4 flex justify-between items-center rounded-t-lg">
+                <h3 className="text-xl font-bold text-white">PlayStation 5</h3>
+                <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">Featured</span>
+              </div>
+              
               <div className="p-6 relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-primary">PlayStation 5</h3>
-                  <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">Featured</span>
-                </div>
                 <p className="text-muted-foreground text-sm mb-4">Win the latest generation PlayStation console with controller and games!</p>
                 <div className="flex justify-between items-center">
                   <CountdownTimer days={3} color="primary" />
@@ -61,11 +64,14 @@ export default function HomePage() {
               <div className="absolute -right-6 -top-6 w-12 h-12 bg-pink-500/30 blur-xl rounded-full"></div>
               <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-pink-500/20 blur-xl rounded-full"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent"></div>
+              
+              {/* Colored header */}
+              <div className="bg-gradient-to-r from-pink-500 to-pink-500/80 p-4 flex justify-between items-center rounded-t-lg">
+                <h3 className="text-xl font-bold text-white">Kitchen Makeover</h3>
+                <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">Popular</span>
+              </div>
+              
               <div className="p-6 relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-pink-500">Kitchen Makeover</h3>
-                  <span className="px-2 py-1 bg-pink-500/10 text-pink-500 text-xs rounded-full font-medium">Popular</span>
-                </div>
                 <p className="text-muted-foreground text-sm mb-4">Transform your kitchen with this amazing appliance bundle!</p>
                 <div className="flex justify-between items-center">
                   <CountdownTimer days={5} color="pink" />
@@ -81,11 +87,14 @@ export default function HomePage() {
               <div className="absolute -right-6 -top-6 w-12 h-12 bg-green-500/30 blur-xl rounded-full"></div>
               <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-green-500/20 blur-xl rounded-full"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent"></div>
+              
+              {/* Colored header */}
+              <div className="bg-gradient-to-r from-green-500 to-green-500/80 p-4 flex justify-between items-center rounded-t-lg">
+                <h3 className="text-xl font-bold text-white">£1,000 Cash</h3>
+                <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">Trending</span>
+              </div>
+              
               <div className="p-6 relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-green-500">£1,000 Cash</h3>
-                  <span className="px-2 py-1 bg-green-500/10 text-green-500 text-xs rounded-full font-medium">Trending</span>
-                </div>
                 <p className="text-muted-foreground text-sm mb-4">Win £1,000 cash deposited directly to your account!</p>
                 <div className="flex justify-between items-center">
                   <CountdownTimer days={2} color="green" />
