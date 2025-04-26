@@ -1,12 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { Menu, ChevronDown, User, Shield, ClipboardList, Wallet, Settings, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { CartIcon } from "@/components/cart/cart-icon";
-import { CompetitionDropdown } from "@/components/layout/competition-dropdown";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,10 +73,14 @@ export function Navbar() {
                     <i className="fas fa-home mr-2"></i> Home
                   </Link>
                   
-                  {/* Competitions dropdown - using a dedicated component */}
-                  <div className="z-50">
-                    <CompetitionDropdown />
-                  </div>
+                  <Link href="/competitions" className={cn(
+                    "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
+                    location.includes("/competitions") 
+                      ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                  )}>
+                    <i className="fas fa-trophy mr-2"></i> Competitions
+                  </Link>
                   
                   <Link href="/how-to-play" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
@@ -234,36 +237,14 @@ export function Navbar() {
                       )}>
                       <i className="fas fa-home mr-2"></i> Home
                     </Link>
-                    <div className="flex items-center justify-between">
-                      <Link href="/competitions" 
-                        onClick={() => setIsMenuOpen(false)}
-                        className={cn(
-                          "flex items-center text-lg font-medium",
-                          location.includes("/competitions") ? "text-primary" : "text-foreground"
-                        )}>
-                        <i className="fas fa-trophy mr-2"></i> Competitions
-                      </Link>
-                    </div>
-                    <div className="pl-5 space-y-3">
-                      <Link href="/competitions?category=family" 
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center text-yellow-500 font-medium">
-                        <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full mr-2.5"></span>
-                        Family
-                      </Link>
-                      <Link href="/competitions?category=appliances" 
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center text-pink-500 font-medium">
-                        <span className="w-2.5 h-2.5 bg-pink-400 rounded-full mr-2.5"></span>
-                        Appliances
-                      </Link>
-                      <Link href="/competitions?category=cash" 
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center text-green-500 font-medium">
-                        <span className="w-2.5 h-2.5 bg-green-400 rounded-full mr-2.5"></span>
-                        Cash
-                      </Link>
-                    </div>
+                    <Link href="/competitions" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className={cn(
+                        "flex items-center text-lg font-medium",
+                        location.includes("/competitions") ? "text-primary" : "text-foreground"
+                      )}>
+                      <i className="fas fa-trophy mr-2"></i> Competitions
+                    </Link>
                     <Link href="/how-to-play" 
                       onClick={() => setIsMenuOpen(false)}
                       className={cn(
