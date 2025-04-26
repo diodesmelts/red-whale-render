@@ -84,26 +84,26 @@ export function Navbar() {
                       <i className="fas fa-trophy mr-2"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
                     </Link>
                     <div 
-                      className="hidden group-hover:flex flex-col absolute left-0 mt-2 w-48 bg-card/95 backdrop-blur-md rounded-md shadow-md py-1 z-[9999] border border-border/60"
+                      className="hidden group-hover:block absolute left-0 mt-2 w-56 bg-background/95 backdrop-blur-md rounded-md shadow-lg py-3 z-[9999] border-2 border-primary/20"
                       style={{
-                        backgroundColor: "var(--background)",
-                        position: "fixed",
-                        transform: "translate(0, 100px)",
-                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
+                        boxShadow: "0 20px 50px -10px rgba(0, 0, 0, 0.25), 0 0 15px rgba(123, 57, 237, 0.2)"
                       }}
                     >
-                      <Link href="/competitions" className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                        All Competitions
+                      <Link href="/competitions" className="flex items-center block px-5 py-3 font-medium text-base text-primary hover:bg-primary/5 transition-colors">
+                        <div className="flex items-center w-full">
+                          <span className="mr-2">🏆</span> All Competitions
+                        </div>
                       </Link>
-                      <div className="border-t border-border my-1"></div>
-                      <Link href="/competitions?category=family" className="block px-4 py-2 text-sm text-yellow-400 hover:bg-accent hover:text-accent-foreground">
-                        <span className="w-2 h-2 inline-block bg-yellow-400 rounded-full mr-2"></span> Family
+                      <div className="border-t border-border/50 my-2 mx-3"></div>
+                      <div className="px-3 pb-1 text-xs uppercase text-muted-foreground font-semibold tracking-wider">Categories</div>
+                      <Link href="/competitions?category=family" className="flex items-center px-5 py-2.5 text-base font-medium text-yellow-500 hover:bg-yellow-500/5 hover:pl-6 transition-all">
+                        <span className="w-2.5 h-2.5 inline-block bg-yellow-400 rounded-full mr-2.5"></span> Family
                       </Link>
-                      <Link href="/competitions?category=appliances" className="block px-4 py-2 text-sm text-pink-400 hover:bg-accent hover:text-accent-foreground">
-                        <span className="w-2 h-2 inline-block bg-pink-400 rounded-full mr-2"></span> Appliances
+                      <Link href="/competitions?category=appliances" className="flex items-center px-5 py-2.5 text-base font-medium text-pink-500 hover:bg-pink-500/5 hover:pl-6 transition-all">
+                        <span className="w-2.5 h-2.5 inline-block bg-pink-400 rounded-full mr-2.5"></span> Appliances
                       </Link>
-                      <Link href="/competitions?category=cash" className="block px-4 py-2 text-sm text-green-400 hover:bg-accent hover:text-accent-foreground">
-                        <span className="w-2 h-2 inline-block bg-green-400 rounded-full mr-2"></span> Cash
+                      <Link href="/competitions?category=cash" className="flex items-center px-5 py-2.5 text-base font-medium text-green-500 hover:bg-green-500/5 hover:pl-6 transition-all">
+                        <span className="w-2.5 h-2.5 inline-block bg-green-400 rounded-full mr-2.5"></span> Cash
                       </Link>
                     </div>
                   </div>
