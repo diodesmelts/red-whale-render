@@ -139,7 +139,7 @@ export default function HomePage() {
                           £{(competition.ticketPrice / 100).toFixed(2)}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {competition.ticketsSold} / {competition.totalTickets} sold
+                          {competition.ticketsSold || 0} / {competition.totalTickets} sold
                         </span>
                       </div>
                       
@@ -150,7 +150,7 @@ export default function HomePage() {
                             index === 1 ? "bg-pink-500" : 
                             "bg-green-500"
                           }`}
-                          style={{ width: `${Math.min(100, (competition.ticketsSold / competition.totalTickets) * 100)}%` }}
+                          style={{ width: `${Math.min(100, ((competition.ticketsSold || 0) / competition.totalTickets) * 100)}%` }}
                         ></div>
                       </div>
                       
@@ -202,7 +202,7 @@ export default function HomePage() {
             <p className="text-muted-foreground max-w-2xl mx-auto mb-6 text-lg font-light">
               Just <span className="text-primary font-medium">four simple steps</span> to start winning amazing prizes!
             </p>
-            <Link href="/how-to-play">
+            <Link to="/how-to-play">
               <Button className="mb-6 inline-flex items-center px-6 py-3 text-base shine-btn shadow-lg shadow-primary/20">
                 Detailed Guide <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
@@ -306,7 +306,7 @@ export default function HomePage() {
               <p className="text-muted-foreground max-w-md text-center mb-6">
                 We're preparing some exciting new competitions. Check back soon or follow us on social media for updates!
               </p>
-              <Link href="/how-to-play">
+              <Link to="/how-to-play">
                 <Button variant="outline" className="border-primary border-2 text-primary hover:bg-primary/10">
                   Learn How Competitions Work
                 </Button>
@@ -321,9 +321,9 @@ export default function HomePage() {
           )}
           
           <div className="text-center">
-            <Link href="/competitions">
+            <Link to="/competitions">
               <Button size="lg" className="group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-primary/20">
-                <i className="fas fa-trophy mr-2"></i> View All Competitions <ChevronRight className="ml-2 h-5 w-5" />
+                <Ticket className="mr-2 h-5 w-5" /> View All Competitions <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>
