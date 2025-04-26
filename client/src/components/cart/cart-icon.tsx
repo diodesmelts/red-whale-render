@@ -1,4 +1,4 @@
-import { ShoppingCart } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export function CartIcon({
                 onClick={() => navigate("/cart")}
                 aria-label={`Shopping cart with ${cartCount} items`}
               >
-                <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
+                <ShoppingBag className="h-[1.5rem] w-[1.5rem]" />
                 {cartCount > 0 && (
                   <Badge 
                     variant="destructive" 
@@ -60,7 +60,7 @@ export function CartIcon({
           onClick={() => navigate("/cart")}
           aria-label={`Shopping cart with ${cartCount} items`}
         >
-          <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
+          <ShoppingBag className="h-[1.5rem] w-[1.5rem]" />
           {cartCount > 0 && (
             <Badge 
               variant="destructive" 
