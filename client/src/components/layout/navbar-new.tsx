@@ -36,10 +36,8 @@ export function Navbar() {
       }
     }
     
-    // Add event listener
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Remove event listener on cleanup
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
@@ -69,8 +67,6 @@ export function Navbar() {
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute -top-10 left-1/4 w-[500px] h-[300px] bg-primary/3 rounded-full blur-[80px] opacity-40"></div>
             <div className="absolute -bottom-20 right-1/4 w-[300px] h-[200px] bg-pink-500/3 rounded-full blur-[60px] opacity-30"></div>
-            
-            {/* Removed animated light beam as per user's request */}
           </div>
           
           <div className="flex items-center justify-between h-24 relative z-10">
@@ -92,28 +88,27 @@ export function Navbar() {
                   )}>
                     <i className="fas fa-home mr-2"></i> Home
                   </Link>
+                  
+                  {/* Competitions dropdown - now using direct state management instead of hover */}
                   <div className="relative" ref={dropdownRef}>
-                    <div
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setCompDropdownOpen(!compDropdownOpen);
-                      }}
+                    <button
+                      onClick={() => setCompDropdownOpen(!compDropdownOpen)}
                       className={cn(
                         "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200 cursor-pointer",
                         location.includes("/competitions") 
                           ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
                           : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                       )}>
-                      <i className="fas fa-trophy mr-2"></i> Competitions <ChevronDown className={cn("h-4 w-4 ml-1 transition-transform", compDropdownOpen ? "transform rotate-180" : "")} />
-                    </div>
+                      <i className="fas fa-trophy mr-2"></i> 
+                      Competitions 
+                      <ChevronDown className={cn("h-4 w-4 ml-1 transition-transform", compDropdownOpen ? "transform rotate-180" : "")} />
+                    </button>
+                    
                     {compDropdownOpen && (
-                      <div 
-                        className="absolute left-0 mt-2 w-56 bg-background/95 backdrop-blur-md rounded-md shadow-lg py-3 z-[9999] border-2 border-primary/20"
+                      <div className="absolute left-0 mt-2 w-56 bg-background/95 backdrop-blur-md rounded-md shadow-lg py-3 z-[9999] border-2 border-primary/20" 
                         style={{
                           boxShadow: "0 20px 50px -10px rgba(0, 0, 0, 0.25), 0 0 15px rgba(123, 57, 237, 0.2)"
-                        }}
-                      >
+                        }}>
                         <Link href="/competitions" className="flex items-center block px-5 py-3 font-medium text-base text-primary hover:bg-primary/5 transition-colors">
                           <div className="flex items-center w-full">
                             <span className="mr-2">🏆</span> All Competitions
@@ -133,6 +128,7 @@ export function Navbar() {
                       </div>
                     )}
                   </div>
+                  
                   <Link href="/how-to-play" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
                     location === "/how-to-play" 
