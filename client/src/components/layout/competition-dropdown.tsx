@@ -69,8 +69,8 @@ export function CompetitionDropdown() {
             <Link href="/competitions?category=family" className="flex items-center px-5 py-2.5 text-base font-medium text-yellow-500 hover:bg-yellow-500/5 hover:pl-6 transition-all">
               <span className="w-2.5 h-2.5 inline-block bg-yellow-400 rounded-full mr-2.5"></span> Family
             </Link>
-            <Link href="/competitions?category=appliances" className="flex items-center px-5 py-2.5 text-base font-medium text-pink-500 hover:bg-pink-500/5 hover:pl-6 transition-all">
-              <span className="w-2.5 h-2.5 inline-block bg-pink-400 rounded-full mr-2.5"></span> Appliances
+            <Link href="/competitions?category=household" className="flex items-center px-5 py-2.5 text-base font-medium text-pink-500 hover:bg-pink-500/5 hover:pl-6 transition-all">
+              <span className="w-2.5 h-2.5 inline-block bg-pink-400 rounded-full mr-2.5"></span> Household
             </Link>
             <Link href="/competitions?category=cash" className="flex items-center px-5 py-2.5 text-base font-medium text-green-500 hover:bg-green-500/5 hover:pl-6 transition-all">
               <span className="w-2.5 h-2.5 inline-block bg-green-400 rounded-full mr-2.5"></span> Cash

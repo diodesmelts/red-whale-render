@@ -54,8 +54,8 @@ export function getCategoryColor(category: string): string {
   switch (category.toLowerCase()) {
     case "family":
       return "category-family";
-    case "appliances":
-      return "category-appliances";
+    case "household":
+      return "category-household";
     case "cash":
       return "category-cash";
     default:

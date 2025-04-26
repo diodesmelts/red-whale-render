@@ -125,14 +125,14 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
           <i className="fas fa-users mr-1"></i> Family
         </Button>
         <Button 
-          variant={activeCategory === "appliances" ? "default" : "outline"} 
-          onClick={() => handleCategoryChange("appliances")}
+          variant={activeCategory === "household" ? "default" : "outline"} 
+          onClick={() => handleCategoryChange("household")}
           className={cn(
             "flex items-center",
-            activeCategory === "appliances" && "bg-pink-500 hover:bg-pink-600"
+            activeCategory === "household" && "bg-pink-500 hover:bg-pink-600"
           )}
         >
-          <i className="fas fa-blender mr-1"></i> Appliances
+          <i className="fas fa-blender mr-1"></i> Household
         </Button>
       </div>
       

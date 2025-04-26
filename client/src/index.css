@@ -28,7 +28,7 @@
   
   /* Category Colors */
   --category-family: 45 100% 51%;
-  --category-appliances: 328 100% 63%;
+  --category-household: 328 100% 63%;
   --category-cash: 122 39% 49%;
   
   /* Chart Colors */
@@ -53,8 +53,8 @@
   color: hsl(var(--category-family));
 }
 
-.text-category-appliances {
-  color: hsl(var(--category-appliances));
+.text-category-household {
+  color: hsl(var(--category-household));
 }
 
 .text-category-cash {
@@ -65,8 +65,8 @@
   background-color: hsl(var(--category-family));
 }
 
-.bg-category-appliances {
-  background-color: hsl(var(--category-appliances));
+.bg-category-household {
+  background-color: hsl(var(--category-household));
 }
 
 .bg-category-cash {
@@ -77,8 +77,8 @@
   border-color: hsl(var(--category-family));
 }
 
-.border-category-appliances {
-  border-color: hsl(var(--category-appliances));
+.border-category-household {
+  border-color: hsl(var(--category-household));
 }
 
 .border-category-cash {
@@ -172,7 +172,7 @@
 }
 
 .gradient-border-pink::before {
-  background: linear-gradient(135deg, hsl(var(--category-appliances)), hsl(var(--category-appliances) / 0.5));
+  background: linear-gradient(135deg, hsl(var(--category-household)), hsl(var(--category-household) / 0.5));
 }
 
 .gradient-border-green::before {
