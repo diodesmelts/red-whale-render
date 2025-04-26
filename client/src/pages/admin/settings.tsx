@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { SiteConfig } from "@shared/schema";
 import { Loader2, Save } from "lucide-react";
@@ -31,10 +32,12 @@ export default function AdminSettings() {
   // Form state
   const [logoImage, setLogoImage] = useState<string>("");
   const [heroBannerImage, setHeroBannerImage] = useState<string>("");
+  const [heroBannerTitle, setHeroBannerTitle] = useState<string>("Turbo Cash Instants. Up to £1,000 cash!");
   
   // Get current config values if they exist
   const logoConfig = siteConfigs?.find(config => config.key === "siteLogo");
   const heroBannerConfig = siteConfigs?.find(config => config.key === "heroBanner");
+  const heroBannerTitleConfig = siteConfigs?.find(config => config.key === "heroBannerTitle");
   
   // Update site configuration mutation
   const updateConfigMutation = useMutation({
