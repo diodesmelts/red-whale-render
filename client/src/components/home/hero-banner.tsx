@@ -59,9 +59,9 @@ export function HeroBanner() {
           <h1 className="text-5xl md:text-7xl font-light mb-4 relative">
             <span className="relative inline-block">
               {hasBackgroundImage ? (
-                <span className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Let's have a</span>
+                <span className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">have a</span>
               ) : (
-                <span className="text-white">Let's have a</span>
+                <span className="text-white">have a</span>
               )}
               <span className="absolute -top-6 -right-6 text-yellow-400 text-3xl transform rotate-12">★</span>
             </span>
