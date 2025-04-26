@@ -143,7 +143,7 @@ export default function HomePage() {
                 Explore our wide range of exciting competitions across different categories and platforms.
               </p>
               <div className="mt-6 w-full h-2 bg-primary/20 rounded-full overflow-hidden">
-                <div className="h-full w-full bg-primary"></div>
+                <div className="h-full w-1/4 bg-primary"></div>
               </div>
             </div>
             
@@ -157,7 +157,7 @@ export default function HomePage() {
                 Select a competition and follow the simple entry steps to secure your tickets.
               </p>
               <div className="mt-6 w-full h-2 bg-purple-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-2/3 bg-purple-500"></div>
+                <div className="h-full w-1/2 bg-purple-500"></div>
               </div>
             </div>
             
@@ -171,7 +171,7 @@ export default function HomePage() {
                 Monitor your active entries and check competition closing dates on your dashboard.
               </p>
               <div className="mt-6 w-full h-2 bg-blue-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-1/2 bg-blue-500"></div>
+                <div className="h-full w-3/4 bg-blue-500"></div>
               </div>
             </div>
             
@@ -185,7 +185,7 @@ export default function HomePage() {
                 Get notified when you win and follow the simple claim process to receive your prize!
               </p>
               <div className="mt-6 w-full h-2 bg-orange-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-1/4 bg-orange-500"></div>
+                <div className="h-full w-full bg-orange-500"></div>
               </div>
             </div>
           </div>
