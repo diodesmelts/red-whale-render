@@ -48,8 +48,6 @@ const CreateCompetition = () => {
 };
 
 import { Layout } from "@/components/layout/layout";
-import { Navbar } from "@/components/layout/navbar-new";
-import { Footer } from "@/components/layout/footer";
 
 function Router() {
   return (
