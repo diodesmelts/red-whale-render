@@ -82,6 +82,15 @@ export default function AdminSettings() {
     });
   };
   
+  // Save hero banner title
+  const handleSaveHeroBannerTitle = () => {
+    updateConfigMutation.mutate({
+      key: "heroBannerTitle",
+      value: heroBannerTitle,
+      description: "Homepage hero banner title text"
+    });
+  };
+  
   // Handle logo image upload completion
   const handleLogoUploaded = (imageUrl: string) => {
     setLogoImage(imageUrl);
@@ -101,7 +110,11 @@ export default function AdminSettings() {
     if (heroBannerConfig?.value) {
       setHeroBannerImage(heroBannerConfig.value);
     }
-  }, [logoConfig, heroBannerConfig]);
+    
+    if (heroBannerTitleConfig?.value) {
+      setHeroBannerTitle(heroBannerTitleConfig.value);
+    }
+  }, [logoConfig, heroBannerConfig, heroBannerTitleConfig]);
 
   return (
     <AdminLayout>
@@ -190,6 +203,21 @@ export default function AdminSettings() {
                         />
                         <p className="text-sm text-muted-foreground mt-2">
                           Recommended size: 1920x600px. This image will appear at the top of your homepage.
+                        </p>
+                      </div>
+                      
+                      <div className="mt-4">
+                        <Label htmlFor="hero-title">Hero Banner Title</Label>
+                        <Input
+                          id="hero-title"
+                          value={heroBannerTitle}
+                          onChange={(e) => setHeroBannerTitle(e.target.value)}
+                          placeholder="Enter hero banner title"
+                          className="mt-1"
+                        />
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Add a period (.) to separate the main title from highlighted text. 
+                          Example: "Turbo Cash Instants. Up to £1,000 cash!"
                         </p>
                       </div>
                     </div>
