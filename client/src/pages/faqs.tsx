@@ -1,4 +1,3 @@
-import { Layout } from "@/components/layout/layout";
 import { Helmet } from "react-helmet";
 import {
   Accordion,
@@ -9,7 +8,7 @@ import {
 
 export default function FAQsPage() {
   return (
-    <Layout>
+    <>
       <Helmet>
         <title>Blue Whale Competitions | Frequently Asked Questions</title>
         <meta
@@ -201,6 +200,6 @@ export default function FAQsPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
