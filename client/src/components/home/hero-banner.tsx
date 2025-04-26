@@ -33,7 +33,7 @@ export function HeroBanner() {
       const res = await fetch("/api/site-config/heroBannerTitle");
       if (!res.ok) {
         if (res.status === 404) {
-          return { key: "heroBannerTitle", value: "Turbo Cash Instants. Up to £1,000 cash!" };
+          return { key: "heroBannerTitle", value: "Turbo Cash Instants" };
         }
         throw new Error("Failed to fetch hero banner title");
       }
@@ -93,12 +93,7 @@ export function HeroBanner() {
   };
 
   const isLoading = isLoadingBanner || isLoadingCompetitions || isLoadingTitle;
-  const title = heroBannerTitle?.value || "Turbo Cash Instants. Up to £1,000 cash!";
-
-  // Split the title to highlight parts if it contains a period
-  const titleParts = title.split('.');
-  const mainTitle = titleParts[0].trim();
-  const highlightText = titleParts.length > 1 ? titleParts.slice(1).join('.').trim() : '';
+  const title = heroBannerTitle?.value || "Turbo Cash Instants";
 
   return (
     <section 
@@ -134,10 +129,7 @@ export function HeroBanner() {
           {/* Main Title - Using title from site config */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6 relative">
             <span className={hasBackgroundImage ? "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-white"}>
-              {mainTitle}
-              {highlightText && (
-                <span className="text-yellow-400"> {highlightText}</span>
-              )}
+              {title}
             </span>
             <span className="absolute -top-6 right-8 text-yellow-400 text-3xl transform rotate-12">★</span>
             <span className="absolute -bottom-2 left-1/4 text-pink-400 text-2xl transform -rotate-6">✦</span>
