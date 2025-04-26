@@ -222,7 +222,7 @@ export default function AdminSettings() {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="flex gap-2">
                     <Button 
                       onClick={handleSaveHeroBanner}
                       disabled={updateConfigMutation.isPending || !heroBannerImage}
@@ -235,7 +235,25 @@ export default function AdminSettings() {
                       ) : (
                         <>
                           <Save className="mr-2 h-4 w-4" />
-                          Save Banner
+                          Save Banner Image
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button 
+                      onClick={handleSaveHeroBannerTitle}
+                      disabled={updateConfigMutation.isPending || !heroBannerTitle}
+                      variant="outline"
+                    >
+                      {updateConfigMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Banner Title
                         </>
                       )}
                     </Button>
