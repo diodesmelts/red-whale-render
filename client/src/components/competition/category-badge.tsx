@@ -12,7 +12,7 @@ export function CategoryBadge({ category, brand, className }: CategoryBadgeProps
     switch (category.toLowerCase()) {
       case "family":
         return "bg-yellow-500";
-      case "appliances":
+      case "household":
         return "bg-pink-500";
       case "cash":
         return "bg-green-500";
@@ -26,7 +26,7 @@ export function CategoryBadge({ category, brand, className }: CategoryBadgeProps
     switch (category.toLowerCase()) {
       case "family":
         return "fas fa-users";
-      case "appliances":
+      case "household":
         return "fas fa-blender";
       case "cash":
         return "fas fa-pound-sign";

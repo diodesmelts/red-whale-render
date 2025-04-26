@@ -1,7 +1,7 @@
 // Competition categories
 export const COMPETITION_CATEGORIES = {
   FAMILY: "family",
-  APPLIANCES: "appliances",
+  HOUSEHOLD: "household",
   CASH: "cash",
   ELECTRONICS: "electronics",
   TRAVEL: "travel",
@@ -17,7 +17,7 @@ export const CATEGORY_COLORS = {
     glow: "shadow-[0_0_15px_rgba(255,193,7,0.5)]",
     icon: "fas fa-users",
   },
-  [COMPETITION_CATEGORIES.APPLIANCES]: {
+  [COMPETITION_CATEGORIES.HOUSEHOLD]: {
     bg: "bg-pink-500",
     text: "text-pink-400",
     hover: "hover:bg-pink-600",
