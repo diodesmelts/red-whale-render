@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { CompetitionCard } from "@/components/competition/competition-card";
 import { Competition } from "@shared/schema";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search, Ticket, Clock } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { HeroBanner } from "@/components/home/hero-banner";
 import { CountdownTimer } from "@/components/countdown-timer";
@@ -14,6 +14,15 @@ export default function HomePage() {
     queryFn: async () => {
       const res = await fetch("/api/competitions?featured=true&live=true");
       if (!res.ok) throw new Error("Failed to fetch competitions");
+      return res.json();
+    }
+  });
+  
+  const { data: liveCompetitions, isLoading: isLoadingLive } = useQuery<Competition[]>({
+    queryKey: ["/api/competitions", { live: true }],
+    queryFn: async () => {
+      const res = await fetch("/api/competitions?live=true&listed=true");
+      if (!res.ok) throw new Error("Failed to fetch live competitions");
       return res.json();
     }
   });
@@ -36,74 +45,142 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Hot Pick 1 */}
-            <div className="bg-card rounded-xl border-2 border-primary/50 shadow-[0_0_25px_rgba(123,57,237,0.5)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(123,57,237,0.8)] hover:-translate-y-2 group relative overflow-hidden transform">
-              <div className="absolute -right-6 -top-6 w-12 h-12 bg-primary/30 blur-xl rounded-full"></div>
-              <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-primary/20 blur-xl rounded-full"></div>
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-              
-              {/* Colored header */}
-              <div className="bg-gradient-to-r from-primary to-primary/80 p-4 flex justify-between items-center rounded-t-lg">
-                <h3 className="text-xl font-bold text-white">PlayStation 5</h3>
-                <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">Featured</span>
+            {isLoadingLive ? (
+              <div className="col-span-3 flex justify-center items-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+                <span className="text-white">Loading top competitions...</span>
               </div>
-              
-              <div className="p-6 relative z-10">
-                <p className="text-muted-foreground text-sm mb-4">Win the latest generation PlayStation console with controller and games!</p>
-                <div className="flex justify-between items-center">
-                  <CountdownTimer days={3} color="primary" />
-                  <Link href="/competitions/1">
-                    <Button size="sm" variant="outline" className="border-primary text-primary hover:bg-primary/10">View</Button>
-                  </Link>
+            ) : liveCompetitions && liveCompetitions.length > 0 ? (
+              liveCompetitions.slice(0, 3).map((competition, index) => {
+                // Determine colors based on category or index
+                const colors = [
+                  {
+                    border: "border-primary/50",
+                    glow: "shadow-[0_0_25px_rgba(123,57,237,0.5)]",
+                    hoverGlow: "hover:shadow-[0_0_35px_rgba(123,57,237,0.8)]",
+                    bg1: "bg-primary/30",
+                    bg2: "bg-primary/20",
+                    gradient: "from-primary/10",
+                    header: "from-primary to-primary/80",
+                    text: "text-primary",
+                    buttonBorder: "border-primary",
+                    buttonHover: "hover:bg-primary/10",
+                    badge: competition.isFeatured ? "Featured" : 
+                           competition.category === "cash" ? "Cash Prize" : "Hot Pick"
+                  },
+                  {
+                    border: "border-pink-500/50",
+                    glow: "shadow-[0_0_25px_rgba(236,72,153,0.5)]",
+                    hoverGlow: "hover:shadow-[0_0_35px_rgba(236,72,153,0.8)]",
+                    bg1: "bg-pink-500/30",
+                    bg2: "bg-pink-500/20",
+                    gradient: "from-pink-500/10",
+                    header: "from-pink-500 to-pink-500/80",
+                    text: "text-pink-500",
+                    buttonBorder: "border-pink-500",
+                    buttonHover: "hover:bg-pink-500/10",
+                    badge: competition.isFeatured ? "Popular" : 
+                           (competition.ticketsSold || 0) > competition.totalTickets * 0.5 ? "Selling Fast" : "Hot Pick"
+                  },
+                  {
+                    border: "border-green-500/50",
+                    glow: "shadow-[0_0_25px_rgba(34,197,94,0.5)]",
+                    hoverGlow: "hover:shadow-[0_0_35px_rgba(34,197,94,0.8)]",
+                    bg1: "bg-green-500/30",
+                    bg2: "bg-green-500/20",
+                    gradient: "from-green-500/10",
+                    header: "from-green-500 to-green-500/80",
+                    text: "text-green-500",
+                    buttonBorder: "border-green-500",
+                    buttonHover: "hover:bg-green-500/10",
+                    badge: competition.isFeatured ? "Trending" : 
+                           new Date(competition.drawDate) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) ? "Ending Soon" : "Hot Pick"
+                  }
+                ];
+                
+                const color = colors[index % colors.length];
+                
+                // Calculate days remaining for countdown
+                const today = new Date();
+                const drawDate = new Date(competition.drawDate);
+                const daysRemaining = Math.max(0, Math.ceil((drawDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+                
+                return (
+                  <div 
+                    key={competition.id}
+                    className={`bg-card rounded-xl border-2 ${color.border} ${color.glow} transition-all duration-300 ${color.hoverGlow} hover:-translate-y-2 group relative overflow-hidden transform`}
+                  >
+                    <div className={`absolute -right-6 -top-6 w-12 h-12 ${color.bg1} blur-xl rounded-full`}></div>
+                    <div className={`absolute -left-6 -bottom-6 w-12 h-12 ${color.bg2} blur-xl rounded-full`}></div>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${color.gradient} to-transparent`}></div>
+                    
+                    {/* Image */}
+                    <div className="relative h-44 overflow-hidden rounded-t-lg">
+                      <img 
+                        src={competition.imageUrl || "https://placehold.co/600x400/1a1f2b/FFFFFF/png?text=No+Image"} 
+                        alt={competition.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    </div>
+                    
+                    {/* Colored header */}
+                    <div className={`bg-gradient-to-r ${color.header} p-4 flex justify-between items-center`}>
+                      <h3 className="text-xl font-bold text-white">{competition.title}</h3>
+                      <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">
+                        {color.badge}
+                      </span>
+                    </div>
+                    
+                    <div className="p-6 relative z-10">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className={`flex items-center font-bold ${color.text}`}>
+                          <Ticket className="h-4 w-4 mr-1" />
+                          £{(competition.ticketPrice / 100).toFixed(2)}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {competition.ticketsSold} / {competition.totalTickets} sold
+                        </span>
+                      </div>
+                      
+                      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mb-4">
+                        <div 
+                          className={`h-2 rounded-full ${
+                            index === 0 ? "bg-primary" : 
+                            index === 1 ? "bg-pink-500" : 
+                            "bg-green-500"
+                          }`}
+                          style={{ width: `${Math.min(100, (competition.ticketsSold / competition.totalTickets) * 100)}%` }}
+                        ></div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <CountdownTimer days={daysRemaining} color={index === 0 ? "primary" : index === 1 ? "pink" : "green"} />
+                        <Link to={`/competitions/${competition.id}`}>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className={`${color.buttonBorder} ${color.text} ${color.buttonHover}`}
+                          >
+                            View
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-3 flex flex-col items-center justify-center py-20 px-4 border-2 border-dashed border-white/20 rounded-xl">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Ticket className="h-8 w-8 text-primary" />
                 </div>
+                <h3 className="text-xl font-bold text-white mb-2">No Live Competitions</h3>
+                <p className="text-gray-400 text-center max-w-md mb-4">
+                  We're preparing some exciting new competitions. Check back soon!
+                </p>
               </div>
-            </div>
-            
-            {/* Hot Pick 2 */}
-            <div className="bg-card rounded-xl border-2 border-pink-500/50 shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(236,72,153,0.8)] hover:-translate-y-2 group relative overflow-hidden transform">
-              <div className="absolute -right-6 -top-6 w-12 h-12 bg-pink-500/30 blur-xl rounded-full"></div>
-              <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-pink-500/20 blur-xl rounded-full"></div>
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent"></div>
-              
-              {/* Colored header */}
-              <div className="bg-gradient-to-r from-pink-500 to-pink-500/80 p-4 flex justify-between items-center rounded-t-lg">
-                <h3 className="text-xl font-bold text-white">Kitchen Makeover</h3>
-                <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">Popular</span>
-              </div>
-              
-              <div className="p-6 relative z-10">
-                <p className="text-muted-foreground text-sm mb-4">Transform your kitchen with this amazing appliance bundle!</p>
-                <div className="flex justify-between items-center">
-                  <CountdownTimer days={5} color="pink" />
-                  <Link href="/competitions/2">
-                    <Button size="sm" variant="outline" className="border-pink-500 text-pink-500 hover:bg-pink-500/10">View</Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            
-            {/* Hot Pick 3 */}
-            <div className="bg-card rounded-xl border-2 border-green-500/50 shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(34,197,94,0.8)] hover:-translate-y-2 group relative overflow-hidden transform">
-              <div className="absolute -right-6 -top-6 w-12 h-12 bg-green-500/30 blur-xl rounded-full"></div>
-              <div className="absolute -left-6 -bottom-6 w-12 h-12 bg-green-500/20 blur-xl rounded-full"></div>
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent"></div>
-              
-              {/* Colored header */}
-              <div className="bg-gradient-to-r from-green-500 to-green-500/80 p-4 flex justify-between items-center rounded-t-lg">
-                <h3 className="text-xl font-bold text-white">£1,000 Cash</h3>
-                <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">Trending</span>
-              </div>
-              
-              <div className="p-6 relative z-10">
-                <p className="text-muted-foreground text-sm mb-4">Win £1,000 cash deposited directly to your account!</p>
-                <div className="flex justify-between items-center">
-                  <CountdownTimer days={2} color="green" />
-                  <Link href="/competitions/3">
-                    <Button size="sm" variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/10">View</Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
