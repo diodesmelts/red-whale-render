@@ -75,7 +75,7 @@ export default function HowToPlay() {
                 <Card className="w-1/3 mx-1">
                   <CardContent className="p-3 flex flex-col items-center justify-center">
                     <span className="w-3 h-3 rounded-full bg-pink-400 mb-2"></span>
-                    <span className="text-xs font-medium">Appliances</span>
+                    <span className="text-xs font-medium">Household</span>
                   </CardContent>
                 </Card>
                 <Card className="w-1/3 ml-2">
@@ -195,7 +195,7 @@ export default function HowToPlay() {
                 <CardContent className="p-4">
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="font-medium">Ninja Air Fryer</h4>
-                    <span className="text-xs bg-pink-400/20 text-pink-400 px-2 py-0.5 rounded">Appliances</span>
+                    <span className="text-xs bg-pink-400/20 text-pink-400 px-2 py-0.5 rounded">Household</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tickets: 2</span>

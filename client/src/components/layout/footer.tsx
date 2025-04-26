@@ -66,27 +66,27 @@ export function Footer() {
             <h3 className="text-foreground font-semibold text-lg mb-4">Categories</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/competitions?category=family" className="text-muted-foreground hover:text-yellow-400 transition-colors">
+                <Link to="/competitions?category=family" className="text-muted-foreground hover:text-yellow-400 transition-colors">
                   <span className="w-2 h-2 inline-block bg-yellow-400 rounded-full mr-2"></span> Family
                 </Link>
               </li>
               <li>
-                <Link href="/competitions?category=appliances" className="text-muted-foreground hover:text-pink-400 transition-colors">
-                  <span className="w-2 h-2 inline-block bg-pink-400 rounded-full mr-2"></span> Appliances
+                <Link to="/competitions?category=household" className="text-muted-foreground hover:text-pink-400 transition-colors">
+                  <span className="w-2 h-2 inline-block bg-pink-400 rounded-full mr-2"></span> Household
                 </Link>
               </li>
               <li>
-                <Link href="/competitions?category=cash" className="text-muted-foreground hover:text-green-400 transition-colors">
+                <Link to="/competitions?category=cash" className="text-muted-foreground hover:text-green-400 transition-colors">
                   <span className="w-2 h-2 inline-block bg-green-400 rounded-full mr-2"></span> Cash
                 </Link>
               </li>
               <li>
-                <Link href="/competitions?category=electronics" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/competitions?category=electronics" className="text-muted-foreground hover:text-primary transition-colors">
                   <span className="w-2 h-2 inline-block bg-primary rounded-full mr-2"></span> Electronics
                 </Link>
               </li>
               <li>
-                <Link href="/competitions?category=travel" className="text-muted-foreground hover:text-purple-500 transition-colors">
+                <Link to="/competitions?category=travel" className="text-muted-foreground hover:text-purple-500 transition-colors">
                   <span className="w-2 h-2 inline-block bg-purple-500 rounded-full mr-2"></span> Travel
                 </Link>
               </li>
