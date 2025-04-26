@@ -83,7 +83,7 @@ export function Navbar() {
                     )}>
                       <i className="fas fa-trophy mr-2"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
                     </Link>
-                    <div className="hidden group-hover:block absolute left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-[100] border border-border/60">
+                    <div className="hidden group-hover:block fixed left-[inherit] top-[inherit] mt-2 w-48 bg-card/95 backdrop-blur-md rounded-md shadow-md py-1 z-[300] border border-border/60" style={{backgroundColor: "var(--background)"}}>
                       <Link href="/competitions" className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
                         All Competitions
                       </Link>

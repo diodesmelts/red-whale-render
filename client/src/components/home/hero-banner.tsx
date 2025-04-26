@@ -36,13 +36,14 @@ export function HeroBanner() {
           : "bg-gradient-to-b from-background to-background/70"
       }`}
       style={hasBackgroundImage ? { 
-        backgroundImage: `linear-gradient(rgba(0, 0, 30, 0.05), rgba(0, 0, 30, 0.05)), url(${absoluteBackgroundImage})` 
+        backgroundImage: `linear-gradient(rgba(0, 0, 30, 0.05), rgba(0, 0, 30, 0.05)), url(${absoluteBackgroundImage})`,
+        zIndex: -1
       } : {}}
     >
       {/* Darkening filter with blue hue (5%) */}
 
       {/* Confetti elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{zIndex: -1}}>
         <div className="animate-float absolute top-20 left-[10%] w-4 h-4 bg-primary/50 rounded-full"></div>
         <div className="animate-float absolute top-36 left-[20%] w-6 h-6 bg-yellow-500/40 rounded-full" style={{animationDelay: '0.5s'}}></div>
         <div className="animate-float absolute top-48 left-[80%] w-8 h-8 bg-pink-500/40 rounded-full" style={{animationDelay: '1.5s'}}></div>
