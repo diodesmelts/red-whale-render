@@ -87,8 +87,8 @@ export function HeroBanner() {
   };
 
   // Calculate the percentage of tickets sold
-  const calculateTicketPercentage = (sold: number, total: number): number => {
-    if (total === 0) return 0;
+  const calculateTicketPercentage = (sold: number | null | undefined, total: number | null | undefined): number => {
+    if (!sold || !total || total === 0) return 0;
     return Math.min(100, Math.round((sold / total) * 100));
   };
 
