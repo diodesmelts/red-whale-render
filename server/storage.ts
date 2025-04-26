@@ -660,7 +660,8 @@ export class DatabaseStorage implements IStorage {
     const conditions = [];
     
     if (options.category) {
-      conditions.push(eq(competitions.category, options.category));
+      // Make category filtering case-insensitive by converting both sides to lowercase
+      conditions.push(sql`LOWER(${competitions.category}) = LOWER(${options.category})`);
     }
     
     if (options.isLive !== undefined) {
