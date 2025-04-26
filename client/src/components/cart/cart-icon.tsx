@@ -32,7 +32,7 @@ export function CartIcon({
                 onClick={() => navigate("/cart")}
                 aria-label={`Shopping cart with ${cartCount} items`}
               >
-                <ShoppingBag className="h-[1.5rem] w-[1.5rem]" />
+                <ShoppingBag className="h-[1.8rem] w-[1.8rem]" />
                 {cartCount > 0 && (
                   <Badge 
                     variant="destructive" 
@@ -60,7 +60,7 @@ export function CartIcon({
           onClick={() => navigate("/cart")}
           aria-label={`Shopping cart with ${cartCount} items`}
         >
-          <ShoppingBag className="h-[1.5rem] w-[1.5rem]" />
+          <ShoppingBag className="h-[1.8rem] w-[1.8rem]" />
           {cartCount > 0 && (
             <Badge 
               variant="destructive" 

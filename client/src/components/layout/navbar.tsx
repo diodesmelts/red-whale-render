@@ -142,7 +142,7 @@ export function Navbar() {
               <div className="ml-4 flex items-center md:ml-6 pr-2 sm:pr-4">
                 {user ? (
                   <>
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center mr-6">
                       <CartIcon variant="ghost" size="icon" showTooltip={true} />
                     </div>
                     <DropdownMenu>
