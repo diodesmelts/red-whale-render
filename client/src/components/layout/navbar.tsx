@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { Menu, ChevronDown, User, Shield, ClipboardList, Wallet, Settings, LogOut, Users } from "lucide-react";
@@ -25,6 +25,24 @@ export function Navbar() {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [compDropdownOpen, setCompDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setCompDropdownOpen(false);
+      }
+    }
+    
+    // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Remove event listener on cleanup
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -74,17 +92,25 @@ export function Navbar() {
                   )}>
                     <i className="fas fa-home mr-2"></i> Home
                   </Link>
-                  <div className="relative group">
-                    <Link href="/competitions" className={cn(
-                      "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200",
-                      location.includes("/competitions") 
-                        ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
-                    )}>
-                      <i className="fas fa-trophy mr-2"></i> Competitions <ChevronDown className="h-4 w-4 ml-1" />
-                    </Link>
+                  <div className="relative" ref={dropdownRef}>
+                    <div
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCompDropdownOpen(!compDropdownOpen);
+                      }}
+                      className={cn(
+                        "px-4 py-3 text-base font-medium flex items-center rounded-md transition-all duration-200 cursor-pointer",
+                        location.includes("/competitions") 
+                          ? "text-primary relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full" 
+                          : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                      )}>
+                      <i className="fas fa-trophy mr-2"></i> Competitions <ChevronDown className={cn("h-4 w-4 ml-1 transition-transform", compDropdownOpen ? "transform rotate-180" : "")} />
+                    </div>
                     <div 
-                      className="hidden group-hover:block absolute left-0 mt-2 w-56 bg-background/95 backdrop-blur-md rounded-md shadow-lg py-3 z-[9999] border-2 border-primary/20"
+                      className={cn(
+                        "absolute left-0 mt-2 w-56 bg-background/95 backdrop-blur-md rounded-md shadow-lg py-3 z-[9999] border-2 border-primary/20 transition-all duration-200",
+                        compDropdownOpen ? "block opacity-100 translate-y-0" : "hidden opacity-0 -translate-y-2"
+                      )}
                       style={{
                         boxShadow: "0 20px 50px -10px rgba(0, 0, 0, 0.25), 0 0 15px rgba(123, 57, 237, 0.2)"
                       }}
@@ -262,31 +288,33 @@ export function Navbar() {
                       )}>
                       <i className="fas fa-home mr-2"></i> Home
                     </Link>
-                    <Link href="/competitions" 
-                      onClick={() => setIsMenuOpen(false)}
-                      className={cn(
-                        "flex items-center text-lg font-medium",
-                        location.includes("/competitions") ? "text-primary" : "text-foreground"
-                      )}>
-                      <i className="fas fa-trophy mr-2"></i> Competitions
-                    </Link>
+                    <div className="flex items-center justify-between">
+                      <Link href="/competitions" 
+                        onClick={() => setIsMenuOpen(false)}
+                        className={cn(
+                          "flex items-center text-lg font-medium",
+                          location.includes("/competitions") ? "text-primary" : "text-foreground"
+                        )}>
+                        <i className="fas fa-trophy mr-2"></i> Competitions
+                      </Link>
+                    </div>
                     <div className="pl-5 space-y-3">
                       <Link href="/competitions?category=family" 
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center text-yellow-400">
-                        <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                        className="flex items-center text-yellow-500 font-medium">
+                        <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full mr-2.5"></span>
                         Family
                       </Link>
                       <Link href="/competitions?category=appliances" 
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center text-pink-400">
-                        <span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>
+                        className="flex items-center text-pink-500 font-medium">
+                        <span className="w-2.5 h-2.5 bg-pink-400 rounded-full mr-2.5"></span>
                         Appliances
                       </Link>
                       <Link href="/competitions?category=cash" 
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center text-green-400">
-                        <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                        className="flex items-center text-green-500 font-medium">
+                        <span className="w-2.5 h-2.5 bg-green-400 rounded-full mr-2.5"></span>
                         Cash
                       </Link>
                     </div>
