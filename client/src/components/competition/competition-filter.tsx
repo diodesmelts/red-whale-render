@@ -100,7 +100,10 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
         <Button 
           variant={!activeCategory ? "default" : "outline"} 
           onClick={() => handleCategoryChange(undefined)}
-          className="flex items-center"
+          className={cn(
+            "flex items-center",
+            !activeCategory ? "text-white" : "text-foreground"
+          )}
         >
           <Filter className="h-4 w-4 mr-1" /> All Prizes
         </Button>
@@ -109,7 +112,7 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
           onClick={() => handleCategoryChange("cash")}
           className={cn(
             "flex items-center",
-            activeCategory === "cash" && "bg-green-500 hover:bg-green-600"
+            activeCategory === "cash" ? "bg-green-500 hover:bg-green-600 text-white" : "text-foreground"
           )}
         >
           <i className="fas fa-pound-sign mr-1"></i> Cash Prizes
@@ -119,7 +122,7 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
           onClick={() => handleCategoryChange("family")}
           className={cn(
             "flex items-center",
-            activeCategory === "family" && "bg-yellow-500 hover:bg-yellow-600"
+            activeCategory === "family" ? "bg-yellow-500 hover:bg-yellow-600 text-white" : "text-foreground"
           )}
         >
           <i className="fas fa-users mr-1"></i> Family
@@ -129,7 +132,7 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
           onClick={() => handleCategoryChange("household")}
           className={cn(
             "flex items-center",
-            activeCategory === "household" && "bg-pink-500 hover:bg-pink-600"
+            activeCategory === "household" ? "bg-pink-500 hover:bg-pink-600 text-white" : "text-foreground"
           )}
         >
           <i className="fas fa-blender mr-1"></i> Household
@@ -143,7 +146,7 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
           onClick={() => handleSortChange("popular")}
           className={cn(
             "flex items-center",
-            activeSort === "popular" && "bg-purple-600 hover:bg-purple-700"
+            activeSort === "popular" ? "bg-purple-600 hover:bg-purple-700 text-white" : "text-foreground"
           )}
         >
           <Flame className="h-4 w-4 mr-1" /> Most Popular
@@ -151,7 +154,10 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
         <Button 
           variant={activeSort === "newest" ? "default" : "outline"} 
           onClick={() => handleSortChange("newest")}
-          className="flex items-center"
+          className={cn(
+            "flex items-center",
+            activeSort === "newest" ? "text-white" : "text-foreground"
+          )}
         >
           <Calendar className="h-4 w-4 mr-1" /> Newest First
         </Button>
@@ -160,7 +166,7 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
           onClick={() => handleSortChange("endingSoon")}
           className={cn(
             "flex items-center",
-            activeSort === "endingSoon" && "bg-primary hover:bg-primary/90"
+            activeSort === "endingSoon" ? "bg-primary hover:bg-primary/90 text-white" : "text-foreground"
           )}
         >
           <TrendingUp className="h-4 w-4 mr-1" /> Ending Soon
