@@ -32,14 +32,13 @@ export default function HomePage() {
       {/* Hero Section */}
       <HeroBanner />
       
-      {/* Hot Picks Section - Overlapping with Hero Banner */}
-      <section className="relative z-20 -mt-36 mb-16">
+      {/* Hot Picks Section - Below Hero Banner */}
+      <section className="relative z-20 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <div className="inline-block bg-black/30 px-8 py-3 rounded-full backdrop-blur-sm border border-primary/20 shadow-[0_0_15px_rgba(123,57,237,0.4)]">
+            <div className="inline-block">
               <h2 className="text-3xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
                 Hot Picks for <span className="text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-                <span className="absolute -top-1 -right-4 text-yellow-400 text-lg animate-pulse-slow">🔥</span>
               </h2>
             </div>
           </div>
@@ -128,25 +127,25 @@ export default function HomePage() {
                     <div className={`bg-gradient-to-r ${color.header} p-4 flex justify-between items-center`}>
                       <h3 className="text-xl font-bold text-white">{competition.title}</h3>
                       <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full font-medium backdrop-blur-sm">
-                        {color.badge}
+                        {index === 0 ? "Featured" : index === 1 ? "Popular" : "Ending Soon"}
                       </span>
                     </div>
                     
-                    <div className="p-6 relative z-10">
+                    <div className="p-4 relative z-10">
                       <div className="flex items-center justify-between mb-3">
-                        <span className={`flex items-center font-bold ${color.text}`}>
+                        <span className="flex items-center font-bold text-white">
                           <Ticket className="h-4 w-4 mr-1" />
                           £{(competition.ticketPrice / 100).toFixed(2)}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-white">
                           {competition.ticketsSold || 0} / {competition.totalTickets} sold
                         </span>
                       </div>
                       
-                      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mb-4">
+                      <div className="w-full h-1 bg-gray-700 rounded-full mb-4">
                         <div 
-                          className={`h-2 rounded-full ${
-                            index === 0 ? "bg-primary" : 
+                          className={`h-1 rounded-full ${
+                            index === 0 ? "bg-blue-500" : 
                             index === 1 ? "bg-pink-500" : 
                             "bg-green-500"
                           }`}
@@ -155,12 +154,14 @@ export default function HomePage() {
                       </div>
                       
                       <div className="flex justify-between items-center">
-                        <CountdownTimer days={daysRemaining} color={index === 0 ? "primary" : index === 1 ? "pink" : "green"} />
+                        <div className="flex items-center text-white text-sm">
+                          <Clock className="h-4 w-4 mr-1" />
+                          {daysRemaining}d : 23h : 58m : 50s
+                        </div>
                         <Link to={`/competitions/${competition.id}`}>
                           <Button 
                             size="sm" 
-                            variant="outline" 
-                            className={`${color.buttonBorder} ${color.text} ${color.buttonHover}`}
+                            className="bg-blue-500 hover:bg-blue-600 text-white"
                           >
                             View
                           </Button>

@@ -32,8 +32,8 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-[200]">
-      {/* Announcement strip with darker purple */}
-      <div className="bg-[#5B1ECB] text-white py-1.5 shadow-sm">
+      {/* Announcement strip with brighter, vibrant purple */}
+      <div className="bg-[#5B1ECB] text-white py-2.5 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 text-center text-sm font-medium">
           <span className="inline-flex items-center">
             <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,17 +44,9 @@ export function Navbar() {
         </div>
       </div>
       
-      {/* Main navbar with more dynamic background and reduced translucency */}
-      <div className="bg-gradient-to-r from-background/95 via-[rgba(123,57,237,0.05)] to-background/95 backdrop-blur-md border-b border-primary/10 shadow-sm relative overflow-hidden">
-        <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          {/* Subtle dynamic light effects */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-10 left-1/4 w-[500px] h-[300px] bg-primary/3 rounded-full blur-[80px] opacity-40"></div>
-            <div className="absolute -bottom-20 right-1/4 w-[300px] h-[200px] bg-pink-500/3 rounded-full blur-[60px] opacity-30"></div>
-            
-            {/* Removed animated light beam as per user's request */}
-          </div>
-          
+      {/* Main navbar with darker background */}
+      <div className="bg-gradient-to-r from-[#081731] via-[#0c1e42] to-[#081731] backdrop-blur-md border-b border-primary/10 shadow-sm relative overflow-hidden">
+        <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">          
           <div className="flex items-center justify-between h-24 relative z-10">
             <div className="flex items-center">
               <div className="flex-shrink-0 pl-2 sm:pl-4">
