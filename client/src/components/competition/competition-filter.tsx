@@ -174,7 +174,7 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
         <Button 
           variant="outline" 
           onClick={resetFilters}
-          className="flex items-center"
+          className="flex items-center text-white"
         >
           <SlidersHorizontal className="h-4 w-4 mr-1" /> Reset Filters
         </Button>

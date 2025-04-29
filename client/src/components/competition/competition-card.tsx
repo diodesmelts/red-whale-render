@@ -17,8 +17,9 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
   const categoryColor = getCategoryColor(competition.category);
   const timeRemaining = calculateTimeRemaining(competition.drawDate);
   
-  const remainingTickets = competition.totalTickets - competition.ticketsSold;
-  const percentSold = (competition.ticketsSold / competition.totalTickets) * 100;
+  const ticketsSold = competition.ticketsSold || 0;
+  const remainingTickets = competition.totalTickets - ticketsSold;
+  const percentSold = (ticketsSold / competition.totalTickets) * 100;
   
   // Format ticket price
   const ticketPrice = formatCurrency(competition.ticketPrice);
@@ -28,7 +29,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
     switch (competition.category) {
       case "family":
         return "border-yellow-400";
-      case "appliances":
+      case "household":
         return "border-pink-400";
       case "cash":
         return "border-green-400";
@@ -41,7 +42,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
     switch (competition.category) {
       case "family":
         return "bg-yellow-500 hover:bg-yellow-600";
-      case "appliances":
+      case "household":
         return "bg-pink-500 hover:bg-pink-600";
       case "cash":
         return "bg-green-500 hover:bg-green-600";
@@ -54,7 +55,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
     switch (competition.category) {
       case "family":
         return "shadow-[0_0_15px_rgba(255,193,7,0.5)]";
-      case "appliances":
+      case "household":
         return "shadow-[0_0_15px_rgba(255,77,148,0.5)]";
       case "cash":
         return "shadow-[0_0_15px_rgba(76,175,80,0.5)]";
@@ -80,7 +81,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
           alt={competition.title}
         />
         
-        <CategoryBadge category={competition.category} brand={competition.brand} className="absolute top-0 left-0 m-2" />
+        <CategoryBadge category={competition.category} brand={competition.brand || undefined} className="absolute top-0 left-0 m-2" />
         
         {/* Highlight badges for special competitions */}
         {percentSold > 80 && (
