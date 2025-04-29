@@ -36,10 +36,10 @@ export function CountdownTimer({ days, color = "primary" }: CountdownTimerProps)
 
   const getColorClass = () => {
     switch (color) {
-      case "primary": return "bg-primary/10 text-primary border-primary/20";
-      case "pink": return "bg-pink-500/10 text-pink-500 border-pink-500/20";
-      case "green": return "bg-green-500/10 text-green-500 border-green-500/20";
-      default: return "bg-primary/10 text-primary border-primary/20";
+      case "primary": return "bg-primary/10 text-white border-primary/20";
+      case "pink": return "bg-pink-500/10 text-white border-pink-500/20";
+      case "green": return "bg-green-500/10 text-white border-green-500/20";
+      default: return "bg-primary/10 text-white border-primary/20";
     }
   };
 

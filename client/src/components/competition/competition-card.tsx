@@ -101,14 +101,14 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
       
       <div className="p-4">
         <Link href={`/competitions/${competition.id}`}>
-          <h3 className="text-lg font-semibold text-foreground mb-1 cursor-pointer">{competition.title}</h3>
+          <h3 className="text-lg font-semibold text-white mb-1 cursor-pointer">{competition.title}</h3>
         </Link>
         
         <div className="flex justify-between items-center mb-3">
-          <span className={`font-bold text-${categoryColor}`}>
-            {ticketPrice} <span className="text-muted-foreground text-xs">per ticket</span>
+          <span className="font-bold text-white">
+            {ticketPrice} <span className="text-white text-xs opacity-80">per ticket</span>
           </span>
-          <span className="text-muted-foreground text-sm">
+          <span className="text-white text-sm opacity-80">
             <Ticket className="h-3 w-3 inline mr-1" /> {remainingTickets} tickets remaining
           </span>
         </div>
