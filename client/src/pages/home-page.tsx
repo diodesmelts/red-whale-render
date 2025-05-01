@@ -32,15 +32,60 @@ export default function HomePage() {
       {/* Hero Section */}
       <HeroBanner />
       
-      {/* Hot Picks Section - Below Hero Banner */}
-      <section className="relative z-20 py-20 mt-4">
+      {/* HOW TO PLAY Section */}
+      <section className="relative z-20 py-16 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-block">
-              <h2 className="text-4xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
-                Hot Picks for <span className="text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            <div className="flex justify-center items-center">
+              <div className="h-[1px] w-24 bg-gray-300"></div>
+              <h2 className="text-3xl font-bold tracking-tight mx-6 text-gray-800 uppercase relative">
+                HOW TO PLAY
               </h2>
+              <div className="h-[1px] w-24 bg-gray-300"></div>
             </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Enter Prize Competitions</h3>
+              <p className="text-gray-600">Browse and choose from our exciting range of competitions.</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Winners Are Picked Live</h3>
+              <p className="text-gray-600">All winners are selected randomly during live streamed draws.</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Delivery & Winner Features</h3>
+              <p className="text-gray-600">We deliver prizes quickly and feature winners on our website.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Hot Picks Section - Active Competitions */}
+      <section className="relative z-20 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
+              Live <span className="text-primary">Competitions</span>
+            </h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -186,89 +231,7 @@ export default function HomePage() {
         </div>
       </section>
       
-      {/* How to Play Section */}
-      <section className="pt-10 pb-16 bg-background relative overflow-hidden">
-        {/* Fun background elements */}
-        <div className="absolute -top-16 -left-16 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/4 right-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-orange-500/5 rounded-full blur-3xl"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto">
-              How To <span className="text-primary relative">Play
-                <span className="absolute -top-1 -right-4 text-yellow-400 text-lg">✨</span>
-              </span>
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto mb-6 text-lg font-light">
-              Just <span className="text-primary font-medium">four simple steps</span> to start winning amazing prizes!
-            </p>
-            <Link to="/how-to-play">
-              <Button className="mb-6 inline-flex items-center px-6 py-3 text-base shine-btn shadow-lg shadow-primary/20">
-                Detailed Guide <ChevronRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Step 1 */}
-            <div className="bg-card rounded-xl p-8 border border-primary transition-all duration-300 shadow-[0_0_20px_rgba(0,153,255,0.5)] group relative overflow-hidden">
-              {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">1</div>
-              
-              <h3 className="text-2xl font-bold text-primary mb-3 transition-colors mt-4">Browse Competitions</h3>
-              <p className="text-muted-foreground font-light text-base">
-                Explore our wide range of exciting competitions across different categories and platforms.
-              </p>
-              <div className="mt-6 w-full h-2 bg-primary/20 rounded-full overflow-hidden">
-                <div className="h-full w-1/4 bg-primary"></div>
-              </div>
-            </div>
-            
-            {/* Step 2 */}
-            <div className="bg-card rounded-xl p-8 border border-purple-500 transition-all duration-300 shadow-[0_0_20px_rgba(155,89,182,0.5)] group relative overflow-hidden">
-              {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">2</div>
-              
-              <h3 className="text-2xl font-bold text-purple-500 mb-3 transition-colors mt-4">Enter & Follow Steps</h3>
-              <p className="text-muted-foreground font-light text-base">
-                Select a competition and follow the simple entry steps to secure your tickets.
-              </p>
-              <div className="mt-6 w-full h-2 bg-purple-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-1/2 bg-purple-500"></div>
-              </div>
-            </div>
-            
-            {/* Step 3 */}
-            <div className="bg-card rounded-xl p-8 border border-blue-500 transition-all duration-300 shadow-[0_0_20px_rgba(66,153,225,0.5)] group relative overflow-hidden">
-              {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">3</div>
-              
-              <h3 className="text-2xl font-bold text-blue-500 mb-3 transition-colors mt-4">Track Entries</h3>
-              <p className="text-muted-foreground font-light text-base">
-                Monitor your active entries and check competition closing dates on your dashboard.
-              </p>
-              <div className="mt-6 w-full h-2 bg-blue-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-3/4 bg-blue-500"></div>
-              </div>
-            </div>
-            
-            {/* Step 4 */}
-            <div className="bg-card rounded-xl p-8 border border-orange-500 transition-all duration-300 shadow-[0_0_20px_rgba(255,127,80,0.5)] group relative overflow-hidden">
-              {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform">4</div>
-              
-              <h3 className="text-2xl font-bold text-orange-500 mb-3 transition-colors mt-4">Win & Celebrate</h3>
-              <p className="text-muted-foreground font-light text-base">
-                Get notified when you win and follow the simple claim process to receive your prize!
-              </p>
-              <div className="mt-6 w-full h-2 bg-orange-500/20 rounded-full overflow-hidden">
-                <div className="h-full w-full bg-orange-500"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
       
       {/* Featured Competitions Section */}
       <section className="py-24 bg-background relative overflow-hidden">

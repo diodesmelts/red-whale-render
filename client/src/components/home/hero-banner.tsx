@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Clock, Ticket, Trophy } from "lucide-react";
+import { Loader2, Clock, Ticket, Trophy, Timer } from "lucide-react";
 import { SiteConfig, Competition } from "@shared/schema";
 import { getImageUrl } from "@/lib/utils";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
 import { Progress } from "@/components/ui/progress";
+import { useState, useEffect } from "react";
 
 export function HeroBanner() {
   const { data: heroBannerConfig, isLoading: isLoadingBanner } = useQuery<SiteConfig>({
@@ -33,7 +34,7 @@ export function HeroBanner() {
       const res = await fetch("/api/site-config/heroBannerTitle");
       if (!res.ok) {
         if (res.status === 404) {
-          return { key: "heroBannerTitle", value: "Ready to win? Win £1,000 TODAY" };
+          return { key: "heroBannerTitle", value: "WIN A PLAYSTATION 5" };
         }
         throw new Error("Failed to fetch hero banner title");
       }
@@ -92,12 +93,32 @@ export function HeroBanner() {
     return Math.min(100, Math.round((sold / total) * 100));
   };
 
+  // Countdown timer
+  const [countdown, setCountdown] = useState({ hours: 8, minutes: 33, seconds: 59 });
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        }
+        return prev;
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+
   const isLoading = isLoadingBanner || isLoadingCompetitions || isLoadingTitle;
-  const title = heroBannerTitle?.value || "Ready to win? Win £1,000 TODAY";
+  const title = heroBannerTitle?.value || "WIN A PLAYSTATION 5";
 
   return (
     <section 
-      className={`relative pt-48 pb-48 overflow-hidden ${
+      className={`relative pt-16 md:pt-0 pb-16 md:pb-0 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
           : "bg-gradient-to-b from-background to-background/70"
@@ -108,54 +129,94 @@ export function HeroBanner() {
       } : {}}
     >
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[90]">
-        <div className="text-center py-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[90] flex flex-col md:flex-row md:items-center md:min-h-[500px]">
+        {/* Left Side Content */}
+        <div className="md:w-1/2 py-8 md:py-16">
           {/* Win Tab */}
-          <div className="inline-block bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold px-6 py-2 rounded mb-2 text-lg shadow-lg">
+          <div className="inline-block bg-primary text-white font-bold px-6 py-2 mb-4 text-lg">
             WIN
           </div>
           
           {/* Main Title - Using title from site config */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-2 relative text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             {title}
           </h1>
           
-          {/* Subtitle */}
-          <p className="text-white text-lg mb-6 opacity-90">Crazy odds. High win rates. Investing in fun!</p>
-          
-          {/* Competition Details */}
           {heroBannerCompetition && !isLoading ? (
-            <div className="mt-4 bg-black/50 backdrop-blur-sm p-6 rounded-xl max-w-3xl mx-auto border border-white/10 shadow-xl hidden sm:block">
-              <div className="flex items-center justify-between gap-6">
-                <div className="flex items-center text-white">
-                  <Ticket className="h-5 w-5 mr-2 text-white" />
-                  <span className="text-xl font-semibold">
-                    £{(heroBannerCompetition.ticketPrice / 100).toFixed(2)} per ticket
+            <div className="flex flex-col space-y-6">
+              {/* Price and Tickets Section */}
+              <div className="flex flex-col">
+                <div className="flex items-center mb-2">
+                  <span className="text-3xl font-bold text-white">
+                    £{(heroBannerCompetition.ticketPrice / 100).toFixed(2)}
                   </span>
                 </div>
-                
-                <div className="flex items-center text-white">
-                  <Clock className="h-5 w-5 mr-2 text-white" />
-                  <span className="text-lg">
-                    Draw {formatTimeRemaining(heroBannerCompetition.drawDate)}
-                  </span>
+                <div className="text-white text-sm">
+                  {heroBannerCompetition.ticketsSold || 0} / {heroBannerCompetition.totalTickets} TICKETS LEFT
                 </div>
-                
-                <div className="flex items-center text-white">
-                  <Trophy className="h-5 w-5 mr-2 text-white" />
-                  <span className="text-lg">
-                    {heroBannerCompetition.ticketsSold} / {heroBannerCompetition.totalTickets} sold
-                  </span>
+              </div>
+              
+              {/* Countdown Timer */}
+              <div className="flex gap-3">
+                <div className="bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-2xl rounded">
+                  {countdown.hours}
                 </div>
-                
+                <div className="bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-2xl rounded">
+                  {countdown.minutes}
+                </div>
+                <div className="bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-2xl rounded">
+                  {countdown.seconds}
+                </div>
+              </div>
+              
+              {/* Enter Button */}
+              <div>
                 <Link to={`/competitions/${heroBannerCompetition.id}`}>
-                  <Button size="lg" className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 text-white font-bold px-6 text-lg">
-                    Enter Now
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-6 text-xl uppercase">
+                    Enter Competition
                   </Button>
                 </Link>
               </div>
+              
+              {/* Trustpilot Reviews */}
+              <div className="flex items-center mt-4">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg key={star} className="w-5 h-5 text-primary fill-current" viewBox="0 0 24 24">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                  ))}
+                </div>
+                <span className="text-white text-sm ml-2">TrustScore 4.9 | 2,845 reviews</span>
+              </div>
             </div>
-          ) : null}
+          ) : (
+            <p className="text-white text-lg mb-6 opacity-90">Crazy odds. High win rates. Investing in fun!</p>
+          )}
+        </div>
+        
+        {/* Right Side - Images (in production these would be of the actual prize) */}
+        <div className="hidden md:block md:w-1/2">
+          {hasBackgroundImage && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2 rounded-lg overflow-hidden h-64 bg-card">
+                {/* This would be the main image of the prize */}
+                {heroBannerCompetition?.imageUrl && (
+                  <img 
+                    src={getImageUrl(heroBannerCompetition.imageUrl)} 
+                    alt={heroBannerCompetition.title || "Competition prize"} 
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+              <div className="rounded-lg overflow-hidden h-40 bg-card">
+                {/* This would be a detail image */}
+              </div>
+              <div className="rounded-lg overflow-hidden h-40 bg-card">
+                {/* This would be another detail image */}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
