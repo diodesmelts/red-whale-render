@@ -33,47 +33,68 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* HOW TO PLAY Section */}
-      <section className="relative z-20 py-16 bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative z-20 py-16 bg-background overflow-hidden">
+        {/* Fun background elements */}
+        <div className="absolute -top-16 -left-16 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
-            <div className="flex justify-center items-center">
-              <div className="h-[1px] w-24 bg-gray-300"></div>
-              <h2 className="text-3xl font-bold tracking-tight mx-6 text-gray-800 uppercase relative">
-                HOW TO PLAY
-              </h2>
-              <div className="h-[1px] w-24 bg-gray-300"></div>
-            </div>
+            <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto text-white">
+              HOW TO <span className="text-primary relative">PLAY
+                <span className="absolute -top-1 -right-4 text-yellow-400 text-lg">✨</span>
+              </span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-6 text-lg">
+              Just <span className="text-primary font-medium">three simple steps</span> to start winning amazing prizes!
+            </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+            <div className="bg-card/40 backdrop-blur-sm rounded-xl p-8 border border-primary/20 transition-all duration-300 shadow-[0_0_20px_rgba(123,57,237,0.2)] hover:shadow-[0_0_30px_rgba(123,57,237,0.4)] group relative overflow-hidden">
+              {/* Number badge */}
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">1</div>
+              
+              <div className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">Get Your Tickets</h3>
+                <p className="text-gray-300">Browse our amazing competitions and secure your tickets to win. The more tickets, the better your chances!</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Enter Prize Competitions</h3>
-              <p className="text-gray-600">Browse and choose from our exciting range of competitions.</p>
             </div>
             
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+            <div className="bg-card/40 backdrop-blur-sm rounded-xl p-8 border border-purple-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.2)] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] group relative overflow-hidden">
+              {/* Number badge */}
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">2</div>
+              
+              <div className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-purple-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">Watch Live Draws</h3>
+                <p className="text-gray-300">All winners are selected randomly during our exciting live streamed draws. Get ready for the thrill!</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Winners Are Picked Live</h3>
-              <p className="text-gray-600">All winners are selected randomly during live streamed draws.</p>
             </div>
             
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
+            <div className="bg-card/40 backdrop-blur-sm rounded-xl p-8 border border-blue-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] group relative overflow-hidden">
+              {/* Number badge */}
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">3</div>
+              
+              <div className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">Win & Celebrate!</h3>
+                <p className="text-gray-300">Get notified when you win and celebrate your new prize! We'll deliver it straight to your door.</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Delivery & Winner Features</h3>
-              <p className="text-gray-600">We deliver prizes quickly and feature winners on our website.</p>
             </div>
           </div>
         </div>

@@ -195,25 +195,16 @@ export function HeroBanner() {
           )}
         </div>
         
-        {/* Right Side - Images (in production these would be of the actual prize) */}
+        {/* Right Side - Images */}
         <div className="hidden md:block md:w-1/2">
-          {hasBackgroundImage && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2 rounded-lg overflow-hidden h-64 bg-card">
-                {/* This would be the main image of the prize */}
-                {heroBannerCompetition?.imageUrl && (
-                  <img 
-                    src={getImageUrl(heroBannerCompetition.imageUrl)} 
-                    alt={heroBannerCompetition.title || "Competition prize"} 
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-              <div className="rounded-lg overflow-hidden h-40 bg-card">
-                {/* This would be a detail image */}
-              </div>
-              <div className="rounded-lg overflow-hidden h-40 bg-card">
-                {/* This would be another detail image */}
+          {hasBackgroundImage && heroBannerCompetition?.imageUrl && (
+            <div className="flex items-center justify-center h-full">
+              <div className="rounded-lg overflow-hidden w-5/6 bg-transparent shadow-2xl">
+                <img 
+                  src={getImageUrl(heroBannerCompetition.imageUrl)} 
+                  alt={heroBannerCompetition.title || "Competition prize"} 
+                  className="w-full h-auto object-cover"
+                />
               </div>
             </div>
           )}
