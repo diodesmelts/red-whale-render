@@ -129,16 +129,16 @@ export function HeroBanner() {
       } : {}}
     >
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[90] flex flex-col md:flex-row md:items-center md:min-h-[700px]">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-[90] flex flex-col md:flex-row md:items-center md:min-h-[700px]">
         {/* Left Side Content */}
-        <div className="md:w-1/2 py-12 md:py-24">
+        <div className="md:w-[65%] py-12 md:py-24">
           {/* Win Tab */}
           <div className="inline-block bg-primary text-white font-bold px-6 py-2 mb-4 text-lg">
             WIN
           </div>
           
           {/* Main Title - Using title from site config */}
-          <h1 className="text-6xl md:text-8xl font-extrabold mb-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <h1 className="text-6xl md:text-8xl font-extrabold mb-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-wide max-w-[95%] leading-[1.1]">
             {title}
           </h1>
           
@@ -203,7 +203,7 @@ export function HeroBanner() {
         </div>
         
         {/* Right Side - Images */}
-        <div className="hidden md:block md:w-1/2">
+        <div className="hidden md:block md:w-[35%]">
           {hasBackgroundImage && heroBannerCompetition?.imageUrl && (
             <div className="flex items-center justify-center h-full">
               <div className="rounded-lg overflow-hidden w-[90%] bg-transparent shadow-2xl transform scale-110">
