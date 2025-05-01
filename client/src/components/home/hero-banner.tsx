@@ -129,16 +129,16 @@ export function HeroBanner() {
       } : {}}
     >
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[90] flex flex-col md:flex-row md:items-center md:min-h-[500px]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[90] flex flex-col md:flex-row md:items-center md:min-h-[700px]">
         {/* Left Side Content */}
-        <div className="md:w-1/2 py-8 md:py-16">
+        <div className="md:w-1/2 py-12 md:py-24">
           {/* Win Tab */}
           <div className="inline-block bg-primary text-white font-bold px-6 py-2 mb-4 text-lg">
             WIN
           </div>
           
           {/* Main Title - Using title from site config */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <h1 className="text-6xl md:text-8xl font-extrabold mb-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             {title}
           </h1>
           
@@ -157,22 +157,29 @@ export function HeroBanner() {
               </div>
               
               {/* Countdown Timer */}
-              <div className="flex gap-3">
-                <div className="bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-2xl rounded">
-                  {countdown.hours}
+              <div className="mb-2 text-white font-medium text-lg">Draw closes in:</div>
+              <div className="flex gap-4">
+                <div className="bg-primary w-16 h-16 flex flex-col items-center justify-center text-white rounded-lg shadow-lg">
+                  <span className="font-bold text-2xl">{countdown.hours}</span>
+                  <span className="text-xs uppercase">Hours</span>
                 </div>
-                <div className="bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-2xl rounded">
-                  {countdown.minutes}
+                <div className="bg-primary w-16 h-16 flex flex-col items-center justify-center text-white rounded-lg shadow-lg">
+                  <span className="font-bold text-2xl">{countdown.minutes}</span>
+                  <span className="text-xs uppercase">Mins</span>
                 </div>
-                <div className="bg-primary w-12 h-12 flex items-center justify-center text-white font-bold text-2xl rounded">
-                  {countdown.seconds}
+                <div className="bg-primary w-16 h-16 flex flex-col items-center justify-center text-white rounded-lg shadow-lg animate-pulse">
+                  <span className="font-bold text-2xl">{countdown.seconds}</span>
+                  <span className="text-xs uppercase">Secs</span>
                 </div>
               </div>
               
               {/* Enter Button */}
-              <div>
+              <div className="mt-3">
                 <Link to={`/competitions/${heroBannerCompetition.id}`}>
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-6 text-xl uppercase">
+                  <Button 
+                    size="lg" 
+                    className="bg-primary hover:bg-primary/90 text-white font-extrabold px-10 py-7 text-2xl uppercase tracking-wide shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-primary/30 hover:shadow-xl"
+                  >
                     Enter Competition
                   </Button>
                 </Link>
@@ -199,11 +206,11 @@ export function HeroBanner() {
         <div className="hidden md:block md:w-1/2">
           {hasBackgroundImage && heroBannerCompetition?.imageUrl && (
             <div className="flex items-center justify-center h-full">
-              <div className="rounded-lg overflow-hidden w-5/6 bg-transparent shadow-2xl">
+              <div className="rounded-lg overflow-hidden w-[90%] bg-transparent shadow-2xl transform scale-110">
                 <img 
                   src={getImageUrl(heroBannerCompetition.imageUrl)} 
                   alt={heroBannerCompetition.title || "Competition prize"} 
-                  className="w-full h-auto object-cover"
+                  className="w-full h-auto object-cover transition-transform hover:scale-105 duration-300"
                 />
               </div>
             </div>
