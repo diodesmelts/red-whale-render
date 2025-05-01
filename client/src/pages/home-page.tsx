@@ -33,11 +33,11 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* Hot Picks Section - Below Hero Banner */}
-      <section className="relative z-20 py-16">
+      <section className="relative z-20 py-20 mt-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
+          <div className="text-center mb-12">
             <div className="inline-block">
-              <h2 className="text-3xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
+              <h2 className="text-4xl font-extrabold tracking-tight mx-auto text-white relative inline-block">
                 Hot Picks for <span className="text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
               </h2>
             </div>
