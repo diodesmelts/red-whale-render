@@ -28,6 +28,7 @@ import TermsConditions from "@/pages/terms-conditions";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import CookiePolicy from "@/pages/cookie-policy";
 import FAQsPage from "@/pages/faqs";
+import AboutUs from "@/pages/about-us";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/index";
@@ -71,6 +72,7 @@ function Router() {
               <Route path="/test-register" component={TestRegister} />
               
               {/* Policy Pages */}
+              <Route path="/about-us" component={AboutUs} />
               <Route path="/terms-conditions" component={TermsConditions} />
               <Route path="/privacy-policy" component={PrivacyPolicy} />
               <Route path="/cookie-policy" component={CookiePolicy} />

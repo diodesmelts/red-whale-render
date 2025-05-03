@@ -81,6 +81,14 @@ export function Navbar() {
                   )}>
                     <i className="fas fa-question-circle mr-2"></i> How to Play
                   </Link>
+                  <Link href="/about-us" className={cn(
+                    "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                    location === "/about-us" 
+                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
+                      : "text-white/80 hover:text-white hover:bg-white/5"
+                  )}>
+                    <i className="fas fa-users mr-2"></i> About Us
+                  </Link>
                   <Link href="/faqs" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location === "/faqs" 
@@ -244,6 +252,14 @@ export function Navbar() {
                         location === "/how-to-play" ? "text-primary" : "text-foreground"
                       )}>
                       <i className="fas fa-question-circle mr-2"></i> How to Play
+                    </Link>
+                    <Link href="/about-us" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className={cn(
+                        "flex items-center text-lg font-medium",
+                        location === "/about-us" ? "text-primary" : "text-foreground"
+                      )}>
+                      <i className="fas fa-users mr-2"></i> About Us
                     </Link>
                     <Link href="/faqs" 
                       onClick={() => setIsMenuOpen(false)}
