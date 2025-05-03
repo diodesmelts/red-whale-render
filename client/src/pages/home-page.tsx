@@ -52,7 +52,7 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="bg-card/40 backdrop-blur-sm rounded-xl p-8 border border-primary/20 transition-all duration-300 shadow-[0_0_20px_rgba(123,57,237,0.2)] hover:shadow-[0_0_30px_rgba(123,57,237,0.4)] group relative overflow-hidden">
+            <div className="bg-white rounded-xl p-8 border border-primary/20 transition-all duration-300 shadow-[0_0_20px_rgba(5,138,99,0.2)] hover:shadow-[0_0_30px_rgba(5,138,99,0.4)] group relative overflow-hidden">
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">1</div>
               
@@ -62,12 +62,12 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">Get Your Tickets</h3>
-                <p className="text-gray-300">Browse our amazing competitions and secure your tickets to win. The more tickets, the better your chances!</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Get Your Tickets</h3>
+                <p className="text-gray-700">Browse our amazing competitions and secure your tickets to win. The more tickets, the better your chances!</p>
               </div>
             </div>
             
-            <div className="bg-card/40 backdrop-blur-sm rounded-xl p-8 border border-purple-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.2)] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] group relative overflow-hidden">
+            <div className="bg-white rounded-xl p-8 border border-purple-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.2)] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] group relative overflow-hidden">
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">2</div>
               
@@ -77,12 +77,12 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">Watch Live Draws</h3>
-                <p className="text-gray-300">All winners are selected randomly during our exciting live streamed draws. Get ready for the thrill!</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Watch Live Draws</h3>
+                <p className="text-gray-700">All winners are selected randomly during our exciting live streamed draws. Get ready for the thrill!</p>
               </div>
             </div>
             
-            <div className="bg-card/40 backdrop-blur-sm rounded-xl p-8 border border-blue-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] group relative overflow-hidden">
+            <div className="bg-white rounded-xl p-8 border border-blue-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] group relative overflow-hidden">
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">3</div>
               
@@ -92,8 +92,8 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">Win & Celebrate!</h3>
-                <p className="text-gray-300">Get notified when you win and celebrate your new prize! We'll deliver it straight to your door.</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Win & Celebrate!</h3>
+                <p className="text-gray-700">Get notified when you win and celebrate your new prize! We'll deliver it straight to your door.</p>
               </div>
             </div>
           </div>
