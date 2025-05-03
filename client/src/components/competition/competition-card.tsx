@@ -76,7 +76,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
     >
       <div className="relative">
         <img 
-          className="w-full h-48 object-cover" 
+          className="w-full h-60 object-cover" 
           src={competition.imageUrl || "https://placehold.co/600x400/f0f0f0/333333/png?text=No+Image"}
           alt={competition.title}
         />
@@ -99,32 +99,32 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/70 to-transparent h-16"></div>
       </div>
       
-      <div className="p-4">
+      <div className="p-6">
         <Link href={`/competitions/${competition.id}`}>
-          <h3 className="text-lg font-semibold text-foreground mb-1 cursor-pointer hover:text-primary transition-colors">{competition.title}</h3>
+          <h3 className="text-xl font-semibold text-foreground mb-2 cursor-pointer hover:text-primary transition-colors">{competition.title}</h3>
         </Link>
         
-        <div className="flex justify-between items-center mb-3">
-          <span className="font-bold text-primary text-lg">
-            {ticketPrice} <span className="text-muted-foreground text-xs">per ticket</span>
+        <div className="flex justify-between items-center mb-4">
+          <span className="font-bold text-primary text-xl">
+            {ticketPrice} <span className="text-muted-foreground text-sm">per ticket</span>
           </span>
           <span className="text-muted-foreground text-sm">
-            <Ticket className="h-3 w-3 inline mr-1 text-primary" /> {remainingTickets} tickets remaining
+            <Ticket className="h-4 w-4 inline mr-1 text-primary" /> {remainingTickets} tickets remaining
           </span>
         </div>
         
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-5">
           <CountdownTimer drawDate={competition.drawDate} />
         </div>
         
         <Link href={`/competitions/${competition.id}`}>
           <div className={cn(
-            "block w-full px-4 py-2 text-white text-center rounded-md font-medium transform transition-all duration-200 cursor-pointer shadow-md",
+            "block w-full px-4 py-3 text-white text-center rounded-md font-medium transform transition-all duration-200 cursor-pointer shadow-md",
             getButtonColorClass(),
-            "relative overflow-hidden group"
+            "relative overflow-hidden group text-lg"
           )}>
             <div className="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-300"></div>
-            <Ticket className="h-4 w-4 inline mr-1" /> GET TICKETS
+            <Ticket className="h-5 w-5 inline mr-2" /> GET TICKETS
           </div>
         </Link>
       </div>

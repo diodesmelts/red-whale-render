@@ -33,9 +33,9 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* Featured Competitions Section */}
-      <section className="py-20 bg-[#bbd665] relative overflow-hidden">
+      <section className="py-20 bg-white relative overflow-hidden">
         {/* Fun background elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#bbd665]/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-0 w-80 h-80 bg-black/5 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -78,7 +78,7 @@ export default function HomePage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-16">
               {featuredCompetitions?.map(competition => (
                 <CompetitionCard key={competition.id} competition={competition} />
               ))}
