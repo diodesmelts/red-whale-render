@@ -13,7 +13,7 @@ export function Footer() {
               <Logo size="md" />
             </div>
             <p className="text-muted-foreground mb-4">
-              Your premier destination for discovering, entering, and winning online competitions across various platforms.
+              A family-run business offering exciting competition opportunities with prizes ranging from big-ticket items to everyday essentials.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
@@ -50,14 +50,19 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/about-us" className="text-muted-foreground hover:text-primary transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
                 <Link href="/my-wins" className="text-muted-foreground hover:text-primary transition-colors">
                   Winners
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  FAQ
-                </a>
+                <Link href="/faqs" className="text-muted-foreground hover:text-primary transition-colors">
+                  FAQs
+                </Link>
               </li>
             </ul>
           </div>
@@ -98,7 +103,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li className="flex items-start">
                 <Mail className="text-primary h-5 w-5 mt-0.5 mr-3" />
-                <span className="text-muted-foreground">support@redwhale.com</span>
+                <span className="text-muted-foreground">support@mobycomps.com</span>
               </li>
               <li className="flex items-start">
                 <Phone className="text-primary h-5 w-5 mt-0.5 mr-3" />
@@ -106,7 +111,7 @@ export function Footer() {
               </li>
               <li className="flex items-start">
                 <MapPin className="text-primary h-5 w-5 mt-0.5 mr-3" />
-                <span className="text-muted-foreground">123 Competition Street, London, UK</span>
+                <span className="text-muted-foreground">Devon, United Kingdom</span>
               </li>
             </ul>
             <div className="mt-4">
@@ -119,7 +124,7 @@ export function Footer() {
         
         <div className="border-t border-border pt-8 mt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-muted-foreground text-sm mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} Red Whale Competitions. All rights reserved.
+            &copy; {new Date().getFullYear()} MobyComps. All rights reserved.
           </div>
           <div className="flex space-x-6">
             <Link href="/terms-conditions" className="text-muted-foreground hover:text-primary text-sm">

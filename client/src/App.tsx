@@ -81,7 +81,7 @@ function Router() {
               {/* Admin Routes - protected and require admin role */}
               <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
               <ProtectedRoute path="/admin/competitions" component={CompetitionsManagement} adminRequired={true} />
-              <ProtectedRoute path="/admin/create-competition" component={CreateCompetition} adminRequired={true} />
+              <ProtectedRoute path="/admin/create-competition" component={() => <CreateCompetition />} adminRequired={true} />
               <ProtectedRoute path="/admin/users" component={UsersManagement} adminRequired={true} />
               <ProtectedRoute path="/admin/settings" component={AdminSettings} adminRequired={true} />
               <ProtectedRoute path="/admin/site-config" component={SiteConfigPage} adminRequired={true} />
