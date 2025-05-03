@@ -33,46 +33,46 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* Featured Competitions Section */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section className="py-20 bg-[#bbd665] relative overflow-hidden">
         {/* Fun background elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#bbd665]/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-0 w-80 h-80 bg-black/5 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto text-black">
-              <span className="text-[#bbd665] relative inline-block">Live
-                <span className="absolute -top-1 -right-4 text-[#bbd665] text-lg">🔥</span>
+              <span className="text-white relative inline-block">Live
+                <span className="absolute -top-1 -right-4 text-white text-lg">🔥</span>
               </span> Competitions
             </h2>
-            <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg font-light">
-              Don't miss your chance to win these <span className="text-[#bbd665] font-medium">amazing prizes</span>! New competitions added regularly.
+            <p className="text-black/80 mt-4 max-w-2xl mx-auto text-lg font-light">
+              Don't miss your chance to win these <span className="text-white font-medium">amazing prizes</span>! New competitions added regularly.
             </p>
             
             {/* Decorative line with highlight */}
-            <div className="relative w-32 h-1.5 bg-[#bbd665]/30 mx-auto mt-8 rounded-full overflow-hidden">
-              <div className="absolute inset-0 w-full h-full bg-[#bbd665] animate-shine" 
-                style={{ backgroundImage: 'linear-gradient(to right, transparent, rgba(255,255,255,0.5) 50%, transparent 100%)' }}>
+            <div className="relative w-32 h-1.5 bg-black/20 mx-auto mt-8 rounded-full overflow-hidden">
+              <div className="absolute inset-0 w-full h-full bg-white animate-shine" 
+                style={{ backgroundImage: 'linear-gradient(to right, transparent, rgba(0,0,0,0.2) 50%, transparent 100%)' }}>
               </div>
             </div>
           </div>
           
           {isLoading ? (
             <div className="flex flex-col justify-center items-center py-32">
-              <Loader2 className="h-12 w-12 animate-spin text-[#bbd665] mb-4" />
-              <p className="text-gray-500 animate-pulse">Loading amazing competitions...</p>
+              <Loader2 className="h-12 w-12 animate-spin text-white mb-4" />
+              <p className="text-black/80 animate-pulse">Loading amazing competitions...</p>
             </div>
           ) : featuredCompetitions?.length === 0 ? (
-            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-gray-300 rounded-xl">
-              <div className="w-20 h-20 bg-[#bbd665]/10 rounded-full flex items-center justify-center mb-6 animate-pulse-slow">
-                <i className="fas fa-trophy text-[#bbd665] text-3xl"></i>
+            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-white/30 bg-white/10 rounded-xl">
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6 animate-pulse-slow">
+                <i className="fas fa-trophy text-white text-3xl"></i>
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">No Active Competitions</h3>
-              <p className="text-gray-600 max-w-md text-center mb-6">
+              <p className="text-black/70 max-w-md text-center mb-6">
                 We're preparing some exciting new competitions. Check back soon or follow us on social media for updates!
               </p>
               <Link to="/how-to-play">
-                <Button variant="outline" className="border-[#bbd665] border-2 text-black hover:bg-[#bbd665]/10">
+                <Button variant="outline" className="border-white border-2 text-black hover:bg-white/20 hover:text-black">
                   Learn How Competitions Work
                 </Button>
               </Link>
@@ -87,7 +87,7 @@ export default function HomePage() {
           
           <div className="text-center">
             <Link to="/competitions">
-              <Button size="lg" className="bg-[#bbd665] hover:bg-[#a8c252] text-black group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-[#bbd665]/20">
+              <Button size="lg" className="bg-black hover:bg-black/80 text-white group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-black/20">
                 <Ticket className="mr-2 h-5 w-5" /> View All Competitions <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
