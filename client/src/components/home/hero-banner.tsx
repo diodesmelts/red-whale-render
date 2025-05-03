@@ -155,8 +155,8 @@ export function HeroBanner() {
         className="absolute inset-0 w-full h-full bg-cover bg-center"
         style={{
           backgroundImage: heroBannerCompetition?.imageUrl 
-            ? `linear-gradient(to right, rgba(5, 138, 99, 0.9) 0%, rgba(5, 138, 99, 0.9) 30%, rgba(5, 138, 99, 0.3) 60%, transparent 100%), url(${competitionImage})`
-            : 'linear-gradient(to right, #058a63, #058a63)',
+            ? `linear-gradient(to right, rgba(214, 35, 35, 0.95) 0%, rgba(214, 35, 35, 0.9) 30%, rgba(214, 35, 35, 0.3) 60%, transparent 100%), url(${competitionImage})`
+            : 'linear-gradient(to right, #d62323, #d62323)',
           backgroundPosition: 'center right',
           backgroundSize: 'cover'
         }}

@@ -5,26 +5,26 @@
 @tailwind utilities;
 
 :root {
-  /* New Emerald Green and White Theme */
+  /* Bright Red and White Theme */
   --background: 0 0% 100%;
-  --foreground: 160 84% 20%;
-  --muted: 160 35% 95%;
-  --muted-foreground: 160 40% 30%;
+  --foreground: 0 84% 25%;
+  --muted: 0 35% 95%;
+  --muted-foreground: 0 40% 40%;
   --popover: 0 0% 100%;
-  --popover-foreground: 160 84% 20%;
+  --popover-foreground: 0 84% 25%;
   --card: 0 0% 98%;
-  --card-foreground: 160 84% 20%;
-  --border: 160 15% 85%;
-  --input: 160 15% 85%;
-  --primary: 160 84% 25%;
+  --card-foreground: 0 84% 25%;
+  --border: 0 15% 85%;
+  --input: 0 15% 85%;
+  --primary: 0 84% 42%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 160 70% 40%;
+  --secondary: 0 70% 50%;
   --secondary-foreground: 0 0% 100%;
   --accent: 25 95% 60%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 160 84% 25%;
+  --ring: 0 84% 42%;
   --radius: 0.75rem;
   
   /* Category Colors */
@@ -33,20 +33,20 @@
   --category-cash: 122 39% 49%;
   
   /* Chart Colors */
-  --chart-1: 160 84% 25%;
+  --chart-1: 0 84% 42%;
   --chart-2: 25 95% 60%;
   --chart-3: 195 100% 50%;
   --chart-4: 266 100% 64%;
   --chart-5: 45 100% 51%;
   
   /* Sidebar Colors - Now Navbar Colors */
-  --sidebar-background: 160 84% 25%;
+  --sidebar-background: 0 84% 42%;
   --sidebar-foreground: 0 0% 100%;
   --sidebar-primary: 25 95% 60%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 160 70% 30%;
+  --sidebar-accent: 0 70% 35%;
   --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 160 70% 20%;
+  --sidebar-border: 0 70% 30%;
   --sidebar-ring: 25 95% 60%;
 }
 
