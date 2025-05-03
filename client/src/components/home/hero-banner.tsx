@@ -76,6 +76,19 @@ export function HeroBanner() {
   // Make sure the URL is absolute for cross-domain compatibility using our utility function
   const absoluteBackgroundImage = getImageUrl(backgroundImage);
   const competitionImage = heroBannerCompetition?.imageUrl ? getImageUrl(heroBannerCompetition.imageUrl) : "";
+  
+  // Debug logging to verify the image URLs
+  console.log("Hero Banner Background Image:", {
+    originalUrl: backgroundImage,
+    processedUrl: absoluteBackgroundImage,
+    heroBannerConfig
+  });
+  
+  console.log("Hero Banner Competition Image:", {
+    originalUrl: heroBannerCompetition?.imageUrl,
+    processedUrl: competitionImage,
+    competitionId: heroBannerCompetition?.id
+  });
 
   // Get draw date and format for display
   const getDrawDate = (drawDate: string | Date | null) => {
@@ -156,7 +169,9 @@ export function HeroBanner() {
         style={{
           backgroundImage: heroBannerCompetition?.imageUrl 
             ? `linear-gradient(to right, rgba(214, 35, 35, 0.95) 0%, rgba(214, 35, 35, 0.9) 30%, rgba(214, 35, 35, 0.3) 60%, transparent 100%), url(${competitionImage})`
-            : 'linear-gradient(to right, #d62323, #d62323)',
+            : absoluteBackgroundImage 
+              ? `linear-gradient(to right, rgba(214, 35, 35, 0.95) 0%, rgba(214, 35, 35, 0.9) 30%, rgba(214, 35, 35, 0.3) 60%, transparent 100%), url(${absoluteBackgroundImage})`
+              : 'linear-gradient(to right, #d62323, #d62323)',
           backgroundPosition: 'center right',
           backgroundSize: 'cover'
         }}
