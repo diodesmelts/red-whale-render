@@ -44,7 +44,7 @@ export function Navbar() {
         </div>
       </div>
       
-      {/* Main navbar with emerald green background */}
+      {/* Main navbar with dark purple background */}
       <div className="bg-primary text-white shadow-md relative overflow-hidden">
         <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">          
           <div className="flex items-center justify-between h-24 relative z-10">
@@ -122,7 +122,7 @@ export function Navbar() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" className="flex items-center bg-primary/30 hover:bg-primary/50 shadow-[0_0_8px_rgba(123,57,237,0.5)] border border-primary/40 transition-all hover:shadow-[0_0_12px_rgba(123,57,237,0.7)]">
+                        <Button variant="secondary" className="flex items-center bg-primary/30 hover:bg-primary/50 shadow-[0_0_8px_rgba(67,32,124,0.5)] border border-primary/40 transition-all hover:shadow-[0_0_12px_rgba(67,32,124,0.7)]">
                           <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center mr-2">
                             <span className="font-semibold text-sm">
                               {user.displayName ? user.displayName[0].toUpperCase() : user.username[0].toUpperCase()}

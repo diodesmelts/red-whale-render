@@ -161,17 +161,17 @@ export function HeroBanner() {
 
   return (
     <section 
-      className="relative w-full h-[600px] md:h-[450px] lg:h-[500px] overflow-hidden bg-gradient-to-r from-primary to-primary/95 text-white"
+      className="relative w-full h-[600px] md:h-[450px] lg:h-[500px] overflow-hidden bg-gradient-to-r from-[#43207c] to-[#43207c]/95 text-white"
     >
       {/* Full width hero image container */}
       <div 
         className="absolute inset-0 w-full h-full bg-cover bg-center"
         style={{
           backgroundImage: heroBannerCompetition?.imageUrl 
-            ? `linear-gradient(to right, rgba(214, 35, 35, 0.95) 0%, rgba(214, 35, 35, 0.9) 30%, rgba(214, 35, 35, 0.3) 60%, transparent 100%), url(${competitionImage})`
+            ? `linear-gradient(to right, rgba(67, 32, 124, 0.95) 0%, rgba(67, 32, 124, 0.9) 30%, rgba(67, 32, 124, 0.3) 60%, transparent 100%), url(${competitionImage})`
             : absoluteBackgroundImage 
-              ? `linear-gradient(to right, rgba(214, 35, 35, 0.95) 0%, rgba(214, 35, 35, 0.9) 30%, rgba(214, 35, 35, 0.3) 60%, transparent 100%), url(${absoluteBackgroundImage})`
-              : 'linear-gradient(to right, #d62323, #d62323)',
+              ? `linear-gradient(to right, rgba(67, 32, 124, 0.95) 0%, rgba(67, 32, 124, 0.9) 30%, rgba(67, 32, 124, 0.3) 60%, transparent 100%), url(${absoluteBackgroundImage})`
+              : 'linear-gradient(to right, #43207c, #43207c)',
           backgroundPosition: 'center right',
           backgroundSize: 'cover'
         }}
@@ -195,7 +195,7 @@ export function HeroBanner() {
             <Link to={heroBannerCompetition ? `/competitions/${heroBannerCompetition.id}` : "/competitions"}>
               <Button 
                 size="lg"
-                className="bg-[#38b6ff] hover:bg-[#2aa0e6] text-white font-bold py-5 px-8 rounded-md text-xl flex items-center gap-2"
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-5 px-8 rounded-md text-xl flex items-center gap-2"
               >
                 Enter now <Ticket className="h-5 w-5 ml-1" />
               </Button>
