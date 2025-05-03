@@ -122,10 +122,10 @@ export function HeroBanner() {
       className={`relative pt-16 md:pt-0 pb-16 md:pb-0 overflow-hidden ${
         hasBackgroundImage 
           ? "bg-cover bg-center" 
-          : "bg-gradient-to-b from-background to-background/70"
+          : "bg-gradient-to-r from-primary to-primary/80"
       }`}
       style={hasBackgroundImage ? { 
-        backgroundImage: `linear-gradient(rgba(0, 0, 60, 0.4), rgba(0, 0, 60, 0.4)), url(${absoluteBackgroundImage})`,
+        backgroundImage: `linear-gradient(rgba(5, 138, 99, 0.85), rgba(5, 138, 99, 0.75)), url(${absoluteBackgroundImage})`,
         zIndex: -1
       } : {}}
     >
@@ -134,12 +134,12 @@ export function HeroBanner() {
         {/* Left Side Content */}
         <div className="md:w-[65%] py-12 md:py-24">
           {/* Win Tab */}
-          <div className="inline-block bg-primary text-white font-bold px-6 py-2 mb-4 text-lg">
+          <div className="inline-block bg-accent text-white font-bold px-6 py-2 mb-4 text-lg rounded-md shadow-md">
             WIN
           </div>
           
           {/* Main Title - Using title from site config */}
-          <h1 className="text-6xl md:text-8xl font-extrabold mb-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-wide max-w-[95%] leading-[1.1]">
+          <h1 className="text-6xl md:text-8xl font-extrabold mb-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)] tracking-wide max-w-[95%] leading-[1.1]">
             {title}
           </h1>
           
@@ -160,26 +160,26 @@ export function HeroBanner() {
               {/* Countdown Timer */}
               <div className="mb-2 text-white font-medium text-lg">Draw closes in:</div>
               <div className="flex gap-4">
-                <div className="bg-primary w-16 h-16 flex flex-col items-center justify-center text-white rounded-lg shadow-lg">
+                <div className="bg-white w-20 h-20 flex flex-col items-center justify-center text-primary rounded-lg shadow-xl border-2 border-white/30">
                   <span className="font-bold text-2xl">{countdown.hours}</span>
-                  <span className="text-xs uppercase">Hours</span>
+                  <span className="text-xs font-medium uppercase">Hours</span>
                 </div>
-                <div className="bg-primary w-16 h-16 flex flex-col items-center justify-center text-white rounded-lg shadow-lg">
+                <div className="bg-white w-20 h-20 flex flex-col items-center justify-center text-primary rounded-lg shadow-xl border-2 border-white/30">
                   <span className="font-bold text-2xl">{countdown.minutes}</span>
-                  <span className="text-xs uppercase">Mins</span>
+                  <span className="text-xs font-medium uppercase">Mins</span>
                 </div>
-                <div className="bg-primary w-16 h-16 flex flex-col items-center justify-center text-white rounded-lg shadow-lg animate-pulse">
+                <div className="bg-accent w-20 h-20 flex flex-col items-center justify-center text-white rounded-lg shadow-xl border-2 border-white/30 animate-pulse">
                   <span className="font-bold text-2xl">{countdown.seconds}</span>
-                  <span className="text-xs uppercase">Secs</span>
+                  <span className="text-xs font-medium uppercase">Secs</span>
                 </div>
               </div>
               
               {/* Enter Button */}
-              <div className="mt-3">
+              <div className="mt-6">
                 <Link to={`/competitions/${heroBannerCompetition.id}`}>
                   <Button 
                     size="lg" 
-                    className="bg-primary hover:bg-primary/90 text-white font-extrabold px-10 py-7 text-2xl uppercase tracking-wide shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-primary/30 hover:shadow-xl"
+                    className="bg-white hover:bg-gray-100 text-primary font-extrabold px-10 py-7 text-2xl uppercase tracking-wide shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-accent/30 hover:shadow-xl"
                   >
                     Enter Competition
                   </Button>
@@ -187,15 +187,15 @@ export function HeroBanner() {
               </div>
               
               {/* Trustpilot Reviews */}
-              <div className="flex items-center mt-4">
+              <div className="flex items-center mt-6 bg-white/20 p-3 rounded-lg backdrop-blur-sm">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-5 h-5 text-primary fill-current" viewBox="0 0 24 24">
+                    <svg key={star} className="w-5 h-5 text-accent fill-current" viewBox="0 0 24 24">
                       <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                     </svg>
                   ))}
                 </div>
-                <span className="text-white text-sm ml-2">TrustScore 4.9 | 2,845 reviews</span>
+                <span className="text-white text-sm ml-2 font-medium">TrustScore 4.9 | 2,845 reviews</span>
               </div>
             </div>
           ) : (
@@ -207,11 +207,11 @@ export function HeroBanner() {
         <div className="hidden md:block md:w-[35%]">
           {hasBackgroundImage && heroBannerCompetition?.imageUrl && (
             <div className="flex items-center justify-center h-full">
-              <div className="rounded-lg overflow-hidden w-[90%] bg-transparent shadow-2xl transform scale-110">
+              <div className="rounded-xl overflow-hidden w-[90%] bg-white p-4 shadow-2xl transform scale-110">
                 <img 
                   src={getImageUrl(heroBannerCompetition.imageUrl)} 
                   alt={heroBannerCompetition.title || "Competition prize"} 
-                  className="w-full h-auto object-cover transition-transform hover:scale-105 duration-300"
+                  className="w-full h-auto object-cover rounded-lg transition-transform hover:scale-105 duration-300"
                 />
               </div>
             </div>
