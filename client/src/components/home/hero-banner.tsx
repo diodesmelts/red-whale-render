@@ -186,7 +186,7 @@ export function HeroBanner() {
           </h1>
           
           {/* Draw Date - Fixed text as per request */}
-          <div className="mb-8 text-[#38b6ff] text-3xl font-bold tracking-wide">
+          <div className="mb-8 text-[#bbd665] text-3xl font-bold tracking-wide">
             {drawDateText}
           </div>
           
