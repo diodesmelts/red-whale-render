@@ -5,49 +5,49 @@
 @tailwind utilities;
 
 :root {
-  /* Dark Purple and White Theme */
+  /* Black and Kiwi Green Theme */
   --background: 0 0% 100%;
-  --foreground: 270 50% 25%;
-  --muted: 270 35% 95%;
-  --muted-foreground: 270 40% 40%;
+  --foreground: 0 0% 0%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 40%;
   --popover: 0 0% 100%;
-  --popover-foreground: 270 50% 25%;
+  --popover-foreground: 0 0% 0%;
   --card: 0 0% 98%;
-  --card-foreground: 270 50% 25%;
-  --border: 270 15% 85%;
-  --input: 270 15% 85%;
-  --primary: 270 50% 35%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 270 60% 45%;
-  --secondary-foreground: 0 0% 100%;
-  --accent: 25 95% 60%;
-  --accent-foreground: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --border: 0 0% 85%;
+  --input: 0 0% 85%;
+  --primary: 80 55% 62%;  /* Kiwi Crush #bbd665 */
+  --primary-foreground: 0 0% 0%;  /* Black text on kiwi */
+  --secondary: 0 0% 0%;   /* Black */
+  --secondary-foreground: 0 0% 100%;  /* White text on black */
+  --accent: 80 55% 62%;  /* Kiwi Crush for accent */
+  --accent-foreground: 0 0% 0%;  /* Black text on kiwi */
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 270 50% 35%;
+  --ring: 80 55% 62%;  /* Kiwi Crush */
   --radius: 0.75rem;
   
   /* Category Colors */
-  --category-family: 25 95% 60%;
-  --category-household: 328 100% 63%;
-  --category-cash: 122 39% 49%;
+  --category-family: 80 55% 62%;  /* Kiwi */
+  --category-household: 0 0% 0%;  /* Black */
+  --category-cash: 80 55% 62%;    /* Kiwi */
   
   /* Chart Colors */
-  --chart-1: 270 50% 35%;
-  --chart-2: 25 95% 60%;
-  --chart-3: 195 100% 50%;
-  --chart-4: 266 100% 64%;
-  --chart-5: 45 100% 51%;
+  --chart-1: 80 55% 62%;  /* Kiwi */
+  --chart-2: 0 0% 0%;     /* Black */
+  --chart-3: 80 55% 50%;  /* Darker Kiwi */
+  --chart-4: 0 0% 40%;    /* Dark Gray */
+  --chart-5: 80 55% 70%;  /* Lighter Kiwi */
   
-  /* Sidebar Colors - Now Navbar Colors */
-  --sidebar-background: 270 50% 35%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-primary: 25 95% 60%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 270 60% 30%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 270 50% 25%;
-  --sidebar-ring: 25 95% 60%;
+  /* Navbar Colors */
+  --sidebar-background: 80 55% 62%;  /* Kiwi */
+  --sidebar-foreground: 0 0% 0%;     /* Black */
+  --sidebar-primary: 0 0% 0%;        /* Black */
+  --sidebar-primary-foreground: 0 0% 100%;  /* White */
+  --sidebar-accent: 80 55% 50%;      /* Darker Kiwi */
+  --sidebar-accent-foreground: 0 0% 0%;  /* Black */
+  --sidebar-border: 0 0% 0%;         /* Black */
+  --sidebar-ring: 80 55% 62%;        /* Kiwi */
 }
 
 .text-category-family {

@@ -33,66 +33,66 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* HOW TO PLAY Section */}
-      <section className="relative z-20 py-16 bg-background overflow-hidden">
+      <section className="relative z-20 py-16 bg-black text-white overflow-hidden">
         {/* Fun background elements */}
-        <div className="absolute -top-16 -left-16 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/4 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-16 -left-16 w-32 h-32 bg-[#bbd665]/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 right-0 w-48 h-48 bg-[#bbd665]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-[#bbd665]/10 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto text-white">
-              HOW TO <span className="text-primary relative">PLAY
-                <span className="absolute -top-1 -right-4 text-yellow-400 text-lg">✨</span>
+              HOW TO <span className="text-[#bbd665] relative">PLAY
+                <span className="absolute -top-1 -right-4 text-[#bbd665] text-lg">✨</span>
               </span>
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto mb-6 text-lg">
-              Just <span className="text-primary font-medium">three simple steps</span> to start winning amazing prizes!
+            <p className="text-gray-300 max-w-2xl mx-auto mb-6 text-lg">
+              Just <span className="text-[#bbd665] font-medium">three simple steps</span> to start winning amazing prizes!
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="bg-white rounded-xl p-8 border border-primary/20 transition-all duration-300 shadow-[0_0_20px_rgba(5,138,99,0.2)] hover:shadow-[0_0_30px_rgba(5,138,99,0.4)] group relative overflow-hidden">
+            <div className="bg-white rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
               {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">1</div>
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-[#bbd665] rounded-full flex items-center justify-center text-black font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">1</div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-20 h-20 bg-[#bbd665]/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-[#bbd665]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Get Your Tickets</h3>
+                <h3 className="text-2xl font-bold text-black mb-3">Get Your Tickets</h3>
                 <p className="text-gray-700">Browse our amazing competitions and secure your tickets to win. The more tickets, the better your chances!</p>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-8 border border-purple-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(168,85,247,0.2)] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] group relative overflow-hidden">
+            <div className="bg-white rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
               {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">2</div>
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">2</div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 bg-purple-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-20 h-20 bg-black/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Watch Live Draws</h3>
+                <h3 className="text-2xl font-bold text-black mb-3">Watch Live Draws</h3>
                 <p className="text-gray-700">All winners are selected randomly during our exciting live streamed draws. Get ready for the thrill!</p>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-8 border border-blue-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] group relative overflow-hidden">
+            <div className="bg-white rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
               {/* Number badge */}
-              <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">3</div>
+              <div className="absolute -top-3 -right-3 w-12 h-12 bg-[#bbd665] rounded-full flex items-center justify-center text-black font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">3</div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-20 h-20 bg-[#bbd665]/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-[#bbd665]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Win & Celebrate!</h3>
+                <h3 className="text-2xl font-bold text-black mb-3">Win & Celebrate!</h3>
                 <p className="text-gray-700">Get notified when you win and celebrate your new prize! We'll deliver it straight to your door.</p>
               </div>
             </div>
@@ -101,23 +101,23 @@ export default function HomePage() {
       </section>
       
       {/* Featured Competitions Section */}
-      <section className="py-24 bg-background relative overflow-hidden">
+      <section className="py-24 bg-white relative overflow-hidden">
         {/* Fun background elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#bbd665]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-0 w-80 h-80 bg-black/5 rounded-full blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto">
-              <span className="text-primary relative">Live</span> Competitions
+            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto text-black">
+              <span className="text-[#bbd665] relative">Live</span> Competitions
             </h2>
-            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg font-light">
-              Don't miss your chance to win these <span className="text-primary font-medium">amazing prizes</span>! New competitions added regularly.
+            <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg font-light">
+              Don't miss your chance to win these <span className="text-[#bbd665] font-medium">amazing prizes</span>! New competitions added regularly.
             </p>
             
             {/* Decorative line with highlight */}
-            <div className="relative w-32 h-1.5 bg-primary/30 mx-auto mt-8 rounded-full overflow-hidden">
-              <div className="absolute inset-0 w-full h-full bg-primary animate-shine" 
+            <div className="relative w-32 h-1.5 bg-[#bbd665]/30 mx-auto mt-8 rounded-full overflow-hidden">
+              <div className="absolute inset-0 w-full h-full bg-[#bbd665] animate-shine" 
                 style={{ backgroundImage: 'linear-gradient(to right, transparent, rgba(255,255,255,0.5) 50%, transparent 100%)' }}>
               </div>
             </div>
@@ -125,20 +125,20 @@ export default function HomePage() {
           
           {isLoading ? (
             <div className="flex flex-col justify-center items-center py-32">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-              <p className="text-muted-foreground animate-pulse">Loading amazing competitions...</p>
+              <Loader2 className="h-12 w-12 animate-spin text-[#bbd665] mb-4" />
+              <p className="text-gray-500 animate-pulse">Loading amazing competitions...</p>
             </div>
           ) : featuredCompetitions?.length === 0 ? (
-            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-border rounded-xl">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 animate-pulse-slow">
-                <i className="fas fa-trophy text-primary text-3xl"></i>
+            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-gray-300 rounded-xl">
+              <div className="w-20 h-20 bg-[#bbd665]/10 rounded-full flex items-center justify-center mb-6 animate-pulse-slow">
+                <i className="fas fa-trophy text-[#bbd665] text-3xl"></i>
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3">No Active Competitions</h3>
-              <p className="text-muted-foreground max-w-md text-center mb-6">
+              <h3 className="text-2xl font-bold text-black mb-3">No Active Competitions</h3>
+              <p className="text-gray-600 max-w-md text-center mb-6">
                 We're preparing some exciting new competitions. Check back soon or follow us on social media for updates!
               </p>
               <Link to="/how-to-play">
-                <Button variant="outline" className="border-primary border-2 text-primary hover:bg-primary/10">
+                <Button variant="outline" className="border-[#bbd665] border-2 text-black hover:bg-[#bbd665]/10">
                   Learn How Competitions Work
                 </Button>
               </Link>
@@ -153,7 +153,7 @@ export default function HomePage() {
           
           <div className="text-center">
             <Link to="/competitions">
-              <Button size="lg" className="group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-primary/20">
+              <Button size="lg" className="bg-[#bbd665] hover:bg-[#a8c252] text-black group shine-btn px-8 py-6 text-lg font-semibold shadow-lg shadow-[#bbd665]/20">
                 <Ticket className="mr-2 h-5 w-5" /> View All Competitions <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
