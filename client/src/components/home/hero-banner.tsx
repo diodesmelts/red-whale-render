@@ -195,7 +195,7 @@ export function HeroBanner() {
             <Link to={heroBannerCompetition ? `/competitions/${heroBannerCompetition.id}` : "/competitions"}>
               <Button 
                 size="lg"
-                className="bg-red-800 hover:bg-red-900 text-white font-bold py-5 px-8 rounded-md text-xl flex items-center gap-2"
+                className="bg-[#bbd665] hover:bg-[#a8c252] text-black font-bold py-5 px-8 rounded-md text-xl flex items-center gap-2"
               >
                 Enter now <Ticket className="h-5 w-5 ml-1" />
               </Button>
