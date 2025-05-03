@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Clock, Ticket, Trophy, Award, Gift, Sparkles, PartyPopper, TrendingUp } from "lucide-react";
+import { Loader2, Clock, Ticket, Trophy, Award, Gift, Sparkles, PartyPopper, TrendingUp, ChevronRight } from "lucide-react";
 import { SiteConfig, Competition } from "@shared/schema";
 import { getImageUrl, cn } from "@/lib/utils";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -35,7 +35,7 @@ export function HeroBanner() {
       const res = await fetch("/api/site-config/heroBannerTitle");
       if (!res.ok) {
         if (res.status === 404) {
-          return { key: "heroBannerTitle", value: "WIN A PLAYSTATION 5" };
+          return { key: "heroBannerTitle", value: "WIN THIS VW TIGUAN R + £10,000" };
         }
         throw new Error("Failed to fetch hero banner title");
       }
@@ -75,16 +75,16 @@ export function HeroBanner() {
   
   // Make sure the URL is absolute for cross-domain compatibility using our utility function
   const absoluteBackgroundImage = getImageUrl(backgroundImage);
+  const competitionImage = heroBannerCompetition?.imageUrl ? getImageUrl(heroBannerCompetition.imageUrl) : "";
 
-  // Format time remaining for competition
-  const formatTimeRemaining = (drawDate: Date | string | null) => {
-    if (!drawDate) return "N/A";
+  // Get draw date and format for display
+  const getDrawDate = (drawDate: string | Date | null) => {
+    if (!drawDate) return "Soon";
     try {
-      const date = new Date(drawDate);
-      return formatDistanceToNow(date, { addSuffix: true });
+      return format(new Date(drawDate), "EEEE h:mm a");
     } catch (error) {
-      console.error("Error formatting date:", error);
-      return "Coming soon";
+      console.error("Error formatting draw date:", error);
+      return "Coming Soon";
     }
   };
 
@@ -95,125 +95,97 @@ export function HeroBanner() {
   };
 
   // Countdown timer
-  const [countdown, setCountdown] = useState({ hours: 8, minutes: 33, seconds: 59 });
+  const [countdown, setCountdown] = useState({ days: 0, hours: 8, minutes: 33, seconds: 59 });
   
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+    // If we have a draw date, calculate countdown based on that
+    if (heroBannerCompetition?.drawDate) {
+      const drawDate = new Date(heroBannerCompetition.drawDate);
+      const updateCountdown = () => {
+        const now = new Date();
+        const diff = drawDate.getTime() - now.getTime();
+        if (diff <= 0) {
+          setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
         }
-        return prev;
-      });
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, []);
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        setCountdown({ days, hours, minutes, seconds });
+      };
+      
+      updateCountdown();
+      const timer = setInterval(updateCountdown, 1000);
+      return () => clearInterval(timer);
+    } else {
+      // Fallback timer if no draw date available
+      const timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev.seconds > 0) {
+            return { ...prev, seconds: prev.seconds - 1 };
+          } else if (prev.minutes > 0) {
+            return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+          } else if (prev.hours > 0) {
+            return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+          } else if (prev.days > 0) {
+            return { days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
+          }
+          return prev;
+        });
+      }, 1000);
+      
+      return () => clearInterval(timer);
+    }
+  }, [heroBannerCompetition?.drawDate]);
 
   const isLoading = isLoadingBanner || isLoadingCompetitions || isLoadingTitle;
-  const title = heroBannerTitle?.value || "WIN A PLAYSTATION 5";
+  const title = heroBannerTitle?.value || "WIN THIS CAR + £10,000";
 
   return (
     <section 
-      className={`relative pt-16 md:pt-0 pb-16 md:pb-0 overflow-hidden ${
-        hasBackgroundImage 
-          ? "bg-cover bg-center" 
-          : "bg-gradient-to-r from-primary to-primary/80"
-      }`}
-      style={hasBackgroundImage ? { 
-        backgroundImage: `linear-gradient(rgba(5, 138, 99, 0.85), rgba(5, 138, 99, 0.75)), url(${absoluteBackgroundImage})`,
-        zIndex: -1
-      } : {}}
+      className="relative w-full h-[600px] md:h-[450px] lg:h-[500px] overflow-hidden bg-gradient-to-r from-primary to-primary/95 text-white"
     >
+      {/* Full width hero image container */}
+      <div 
+        className="absolute inset-0 w-full h-full bg-cover bg-center"
+        style={{
+          backgroundImage: heroBannerCompetition?.imageUrl 
+            ? `linear-gradient(to right, rgba(5, 138, 99, 0.9) 0%, rgba(5, 138, 99, 0.9) 30%, rgba(5, 138, 99, 0.3) 60%, transparent 100%), url(${competitionImage})`
+            : 'linear-gradient(to right, #058a63, #058a63)',
+          backgroundPosition: 'center right',
+          backgroundSize: 'cover'
+        }}
+      />
+
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-[90] flex flex-col md:flex-row md:items-center md:min-h-[700px]">
-        {/* Left Side Content */}
-        <div className="md:w-[65%] py-12 md:py-24">
-          {/* Win Tab */}
-          <div className="inline-block bg-accent text-white font-bold px-6 py-2 mb-4 text-lg rounded-md shadow-md">
-            WIN
-          </div>
-          
-          {/* Main Title - Using title from site config */}
-          <h1 className="text-6xl md:text-8xl font-extrabold mb-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)] tracking-wide max-w-[95%] leading-[1.1]">
+      <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-center px-6 sm:px-8 lg:px-12">
+        <div className="w-full md:w-2/3 lg:w-1/2">
+          {/* Main Title - Bold, Large Text */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-4 text-white tracking-tight leading-[1.1]">
             {title}
           </h1>
           
-          {heroBannerCompetition && !isLoading ? (
-            <div className="flex flex-col space-y-6">
-              {/* Price and Tickets Section */}
-              <div className="flex flex-col">
-                <div className="flex items-center mb-2">
-                  <span className="text-3xl font-bold text-white">
-                    £{(heroBannerCompetition.ticketPrice / 100).toFixed(2)}
-                  </span>
-                </div>
-                <div className="text-white text-sm">
-                  {heroBannerCompetition.ticketsSold || 0} / {heroBannerCompetition.totalTickets} TICKETS LEFT
-                </div>
-              </div>
-              
-              {/* Countdown Timer */}
-              <div className="mb-2 text-white font-medium text-lg">Draw closes in:</div>
-              <div className="flex gap-4">
-                <div className="bg-white w-20 h-20 flex flex-col items-center justify-center text-primary rounded-lg shadow-xl border-2 border-white/30">
-                  <span className="font-bold text-2xl">{countdown.hours}</span>
-                  <span className="text-xs font-medium uppercase">Hours</span>
-                </div>
-                <div className="bg-white w-20 h-20 flex flex-col items-center justify-center text-primary rounded-lg shadow-xl border-2 border-white/30">
-                  <span className="font-bold text-2xl">{countdown.minutes}</span>
-                  <span className="text-xs font-medium uppercase">Mins</span>
-                </div>
-                <div className="bg-accent w-20 h-20 flex flex-col items-center justify-center text-white rounded-lg shadow-xl border-2 border-white/30 animate-pulse">
-                  <span className="font-bold text-2xl">{countdown.seconds}</span>
-                  <span className="text-xs font-medium uppercase">Secs</span>
-                </div>
-              </div>
-              
-              {/* Enter Button */}
-              <div className="mt-6">
-                <Link to={`/competitions/${heroBannerCompetition.id}`}>
-                  <Button 
-                    size="lg" 
-                    className="bg-white hover:bg-gray-100 text-primary font-extrabold px-10 py-7 text-2xl uppercase tracking-wide shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-accent/30 hover:shadow-xl"
-                  >
-                    Enter Competition
-                  </Button>
-                </Link>
-              </div>
-              
-              {/* Trustpilot Reviews */}
-              <div className="flex items-center mt-6 bg-white/20 p-3 rounded-lg backdrop-blur-sm">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-5 h-5 text-accent fill-current" viewBox="0 0 24 24">
-                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-white text-sm ml-2 font-medium">TrustScore 4.9 | 2,845 reviews</span>
-              </div>
+          {/* Draw Date */}
+          {heroBannerCompetition?.drawDate && (
+            <div className="mb-6 bg-primary px-4 py-2 inline-block rounded-md text-xl font-bold tracking-wide">
+              DRAW {getDrawDate(heroBannerCompetition.drawDate)}
             </div>
-          ) : (
-            <p className="text-white text-lg mb-6 opacity-90">Crazy odds. High win rates. Investing in fun!</p>
           )}
-        </div>
-        
-        {/* Right Side - Images */}
-        <div className="hidden md:block md:w-[35%]">
-          {hasBackgroundImage && heroBannerCompetition?.imageUrl && (
-            <div className="flex items-center justify-center h-full">
-              <div className="rounded-xl overflow-hidden w-[90%] bg-white p-4 shadow-2xl transform scale-110">
-                <img 
-                  src={getImageUrl(heroBannerCompetition.imageUrl)} 
-                  alt={heroBannerCompetition.title || "Competition prize"} 
-                  className="w-full h-auto object-cover rounded-lg transition-transform hover:scale-105 duration-300"
-                />
-              </div>
+          
+          {/* Enter Button */}
+          {heroBannerCompetition && (
+            <div className="mt-4">
+              <Link to={`/competitions/${heroBannerCompetition.id}`}>
+                <Button 
+                  size="lg"
+                  className="bg-[#0093e0] hover:bg-[#0083c8] text-white font-bold py-3 px-6 rounded-md flex items-center gap-1 text-lg"
+                >
+                  Enter now <ChevronRight className="h-5 w-5 ml-1" />
+                </Button>
+              </Link>
             </div>
           )}
         </div>
@@ -222,7 +194,7 @@ export function HeroBanner() {
       {/* Loading indicator */}
       {isLoading && (
         <div className="absolute top-2 right-2">
-          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          <Loader2 className="h-4 w-4 animate-spin text-white" />
         </div>
       )}
     </section>
