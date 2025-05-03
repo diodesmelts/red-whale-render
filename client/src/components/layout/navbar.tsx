@@ -31,8 +31,8 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-[200]">
-      {/* Announcement strip with black background and kiwi green text */}
-      <div className="bg-black text-[#bbd665] py-2.5 shadow-sm">
+      {/* Announcement strip with kiwi green background and black text */}
+      <div className="bg-[#bbd665] text-black py-2.5 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 text-center text-sm font-medium">
           <span className="inline-flex items-center">
             <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,15 +43,15 @@ export function Navbar() {
         </div>
       </div>
       
-      {/* Main navbar with Black background and complementary text */}
-      <div className="bg-black text-[#bbd665] shadow-md relative overflow-hidden">
+      {/* Main navbar with Black background and white text */}
+      <div className="bg-black text-white shadow-md relative overflow-hidden">
         <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">          
           <div className="flex items-center justify-between h-24 relative z-10">
             <div className="flex items-center">
               <div className="flex-shrink-0 pl-2 sm:pl-4">
                 <Link href="/">
                   <div className="flex items-center space-x-2 cursor-pointer">
-                    <span className="text-2xl font-bold text-[#bbd665]">MobyComps</span>
+                    <span className="text-2xl font-bold text-white">MobyComps</span>
                   </div>
                 </Link>
               </div>
@@ -60,32 +60,32 @@ export function Navbar() {
                   <Link href="/" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location === "/" 
-                      ? "text-[#bbd665] font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#bbd665] after:rounded-full" 
-                      : "text-[#bbd665]/80 hover:text-[#bbd665] hover:bg-white/5"
+                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
+                      : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
                     <i className="fas fa-home mr-2"></i> Home
                   </Link>
                   <Link href="/competitions" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location.includes("/competitions") 
-                      ? "text-[#bbd665] font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#bbd665] after:rounded-full" 
-                      : "text-[#bbd665]/80 hover:text-[#bbd665] hover:bg-white/5"
+                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
+                      : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
                     <i className="fas fa-trophy mr-2"></i> Competitions
                   </Link>
                   <Link href="/how-to-play" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location === "/how-to-play" 
-                      ? "text-[#bbd665] font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#bbd665] after:rounded-full" 
-                      : "text-[#bbd665]/80 hover:text-[#bbd665] hover:bg-white/5"
+                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
+                      : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
                     <i className="fas fa-question-circle mr-2"></i> How to Play
                   </Link>
                   <Link href="/faqs" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location === "/faqs" 
-                      ? "text-[#bbd665] font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#bbd665] after:rounded-full" 
-                      : "text-[#bbd665]/80 hover:text-[#bbd665] hover:bg-white/5"
+                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
+                      : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
                     <i className="fas fa-info-circle mr-2"></i> FAQs
                   </Link>
@@ -94,16 +94,16 @@ export function Navbar() {
                       <Link href="/my-entries" className={cn(
                         "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                         location === "/my-entries" 
-                          ? "text-[#bbd665] font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#bbd665] after:rounded-full" 
-                          : "text-[#bbd665]/80 hover:text-[#bbd665] hover:bg-white/5"
+                          ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
+                          : "text-white/80 hover:text-white hover:bg-white/5"
                       )}>
                         <i className="fas fa-clipboard-list mr-2"></i> My Entries
                       </Link>
                       <Link href="/my-wins" className={cn(
                         "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                         location === "/my-wins" 
-                          ? "text-[#bbd665] font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#bbd665] after:rounded-full" 
-                          : "text-[#bbd665]/80 hover:text-[#bbd665] hover:bg-white/5"
+                          ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
+                          : "text-white/80 hover:text-white hover:bg-white/5"
                       )}>
                         <i className="fas fa-award mr-2"></i> My Wins
                       </Link>
@@ -199,7 +199,7 @@ export function Navbar() {
                     <Button 
                       variant="outline" 
                       onClick={() => window.location.href = '/auth'} 
-                      className="px-5 py-2 h-auto bg-transparent text-[#bbd665] font-semibold border-2 border-[#bbd665]/80 hover:bg-[#bbd665]/10 transition-all">
+                      className="px-5 py-2 h-auto bg-transparent text-white font-semibold border-2 border-white/80 hover:bg-white/10 transition-all">
                       Login
                     </Button>
                     <Button 
@@ -323,10 +323,10 @@ export function Navbar() {
                     ) : (
                       <div className="flex flex-col space-y-3">
                         <Link href="/auth" onClick={() => setIsMenuOpen(false)}>
-                          <Button className="w-full bg-primary text-white font-semibold">Login</Button>
+                          <Button className="w-full bg-transparent text-white font-semibold border-2 border-white/80 hover:bg-white/10">Login</Button>
                         </Link>
                         <Link href="/auth?tab=register" onClick={() => setIsMenuOpen(false)}>
-                          <Button className="w-full bg-purple-600 text-white font-semibold hover:bg-purple-700">Register</Button>
+                          <Button className="w-full bg-[#bbd665] text-black font-semibold border-2 border-[#bbd665] hover:bg-[#a8c252]">Register</Button>
                         </Link>
                       </div>
                     )}
