@@ -32,8 +32,8 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-[200]">
-      {/* Announcement strip with emerald accent */}
-      <div className="bg-accent text-white py-2.5 shadow-sm">
+      {/* Announcement strip with purple color */}
+      <div className="bg-purple-600 text-white py-2.5 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 text-center text-sm font-medium">
           <span className="inline-flex items-center">
             <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -205,7 +205,7 @@ export function Navbar() {
                     </Button>
                     <Button 
                       onClick={() => window.location.href = '/auth?tab=register'} 
-                      className="px-5 py-2 h-auto bg-accent text-white font-semibold border-2 border-accent hover:bg-accent/90 transition-all">
+                      className="px-5 py-2 h-auto bg-purple-600 text-white font-semibold border-2 border-purple-600 hover:bg-purple-700 transition-all">
                       Register
                     </Button>
                   </div>
@@ -326,7 +326,7 @@ export function Navbar() {
                           <Button className="w-full bg-primary text-white font-semibold">Login</Button>
                         </Link>
                         <Link href="/auth?tab=register" onClick={() => setIsMenuOpen(false)}>
-                          <Button className="w-full bg-accent text-white font-semibold hover:bg-accent/90">Register</Button>
+                          <Button className="w-full bg-purple-600 text-white font-semibold hover:bg-purple-700">Register</Button>
                         </Link>
                       </div>
                     )}
