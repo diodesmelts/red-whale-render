@@ -44,8 +44,8 @@ export function Navbar() {
         </div>
       </div>
       
-      {/* Main navbar with dark purple background */}
-      <div className="bg-primary text-white shadow-md relative overflow-hidden">
+      {/* Main navbar with Kiwi Crush color background */}
+      <div className="bg-[#bbd665] text-black shadow-md relative overflow-hidden">
         <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">          
           <div className="flex items-center justify-between h-24 relative z-10">
             <div className="flex items-center">
@@ -61,32 +61,32 @@ export function Navbar() {
                   <Link href="/" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location === "/" 
-                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
-                      : "text-white/80 hover:text-white hover:bg-secondary/30"
+                      ? "text-black font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-black after:rounded-full" 
+                      : "text-black/80 hover:text-black hover:bg-secondary/30"
                   )}>
                     <i className="fas fa-home mr-2"></i> Home
                   </Link>
                   <Link href="/competitions" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location.includes("/competitions") 
-                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
-                      : "text-white/80 hover:text-white hover:bg-secondary/30"
+                      ? "text-black font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-black after:rounded-full" 
+                      : "text-black/80 hover:text-black hover:bg-secondary/30"
                   )}>
                     <i className="fas fa-trophy mr-2"></i> Competitions
                   </Link>
                   <Link href="/how-to-play" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location === "/how-to-play" 
-                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
-                      : "text-white/80 hover:text-white hover:bg-secondary/30"
+                      ? "text-black font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-black after:rounded-full" 
+                      : "text-black/80 hover:text-black hover:bg-secondary/30"
                   )}>
                     <i className="fas fa-question-circle mr-2"></i> How to Play
                   </Link>
                   <Link href="/faqs" className={cn(
                     "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                     location === "/faqs" 
-                      ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
-                      : "text-white/80 hover:text-white hover:bg-secondary/30"
+                      ? "text-black font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-black after:rounded-full" 
+                      : "text-black/80 hover:text-black hover:bg-secondary/30"
                   )}>
                     <i className="fas fa-info-circle mr-2"></i> FAQs
                   </Link>
@@ -95,16 +95,16 @@ export function Navbar() {
                       <Link href="/my-entries" className={cn(
                         "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                         location === "/my-entries" 
-                          ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
-                          : "text-white/80 hover:text-white hover:bg-secondary/30"
+                          ? "text-black font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-black after:rounded-full" 
+                          : "text-black/80 hover:text-black hover:bg-secondary/30"
                       )}>
                         <i className="fas fa-clipboard-list mr-2"></i> My Entries
                       </Link>
                       <Link href="/my-wins" className={cn(
                         "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
                         location === "/my-wins" 
-                          ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
-                          : "text-white/80 hover:text-white hover:bg-secondary/30"
+                          ? "text-black font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-black after:rounded-full" 
+                          : "text-black/80 hover:text-black hover:bg-secondary/30"
                       )}>
                         <i className="fas fa-award mr-2"></i> My Wins
                       </Link>
