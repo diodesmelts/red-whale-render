@@ -28,11 +28,11 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
   const getBorderColorClass = () => {
     switch (competition.category) {
       case "family":
-        return "border-yellow-400";
+        return "border-accent";
       case "household":
         return "border-pink-400";
       case "cash":
-        return "border-green-400";
+        return "border-primary";
       default:
         return "border-primary";
     }
@@ -41,11 +41,11 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
   const getButtonColorClass = () => {
     switch (competition.category) {
       case "family":
-        return "bg-yellow-500 hover:bg-yellow-600";
+        return "bg-accent hover:bg-accent/90";
       case "household":
         return "bg-pink-500 hover:bg-pink-600";
       case "cash":
-        return "bg-green-500 hover:bg-green-600";
+        return "bg-primary hover:bg-primary/90";
       default:
         return "bg-primary hover:bg-primary/90";
     }
@@ -54,20 +54,20 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
   const getGlowColorClass = () => {
     switch (competition.category) {
       case "family":
-        return "shadow-[0_0_15px_rgba(255,193,7,0.5)]";
+        return "shadow-[0_0_15px_rgba(255,149,40,0.5)]";
       case "household":
         return "shadow-[0_0_15px_rgba(255,77,148,0.5)]";
       case "cash":
-        return "shadow-[0_0_15px_rgba(76,175,80,0.5)]";
+        return "shadow-[0_0_15px_rgba(5,138,99,0.5)]";
       default:
-        return "shadow-[0_0_15px_rgba(0,153,255,0.5)]";
+        return "shadow-[0_0_15px_rgba(5,138,99,0.5)]";
     }
   };
 
   return (
     <motion.div
       className={cn(
-        "bg-card rounded-lg overflow-hidden shadow-lg border border-border transform transition-all duration-300",
+        "bg-white rounded-xl overflow-hidden shadow-lg border-2 border-border transform transition-all duration-300",
         isHovered && `${getBorderColorClass()} ${getGlowColorClass()}`
       )}
       whileHover={{ scale: 1.03 }}
@@ -77,7 +77,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
       <div className="relative">
         <img 
           className="w-full h-48 object-cover" 
-          src={competition.imageUrl || "https://placehold.co/600x400/1a1f2b/FFFFFF/png?text=No+Image"}
+          src={competition.imageUrl || "https://placehold.co/600x400/f0f0f0/333333/png?text=No+Image"}
           alt={competition.title}
         />
         
@@ -85,31 +85,31 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         
         {/* Highlight badges for special competitions */}
         {percentSold > 80 && (
-          <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-2 py-1 m-2 rounded animate-pulse">
+          <div className="absolute top-0 right-0 bg-accent text-white text-xs font-bold px-2 py-1 m-2 rounded-md animate-pulse">
             HOT ITEM
           </div>
         )}
         {timeRemaining.days === 0 && timeRemaining.hours < 12 && (
-          <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 py-1 m-2 rounded animate-pulse">
+          <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 py-1 m-2 rounded-md animate-pulse">
             ENDING SOON
           </div>
         )}
         
         {/* Gradient overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent h-16"></div>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/70 to-transparent h-16"></div>
       </div>
       
       <div className="p-4">
         <Link href={`/competitions/${competition.id}`}>
-          <h3 className="text-lg font-semibold text-white mb-1 cursor-pointer">{competition.title}</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-1 cursor-pointer hover:text-primary transition-colors">{competition.title}</h3>
         </Link>
         
         <div className="flex justify-between items-center mb-3">
-          <span className="font-bold text-white">
-            {ticketPrice} <span className="text-white text-xs opacity-80">per ticket</span>
+          <span className="font-bold text-primary text-lg">
+            {ticketPrice} <span className="text-muted-foreground text-xs">per ticket</span>
           </span>
-          <span className="text-white text-sm opacity-80">
-            <Ticket className="h-3 w-3 inline mr-1" /> {remainingTickets} tickets remaining
+          <span className="text-muted-foreground text-sm">
+            <Ticket className="h-3 w-3 inline mr-1 text-primary" /> {remainingTickets} tickets remaining
           </span>
         </div>
         
@@ -119,7 +119,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         
         <Link href={`/competitions/${competition.id}`}>
           <div className={cn(
-            "block w-full px-4 py-2 text-white text-center rounded-md font-medium transform transition-all duration-150 cursor-pointer",
+            "block w-full px-4 py-2 text-white text-center rounded-md font-medium transform transition-all duration-200 cursor-pointer shadow-md",
             getButtonColorClass(),
             "relative overflow-hidden group"
           )}>

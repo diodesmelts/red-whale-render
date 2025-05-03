@@ -11,11 +11,11 @@ export function CategoryBadge({ category, brand, className }: CategoryBadgeProps
   const getBgColor = () => {
     switch (category.toLowerCase()) {
       case "family":
-        return "bg-yellow-500";
+        return "bg-accent";
       case "household":
         return "bg-pink-500";
       case "cash":
-        return "bg-green-500";
+        return "bg-primary";
       default:
         return "bg-primary";
     }
@@ -39,11 +39,11 @@ export function CategoryBadge({ category, brand, className }: CategoryBadgeProps
   
   return (
     <div className={cn(
-      "text-white text-xs font-bold px-2 py-1 rounded uppercase flex items-center",
+      "text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase flex items-center shadow-md",
       getBgColor(),
       className
     )}>
-      <i className={`${getIcon()} mr-1`}></i>
+      <i className={`${getIcon()} mr-1.5`}></i>
       {displayText}
     </div>
   );
