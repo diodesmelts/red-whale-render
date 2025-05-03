@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Clock, Ticket, Trophy, Award, Gift, Sparkles, PartyPopper, TrendingUp, ChevronRight } from "lucide-react";
+import { Loader2, Clock, Ticket, Trophy, Award, Gift, Sparkles, PartyPopper, TrendingUp, ChevronRight, CreditCard } from "lucide-react";
 import { SiteConfig, Competition } from "@shared/schema";
 import { getImageUrl, cn } from "@/lib/utils";
 import { Link } from "wouter";
@@ -142,7 +142,9 @@ export function HeroBanner() {
   }, [heroBannerCompetition?.drawDate]);
 
   const isLoading = isLoadingBanner || isLoadingCompetitions || isLoadingTitle;
-  const title = heroBannerTitle?.value || "WIN THIS CAR + £10,000";
+  // Hardcoded title and date for the hero banner as requested
+  const title = "WIN THIS BEAUTIFUL NINJA AIR FRYER";
+  const drawDateText = "DRAW 10TH MAY 9PM";
 
   return (
     <section 
@@ -168,26 +170,22 @@ export function HeroBanner() {
             {title}
           </h1>
           
-          {/* Draw Date */}
-          {heroBannerCompetition?.drawDate && (
-            <div className="mb-6 bg-primary px-4 py-2 inline-block rounded-md text-xl font-bold tracking-wide">
-              DRAW {getDrawDate(heroBannerCompetition.drawDate)}
-            </div>
-          )}
+          {/* Draw Date - Fixed text as per request */}
+          <div className="mb-8 text-[#38b6ff] text-3xl font-bold tracking-wide">
+            {drawDateText}
+          </div>
           
-          {/* Enter Button */}
-          {heroBannerCompetition && (
-            <div className="mt-4">
-              <Link to={`/competitions/${heroBannerCompetition.id}`}>
-                <Button 
-                  size="lg"
-                  className="bg-[#0093e0] hover:bg-[#0083c8] text-white font-bold py-3 px-6 rounded-md flex items-center gap-1 text-lg"
-                >
-                  Enter now <ChevronRight className="h-5 w-5 ml-1" />
-                </Button>
-              </Link>
-            </div>
-          )}
+          {/* Enter Button - Styled like the reference image */}
+          <div className="mt-4">
+            <Link to={heroBannerCompetition ? `/competitions/${heroBannerCompetition.id}` : "/competitions"}>
+              <Button 
+                size="lg"
+                className="bg-[#38b6ff] hover:bg-[#2aa0e6] text-white font-bold py-5 px-8 rounded-md text-xl flex items-center gap-2"
+              >
+                Enter now <Ticket className="h-5 w-5 ml-1" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
