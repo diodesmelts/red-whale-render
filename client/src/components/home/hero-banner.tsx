@@ -161,17 +161,17 @@ export function HeroBanner() {
 
   return (
     <section 
-      className="relative w-full h-[600px] md:h-[450px] lg:h-[500px] overflow-hidden bg-gradient-to-r from-black to-black/95 text-white"
+      className="relative w-full h-[600px] md:h-[450px] lg:h-[500px] overflow-hidden bg-gradient-to-r from-[#002147] to-[#002147]/95 text-white"
     >
       {/* Full width hero image container */}
       <div 
         className="absolute inset-0 w-full h-full bg-cover bg-center"
         style={{
           backgroundImage: heroBannerCompetition?.imageUrl 
-            ? `linear-gradient(to right, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0.3) 60%, transparent 100%), url(${competitionImage})`
+            ? `linear-gradient(to right, rgba(0, 33, 71, 0.95) 0%, rgba(0, 33, 71, 0.9) 30%, rgba(0, 33, 71, 0.3) 60%, transparent 100%), url(${competitionImage})`
             : absoluteBackgroundImage 
-              ? `linear-gradient(to right, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0.3) 60%, transparent 100%), url(${absoluteBackgroundImage})`
-              : 'linear-gradient(to right, #000000, #000000)',
+              ? `linear-gradient(to right, rgba(0, 33, 71, 0.95) 0%, rgba(0, 33, 71, 0.9) 30%, rgba(0, 33, 71, 0.3) 60%, transparent 100%), url(${absoluteBackgroundImage})`
+              : 'linear-gradient(to right, #002147, #002147)',
           backgroundPosition: 'center right',
           backgroundSize: 'cover'
         }}

@@ -43,8 +43,8 @@ export function Navbar() {
         </div>
       </div>
       
-      {/* Main navbar with Black background and white text */}
-      <div className="bg-black text-white shadow-md relative overflow-hidden">
+      {/* Main navbar with Oxford Blue background and white text */}
+      <div className="bg-[#002147] text-white shadow-md relative overflow-hidden">
         <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">          
           <div className="flex items-center justify-between h-24 relative z-10">
             <div className="flex items-center">
