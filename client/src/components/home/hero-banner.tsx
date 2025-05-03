@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Clock, Ticket, Trophy, Timer } from "lucide-react";
+import { Loader2, Clock, Ticket, Trophy, Award, Gift, Sparkles, PartyPopper, TrendingUp } from "lucide-react";
 import { SiteConfig, Competition } from "@shared/schema";
-import { getImageUrl } from "@/lib/utils";
+import { getImageUrl, cn } from "@/lib/utils";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export function HeroBanner() {
   const { data: heroBannerConfig, isLoading: isLoadingBanner } = useQuery<SiteConfig>({
