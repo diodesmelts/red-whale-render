@@ -33,7 +33,7 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* HOW TO PLAY Section */}
-      <section className="relative z-20 py-16 bg-black text-white overflow-hidden">
+      <section className="relative z-20 py-16 bg-white text-black overflow-hidden">
         {/* Fun background elements */}
         <div className="absolute -top-16 -left-16 w-32 h-32 bg-[#bbd665]/10 rounded-full blur-3xl"></div>
         <div className="absolute top-1/4 right-0 w-48 h-48 bg-[#bbd665]/10 rounded-full blur-3xl"></div>
@@ -41,23 +41,23 @@ export default function HomePage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto text-white">
+            <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto text-black">
               HOW TO <span className="text-[#bbd665] relative">PLAY
                 <span className="absolute -top-1 -right-4 text-[#bbd665] text-lg">✨</span>
               </span>
             </h2>
-            <p className="text-gray-300 max-w-2xl mx-auto mb-6 text-lg">
+            <p className="text-gray-600 max-w-2xl mx-auto mb-6 text-lg">
               Just <span className="text-[#bbd665] font-medium">three simple steps</span> to start winning amazing prizes!
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="bg-white rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
+            <div className="bg-[#bbd665]/10 rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-[#bbd665] rounded-full flex items-center justify-center text-black font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">1</div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 bg-[#bbd665]/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-[#bbd665]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                   </svg>
@@ -67,12 +67,12 @@ export default function HomePage() {
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
+            <div className="bg-black/5 rounded-xl p-8 border border-black/10 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.1)] hover:shadow-[0_0_30px_rgba(0,0,0,0.2)] group relative overflow-hidden">
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">2</div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 bg-black/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
@@ -82,12 +82,12 @@ export default function HomePage() {
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
+            <div className="bg-[#bbd665]/10 rounded-xl p-8 border border-[#bbd665]/20 transition-all duration-300 shadow-[0_0_20px_rgba(187,214,101,0.2)] hover:shadow-[0_0_30px_rgba(187,214,101,0.4)] group relative overflow-hidden">
               {/* Number badge */}
               <div className="absolute -top-3 -right-3 w-12 h-12 bg-[#bbd665] rounded-full flex items-center justify-center text-black font-bold text-xl shadow-lg transform rotate-12 transition-transform group-hover:rotate-0">3</div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 bg-[#bbd665]/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-[#bbd665]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
