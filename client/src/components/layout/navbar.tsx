@@ -1,7 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/ui/logo";
 import { Menu, ChevronDown, User, Shield, ClipboardList, Wallet, Settings, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -52,7 +51,7 @@ export function Navbar() {
               <div className="flex-shrink-0 pl-2 sm:pl-4">
                 <Link href="/">
                   <div className="flex items-center space-x-2 cursor-pointer">
-                    <Logo size="lg" />
+                    <span className="text-2xl font-bold">MobyComps</span>
                   </div>
                 </Link>
               </div>
@@ -220,7 +219,8 @@ export function Navbar() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[80%]">
-                  <div className="flex flex-col space-y-6 mt-6">
+                  <div className="text-2xl font-bold mb-6">MobyComps</div>
+                  <div className="flex flex-col space-y-6">
                     <Link href="/" 
                       onClick={() => setIsMenuOpen(false)}
                       className={cn(
