@@ -46,75 +46,75 @@ export function Navbar() {
       
       {/* Main navbar with Oxford Blue background and white text */}
       <div className="bg-[#002147] text-white shadow-md relative overflow-hidden">
-        <div className="relative max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">          
-          <div className="flex items-center justify-between h-24 relative z-10">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">          
+          <div className="flex items-center justify-between h-20 relative z-10">
             <div className="flex items-center">
-              <div className="flex-shrink-0 pl-2 sm:pl-4">
+              <div className="flex-shrink-0">
                 <Link href="/">
-                  <div className="flex items-center space-x-2 cursor-pointer">
-                    <Logo size="md" />
+                  <div className="flex items-center cursor-pointer">
+                    <Logo size="sm" />
                   </div>
                 </Link>
               </div>
               <div className="hidden md:block">
-                <div className="ml-10 flex items-center space-x-6">
+                <div className="ml-6 flex items-center space-x-2">
                   <Link href="/" className={cn(
-                    "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                    "px-3 py-2 text-sm font-medium flex items-center transition-all duration-200",
                     location === "/" 
                       ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
                       : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
-                    <i className="fas fa-home mr-2"></i> Home
+                    <i className="fas fa-home mr-1 text-xs"></i> Home
                   </Link>
                   <Link href="/competitions" className={cn(
-                    "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                    "px-3 py-2 text-sm font-medium flex items-center transition-all duration-200",
                     location.includes("/competitions") 
                       ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
                       : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
-                    <i className="fas fa-trophy mr-2"></i> Competitions
+                    <i className="fas fa-trophy mr-1 text-xs"></i> Competitions
                   </Link>
                   <Link href="/how-to-play" className={cn(
-                    "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                    "px-3 py-2 text-sm font-medium flex items-center transition-all duration-200",
                     location === "/how-to-play" 
                       ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
                       : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
-                    <i className="fas fa-question-circle mr-2"></i> How to Play
+                    <i className="fas fa-question-circle mr-1 text-xs"></i> How to Play
                   </Link>
                   <Link href="/about-us" className={cn(
-                    "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                    "px-3 py-2 text-sm font-medium flex items-center transition-all duration-200",
                     location === "/about-us" 
                       ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
                       : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
-                    <i className="fas fa-users mr-2"></i> About Us
+                    <i className="fas fa-users mr-1 text-xs"></i> About Us
                   </Link>
                   <Link href="/faqs" className={cn(
-                    "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                    "px-3 py-2 text-sm font-medium flex items-center transition-all duration-200",
                     location === "/faqs" 
                       ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
                       : "text-white/80 hover:text-white hover:bg-white/5"
                   )}>
-                    <i className="fas fa-info-circle mr-2"></i> FAQs
+                    <i className="fas fa-info-circle mr-1 text-xs"></i> FAQs
                   </Link>
                   {user && (
                     <>
                       <Link href="/my-entries" className={cn(
-                        "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                        "px-3 py-2 text-sm font-medium flex items-center transition-all duration-200",
                         location === "/my-entries" 
                           ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
                           : "text-white/80 hover:text-white hover:bg-white/5"
                       )}>
-                        <i className="fas fa-clipboard-list mr-2"></i> My Entries
+                        <i className="fas fa-clipboard-list mr-1 text-xs"></i> My Entries
                       </Link>
                       <Link href="/my-wins" className={cn(
-                        "px-4 py-3 text-base font-medium flex items-center transition-all duration-200",
+                        "px-3 py-2 text-sm font-medium flex items-center transition-all duration-200",
                         location === "/my-wins" 
                           ? "text-white font-bold relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:rounded-full" 
                           : "text-white/80 hover:text-white hover:bg-white/5"
                       )}>
-                        <i className="fas fa-award mr-2"></i> My Wins
+                        <i className="fas fa-award mr-1 text-xs"></i> My Wins
                       </Link>
                     </>
                   )}
@@ -130,14 +130,14 @@ export function Navbar() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" className="flex items-center bg-primary/30 hover:bg-primary/50 shadow-[0_0_8px_rgba(67,32,124,0.5)] border border-primary/40 transition-all hover:shadow-[0_0_12px_rgba(67,32,124,0.7)]">
-                          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center mr-2">
-                            <span className="font-semibold text-sm">
+                        <Button variant="secondary" className="flex items-center h-9 py-1 px-3 bg-primary/30 hover:bg-primary/50 shadow-[0_0_8px_rgba(67,32,124,0.5)] border border-primary/40 transition-all hover:shadow-[0_0_12px_rgba(67,32,124,0.7)]">
+                          <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center mr-1">
+                            <span className="font-semibold text-xs">
                               {user.displayName ? user.displayName[0].toUpperCase() : user.username[0].toUpperCase()}
                             </span>
                           </div>
-                          <span className="mr-1">{user.displayName || user.username}</span>
-                          <ChevronDown className="h-4 w-4" />
+                          <span className="mr-1 text-sm truncate max-w-[80px]">{user.displayName || user.username}</span>
+                          <ChevronDown className="h-3 w-3" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-56" align="end">
@@ -204,16 +204,16 @@ export function Navbar() {
                     </DropdownMenu>
                   </>
                 ) : (
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
                     <Button 
                       variant="outline" 
                       onClick={() => window.location.href = '/auth'} 
-                      className="px-5 py-2 h-auto bg-transparent text-white font-semibold border-2 border-white/80 hover:bg-white/10 transition-all">
+                      className="px-3 py-1 h-8 text-sm bg-transparent text-white font-medium border border-white/80 hover:bg-white/10 transition-all">
                       Login
                     </Button>
                     <Button 
                       onClick={() => window.location.href = '/auth?tab=register'} 
-                      className="px-5 py-2 h-auto bg-[#bbd665] text-black font-semibold border-2 border-[#bbd665] hover:bg-[#a8c252] transition-all">
+                      className="px-3 py-1 h-8 text-sm bg-[#bbd665] text-black font-medium border border-[#bbd665] hover:bg-[#a8c252] transition-all">
                       Register
                     </Button>
                   </div>
