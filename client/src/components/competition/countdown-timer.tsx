@@ -98,9 +98,9 @@ export function CountdownTimer({
     // Create a sleek, modern countdown timer
     return (
       <div className="flex items-center justify-center w-full">
-        <div className="flex items-center justify-between bg-gradient-to-r from-[#002147] to-[#003167] w-full px-4 py-1.5 rounded-full shadow-inner">
-          <div className="bg-[#bbd665] text-[#002147] font-bold text-[10px] px-2 py-0.5 rounded-full flex items-center animate-pulse">
-            <span className="mr-0.5 text-xs">•</span><span>LIVE</span>
+        <div className="flex flex-col bg-gradient-to-r from-[#002147] to-[#003167] w-full px-4 py-1.5 rounded-full shadow-inner">
+          <div className="bg-[#FFD700] text-[#002147] font-bold text-[10px] px-2 py-1 rounded-full flex items-center justify-center w-full mb-1.5">
+            <span>DRAW DATE</span>
           </div>
           
           <div className="flex items-center justify-center space-x-0.5 mx-auto">
@@ -135,8 +135,8 @@ export function CountdownTimer({
         <div className="flex justify-center items-center p-2">
           <div className="flex items-center space-x-3">
             <div className="flex items-center">
-              <div className="bg-[#bbd665] text-[#002147] font-bold text-[11px] px-2 py-0.5 rounded-md mr-2 animate-pulse flex items-center">
-                <span className="mr-0.5">•</span>LIVE
+              <div className="bg-[#FFD700] text-[#002147] font-bold text-[11px] px-2 py-0.5 rounded-md mr-2 flex items-center justify-center">
+                DRAW DATE
               </div>
               <span className="text-xs font-semibold hidden sm:inline text-white">TIME REMAINING</span>
             </div>
