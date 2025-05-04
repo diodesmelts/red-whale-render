@@ -352,7 +352,7 @@ export default function CompetitionDetails() {
               
               {/* Price */}
               <div className="text-center mb-4">
-                <div className="text-[#0099ff] text-3xl font-bold">
+                <div className="text-black text-3xl font-bold">
                   {formatCurrency(competition.ticketPrice)}
                 </div>
               </div>
@@ -461,17 +461,8 @@ export default function CompetitionDetails() {
                   )}
                 </button>
                 
-                {/* Trustpilot rating */}
-                <div className="mt-3 flex items-center justify-center">
-                  <div className="text-xs text-gray-700 mr-1">Excellent</div>
-                  <div className="flex">
-                    <span className="bg-green-500 text-white text-xs px-1">★★★★★</span>
-                  </div>
-                  <div className="text-xs text-gray-600 ml-1">4,202 reviews on <span className="text-gray-800 font-medium">Trustpilot</span></div>
-                </div>
-                
                 {/* Competition closes notice */}
-                <div className="mt-2 text-center bg-gray-50 p-2 rounded border border-gray-200">
+                <div className="mt-4 text-center bg-gray-50 p-2 rounded border border-gray-200">
                   <div className="text-xs font-medium">Competition closes Today at 8:45 PM</div>
                   <div className="text-xs text-gray-500">or when all tickets are sold</div>
                 </div>
