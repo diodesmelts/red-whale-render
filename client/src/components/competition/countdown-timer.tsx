@@ -96,32 +96,32 @@ export function CountdownTimer({
   
   if (variant === "card-header") {
     return (
-      <div className={cn("flex flex-col bg-[#bbd665] text-black w-full border-t-2 border-[#002147]", className)}>
+      <div className={cn("flex flex-col bg-[#002147] text-white w-full border-t-2 border-[#bbd665]", className)}>
         <div className="flex justify-center items-center p-2">
           <div className="flex items-center space-x-3">
             <div className="flex items-center">
-              <div className="bg-[#002147] text-white font-medium text-xs px-2 py-0.5 rounded-md mr-2 animate-pulse">LIVE</div>
-              <span className="text-xs font-semibold hidden sm:inline">TIME REMAINING</span>
+              <div className="bg-[#bbd665] text-[#002147] font-medium text-xs px-2 py-0.5 rounded-md mr-2 animate-pulse">LIVE</div>
+              <span className="text-xs font-semibold hidden sm:inline text-white">TIME REMAINING</span>
             </div>
             <div className="flex space-x-2">
               <div className="flex flex-col items-center">
-                <div className="text-[#002147] font-bold text-sm">{String(timeRemaining.days).padStart(2, '0')}</div>
-                <div className="text-[10px] font-medium">Days</div>
+                <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.days).padStart(2, '0')}</div>
+                <div className="text-[10px] font-medium text-white">Days</div>
               </div>
-              <span className="text-[#002147] self-start mt-1 font-bold">:</span>
+              <span className="text-white self-start mt-1 font-bold">:</span>
               <div className="flex flex-col items-center">
-                <div className="text-[#002147] font-bold text-sm">{String(timeRemaining.hours).padStart(2, '0')}</div>
-                <div className="text-[10px] font-medium">Hrs</div>
+                <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.hours).padStart(2, '0')}</div>
+                <div className="text-[10px] font-medium text-white">Hrs</div>
               </div>
-              <span className="text-[#002147] self-start mt-1 font-bold">:</span>
+              <span className="text-white self-start mt-1 font-bold">:</span>
               <div className="flex flex-col items-center">
-                <div className="text-[#002147] font-bold text-sm">{String(timeRemaining.minutes).padStart(2, '0')}</div>
-                <div className="text-[10px] font-medium">Min</div>
+                <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.minutes).padStart(2, '0')}</div>
+                <div className="text-[10px] font-medium text-white">Min</div>
               </div>
-              <span className="text-[#002147] self-start mt-1 font-bold">:</span>
+              <span className="text-white self-start mt-1 font-bold">:</span>
               <div className="flex flex-col items-center">
-                <div className="text-[#002147] font-bold text-sm">{String(timeRemaining.seconds).padStart(2, '0')}</div>
-                <div className="text-[10px] font-medium">Sec</div>
+                <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.seconds).padStart(2, '0')}</div>
+                <div className="text-[10px] font-medium text-white">Sec</div>
               </div>
             </div>
           </div>
