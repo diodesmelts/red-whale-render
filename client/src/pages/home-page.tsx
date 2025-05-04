@@ -80,7 +80,7 @@ export default function HomePage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 mb-16 px-4">
               {featuredCompetitions?.map(competition => (
                 <CompetitionCard key={competition.id} competition={competition} />
               ))}
