@@ -39,7 +39,7 @@ export function Navbar() {
             <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Every ticket includes free bonus draw entry
+            Sign up before 20th May and get £10.00 site credit!
           </span>
         </div>
       </div>
