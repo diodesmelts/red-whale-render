@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { useCart } from "@/hooks/use-cart";
 import { ChevronLeft, Heart, ShieldCheck, Plus, Minus, CreditCard, AppleIcon, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
@@ -19,6 +20,7 @@ export default function CompetitionDetails() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { addToCart } = useCart();
   const [ticketQuantity, setTicketQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -306,145 +308,211 @@ export default function CompetitionDetails() {
   }
 
   return (
-    <section className="py-12 flex-grow bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="flex-grow bg-white">
+      {/* Top info bar */}
+      <div className="w-full bg-gray-100 py-3 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-10 text-sm text-gray-700">
+            <div className="flex items-center">
+              <span className="font-semibold">ENTRIES ONLY £{competition.ticketPrice.toFixed(2)}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="font-semibold">MAX ENTRIES £49</span>
+            </div>
+            <div className="flex items-center">
+              <span className="font-semibold">MAX 50 PER PERSON</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/competitions">
           <div className="inline-flex items-center text-primary hover:text-primary/80 mb-6 cursor-pointer">
             <ChevronLeft className="mr-2 h-4 w-4" /> Back to Competitions
           </div>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left column: Image and purchase */}
-          <div className="lg:col-span-1">
-            <div className="bg-card rounded-lg overflow-hidden shadow-lg border border-border p-4">
-              <div className="relative rounded-lg overflow-hidden border border-border/30 mb-4">
-                <div className="aspect-square relative">
-                  <img 
-                    className="w-full h-full object-cover" 
-                    src={competition.imageUrl || "https://placehold.co/600x600/1a1f2b/FFFFFF/png?text=No+Image"} 
-                    alt={competition.title}
-                  />
-                  <div className="absolute top-0 left-0 w-16 h-16 bg-pink-500/40 blur-xl rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                </div>
-                <div className="absolute top-3 left-3 bg-white text-background text-sm font-bold px-3 py-1 rounded">
-                  WIN NOW
-                </div>
-                <button className="absolute top-3 right-3 bg-background/80 hover:bg-background p-1.5 rounded-full text-white">
-                  <Heart className="h-4 w-4" />
-                </button>
-              </div>
-              
-              <CountdownTimer drawDate={competition.drawDate} variant="detailed" />
-              
-              <div className="mt-4">
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="bg-secondary rounded-lg p-3">
-                    <div className="text-muted-foreground text-xs uppercase mb-1">Available</div>
-                    <div className="text-foreground font-medium">{remainingTickets} / {competition.totalTickets}</div>
-                  </div>
-                  <div className="bg-secondary rounded-lg p-3">
-                    <div className="text-muted-foreground text-xs uppercase mb-1">Price</div>
-                    <div className="text-foreground font-medium">{formatCurrency(competition.ticketPrice)}</div>
-                  </div>
-                </div>
-                
-                <AddToCart 
-                  competition={competition}
-                  layout="column"
-                  buttonVariant="default"
-                  withNavigation={true}
-                />
-                
-                <div className="text-center mt-2 text-muted-foreground text-xs">
-                  <ShieldCheck className="h-3 w-3 inline mr-1 text-green-500" /> Secure payment via Stripe
-                </div>
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Left column: Image */}
+          <div className="bg-white rounded-lg p-4">
+            <div className="aspect-square relative bg-white rounded-lg overflow-hidden">
+              <img 
+                className="w-full h-full object-contain" 
+                src={competition.imageUrl || "https://placehold.co/600x600/1a1f2b/FFFFFF/png?text=No+Image"} 
+                alt={competition.title}
+              />
             </div>
           </div>
           
           {/* Right column: Details */}
-          <div className="lg:col-span-2">
-            <div className="bg-card rounded-lg overflow-hidden shadow-lg border border-border p-6">
-              <div className="mb-6">
-                <h1 className="text-3xl font-bold text-foreground mb-2">{competition.title}</h1>
-                <div className="flex items-center">
-                  <CategoryBadge category={competition.category} />
-                  <span className="text-muted-foreground text-sm ml-2">
-                    Draw date: {new Date(competition.drawDate).toLocaleDateString('en-GB', { 
-                      day: '2-digit',
-                      month: 'short', 
-                      year: 'numeric'
-                    })}
-                  </span>
+          <div>
+            <div className="bg-white">
+              <h1 className="text-3xl font-bold text-[#002147] mb-4 uppercase tracking-tight text-center">
+                {competition.title}
+              </h1>
+              
+              <div className="text-center mb-4">
+                <div className="text-gray-600">Cash Alternative: {formatCurrency(competition.prizeValue)}</div>
+              </div>
+              
+              {/* Draw Date Box */}
+              <div className="flex justify-center gap-2 mb-6">
+                <div className="py-1.5 px-4 bg-green-500 text-white rounded-md text-sm inline-flex items-center">
+                  <span className="font-semibold">Draw Tomorrow 9pm</span>
+                </div>
+                <div className="py-1.5 px-4 bg-blue-500 text-white rounded-md text-sm inline-flex items-center">
+                  <span className="font-semibold">Automated Draw</span>
                 </div>
               </div>
               
-              <div className="flex flex-wrap gap-4 mb-6">
-                <div className="bg-secondary rounded-lg p-3 flex-1 min-w-[120px]">
-                  <div className="text-muted-foreground text-xs uppercase mb-1">PRIZE VALUE</div>
-                  <div className="text-foreground font-medium flex items-center">
-                    <i className="fas fa-tag mr-2 text-pink-400"></i> {formatCurrency(competition.prizeValue)}
-                  </div>
-                </div>
-                <div className="bg-secondary rounded-lg p-3 flex-1 min-w-[120px]">
-                  <div className="text-muted-foreground text-xs uppercase mb-1">TICKETS SOLD</div>
-                  <div className="text-foreground font-medium flex items-center">
-                    <i className="fas fa-ticket-alt mr-2 text-purple-500"></i> {competition.ticketsSold || 0} of {competition.totalTickets}
-                  </div>
-                </div>
-                <div className="bg-secondary rounded-lg p-3 flex-1 min-w-[120px]">
-                  <div className="text-muted-foreground text-xs uppercase mb-1">MAX PER USER</div>
-                  <div className="text-foreground font-medium flex items-center">
-                    <i className="fas fa-user mr-2 text-blue-500"></i> {competition.maxTicketsPerUser}
-                  </div>
+              {/* Price */}
+              <div className="text-center mb-6">
+                <div className="text-[#0099ff] text-4xl font-bold">
+                  {formatCurrency(competition.ticketPrice)}
                 </div>
               </div>
               
-              <div className="border-t border-border pt-6 mb-6">
-                <h3 className="text-lg font-semibold text-foreground mb-3 inline-flex items-center">
-                  <i className="fas fa-info-circle mr-2 text-primary"></i> About This Competition
-                </h3>
-                <p className="text-muted-foreground">
-                  {competition.description}
-                </p>
+              {/* Progress Bar */}
+              <div className="mb-8">
+                <div className="mb-2 flex justify-between text-xs text-gray-600">
+                  <span>SOLD: {Math.round((competition.ticketsSold || 0) / competition.totalTickets * 100)}%</span>
+                  <span>{competition.ticketsSold || 0} / {competition.totalTickets}</span>
+                </div>
+                <div className="h-2.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-2.5 bg-[#0099ff] rounded-full" 
+                    style={{ width: `${Math.round((competition.ticketsSold || 0) / competition.totalTickets * 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              {/* Buy Tabs */}
+              <div className="mb-8">
+                <div className="grid grid-cols-2 gap-1">
+                  <button className="bg-[#0099ff] text-white font-medium py-3 rounded-l-md text-center">
+                    ONLINE ENTRY
+                  </button>
+                  <button className="bg-gray-200 text-gray-700 font-medium py-3 rounded-r-md text-center">
+                    FREE POSTAL ENTRY
+                  </button>
+                </div>
+              </div>
+              
+              {/* Ticket Quantity Selector */}
+              <div className="bg-gray-100 p-6 rounded-md mb-8">
+                <div className="mb-4 text-center">
+                  <h3 className="text-gray-700 font-medium mb-2">How many tickets?</h3>
+                  <div className="bg-[#0099ff] text-white font-bold py-1 px-4 rounded-full inline-block">
+                    {ticketQuantity}
+                  </div>
+                </div>
                 
-                {competition.brand && (
-                  <div className="mt-4 flex items-center bg-secondary/50 p-3 rounded-lg">
-                    <div className="text-primary font-semibold mr-2">Brand:</div>
-                    <div>{competition.brand}</div>
-                  </div>
-                )}
-              </div>
-              
-              <div className="border-t border-border pt-6">
-                <h3 className="text-lg font-semibold text-foreground mb-3 inline-flex items-center">
-                  <ShieldCheck className="h-5 w-5 mr-2 text-green-500" /> Secure Payments
-                </h3>
-                
-                <div className="bg-secondary rounded-lg p-4">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 mr-4">
-                      <i className="fab fa-stripe text-4xl text-purple-500"></i>
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-foreground font-medium">Powered by Stripe</div>
-                      <div className="text-muted-foreground text-sm">Industry-leading payment processing</div>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex items-center space-x-4">
-                    <div className="flex items-center text-muted-foreground text-sm">
-                      <CreditCard className="h-4 w-4 mr-1" /> Credit Card
-                    </div>
-                    <div className="flex items-center text-muted-foreground text-sm">
-                      <AppleIcon className="h-4 w-4 mr-1" /> Apple Pay
-                    </div>
-                    <div className="flex items-center text-muted-foreground text-sm">
-                      <Lock className="h-4 w-4 mr-1" /> Secure SSL
-                    </div>
+                {/* Slider */}
+                <div className="mb-4">
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max={competition.maxTicketsPerUser} 
+                    value={ticketQuantity}
+                    onChange={(e) => setTicketQuantity(parseInt(e.target.value))}
+                    className="w-full bg-gray-300 h-2 rounded-full outline-none appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#0099ff] [&::-webkit-slider-thumb]:cursor-pointer"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>1</span>
+                    <span>{competition.maxTicketsPerUser}</span>
                   </div>
                 </div>
+                
+                {/* +/- Controls */}
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <button 
+                    onClick={decreaseQuantity}
+                    className="bg-white border border-gray-300 rounded-md h-8 w-8 flex items-center justify-center"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  
+                  <div className="text-center">
+                    <div className="text-sm text-gray-700">Number of tickets: <span className="font-semibold">{ticketQuantity}</span> (£{(ticketQuantity * competition.ticketPrice).toFixed(2)})</div>
+                  </div>
+                  
+                  <button 
+                    onClick={increaseQuantity}
+                    className="bg-white border border-gray-300 rounded-md h-8 w-8 flex items-center justify-center"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                {/* Add to cart button */}
+                <button 
+                  onClick={() => {
+                    if (!user) {
+                      toast({
+                        title: "Login required",
+                        description: "Please log in to purchase tickets",
+                        variant: "destructive",
+                      });
+                      navigate("/auth");
+                      return;
+                    }
+                    
+                    // Add to cart and navigate
+                    const { addToCart } = useCart();
+                    addToCart(competition, ticketQuantity);
+                    navigate("/cart");
+                  }}
+                  className="w-full bg-[#0099ff] hover:bg-[#0088ee] text-white font-semibold py-3 px-4 rounded-md flex items-center justify-center gap-2"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      Add tickets to basket <CreditCard className="h-5 w-5 ml-1" />
+                    </>
+                  )}
+                </button>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Details Tabs */}
+        <div className="border-t border-gray-200 pt-6">
+          <div className="flex border-b border-gray-200 mb-6">
+            <button className="py-2 px-6 border-b-2 border-[#0099ff] text-[#0099ff] font-semibold">
+              Competition Details
+            </button>
+            <button className="py-2 px-6 text-gray-500">
+              FAQ
+            </button>
+          </div>
+          
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-[#002147] mb-4">
+              {competition.title}
+            </h2>
+            
+            <p className="text-gray-700 mb-6">
+              {competition.description || 
+               "We are giving you the opportunity to win a " + competition.title + " All for just £" + competition.ticketPrice.toFixed(2) + "!"}
+            </p>
+            
+            <p className="text-gray-700 mb-6">
+              Our tech competitions always sell super fast, enter now before it's too late and you could be our next winner!
+            </p>
+            
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-[#002147] mb-2">Draw Information</h3>
+              <ul className="list-disc list-inside text-gray-700 space-y-2">
+                <li>Draw takes place regardless of sell out</li>
+                <li>Competition will close sooner if the maximum entries are received</li>
+              </ul>
             </div>
           </div>
         </div>
