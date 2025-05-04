@@ -371,16 +371,11 @@ export default function CompetitionDetails() {
                 </div>
               </div>
               
-              {/* Buy Tabs */}
+              {/* Entry Mode */}
               <div className="mb-5">
-                <div className="grid grid-cols-2 gap-1">
-                  <button className="bg-[#002147] text-white font-medium py-2 text-sm rounded-l-md text-center">
-                    ONLINE ENTRY
-                  </button>
-                  <button className="bg-gray-200 text-gray-700 font-medium py-2 text-sm rounded-r-md text-center">
-                    FREE POSTAL ENTRY
-                  </button>
-                </div>
+                <button className="w-full bg-[#002147] text-white font-medium py-2 text-sm rounded-md text-center">
+                  ONLINE ENTRY
+                </button>
               </div>
               
               {/* Ticket Quantity Selector */}
