@@ -26,7 +26,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
   // Determine the draw date label text and color
   const getDrawLabelClass = () => {
     const isToday = timeRemaining.days === 0 && timeRemaining.hours < 24;
-    return isToday ? "bg-green-400 text-white" : "bg-[#3bbff2] text-white";
+    return isToday ? "bg-[#bbd665] text-black" : "bg-[#bbd665] text-black";
   };
   
   const getDrawLabelText = () => {
@@ -56,22 +56,22 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         </div>
 
         <img 
-          className="w-full h-48 object-cover" 
+          className="w-full h-64 object-cover" 
           src={competition.imageUrl || "https://placehold.co/600x400/f0f0f0/333333/png?text=No+Image"}
           alt={competition.title}
         />
         
-        {/* Automated Draw button */}
+        {/* Draw date badge */}
         <div className="absolute -bottom-4 w-full flex justify-center">
-          <div className="bg-white text-[#3bbff2] border border-[#3bbff2] font-medium py-1.5 px-6 rounded-full shadow-md text-center w-3/4 text-sm">
-            Automated Draw
+          <div className="bg-[#bbd665] text-black font-medium py-1.5 px-6 rounded-full shadow-md text-center w-4/5 text-sm">
+            {getDrawLabelText()}
           </div>
         </div>
       </div>
       
-      <div className="px-3 pt-6 pb-3">
+      <div className="px-4 pt-8 pb-4">
         <Link href={`/competitions/${competition.id}`}>
-          <h3 className="text-lg font-bold text-[#002147] mb-1 cursor-pointer hover:text-[#3bbff2] transition-colors text-center">
+          <h3 className="text-xl font-bold text-[#002147] mb-2 cursor-pointer hover:text-[#3bbff2] transition-colors text-center">
             {competition.title}
           </h3>
         </Link>
@@ -86,7 +86,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         </div>
         
         {/* Ticket price */}
-        <div className="text-[#3bbff2] text-3xl font-bold mb-2 text-center">
+        <div className="text-[#3bbff2] text-4xl font-bold mb-3 text-center">
           {ticketPrice}
         </div>
         
