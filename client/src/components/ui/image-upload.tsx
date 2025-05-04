@@ -10,17 +10,21 @@ import { getImageUrl } from "@/lib/utils";
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
   currentImageUrl?: string;
+  existingImageUrl?: string | null;
   className?: string;
 }
 
 export function ImageUpload({
   onImageUploaded,
   currentImageUrl = "",
+  existingImageUrl = null,
   className = "",
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   // Use our utility function to ensure the initial preview URL is properly formatted
-  const [preview, setPreview] = useState<string>(getImageUrl(currentImageUrl));
+  // Prioritize existingImageUrl over currentImageUrl for backward compatibility
+  const initialImageUrl = existingImageUrl || currentImageUrl || "";
+  const [preview, setPreview] = useState<string>(getImageUrl(initialImageUrl));
   const { toast } = useToast();
   const { showError, DebugOverlayComponent, closeOverlay, isDebugOpen } = useDebugOverlay();
 
@@ -172,7 +176,7 @@ export function ImageUpload({
       });
       
       // Reset preview if upload fails - ensure URL is properly formatted
-      setPreview(getImageUrl(currentImageUrl));
+      setPreview(getImageUrl(initialImageUrl));
     } finally {
       setIsUploading(false);
     }

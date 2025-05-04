@@ -93,12 +93,28 @@ export default function EditCompetition() {
   // Update form values when competition data is loaded
   useEffect(() => {
     if (competition) {
-      form.reset({
-        ...competition,
-        drawDate: new Date(competition.drawDate)
-      });
+      try {
+        // Ensure drawDate is properly converted to a Date object
+        const drawDate = competition.drawDate ? new Date(competition.drawDate) : new Date();
+        form.reset({
+          ...competition,
+          drawDate
+        });
+      } catch (error) {
+        console.error("Error parsing competition data:", error);
+        toast({
+          title: "Error formatting date",
+          description: "There was a problem with the date format. Using current date instead.",
+          variant: "destructive"
+        });
+        // Fallback to current date
+        form.reset({
+          ...competition,
+          drawDate: new Date()
+        });
+      }
     }
-  }, [competition, form]);
+  }, [competition, form, toast]);
 
   // Update competition mutation
   const updateCompetitionMutation = useMutation({
