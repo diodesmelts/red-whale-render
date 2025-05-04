@@ -49,12 +49,10 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
+      {/* Live Countdown Timer */}
+      <CountdownTimer drawDate={competition.drawDate} variant="card-header" />
+      
       <div className="relative">
-        {/* Draw date label at top */}
-        <div className={`absolute top-2 left-0 right-0 ${getDrawLabelClass()} py-2 px-6 text-center font-medium z-10 mx-auto w-max rounded-full shadow-md text-sm`}>
-          {getDrawLabelText()}
-        </div>
-
         <img 
           className="w-full h-64 object-cover" 
           src={competition.imageUrl || "https://placehold.co/600x400/f0f0f0/333333/png?text=No+Image"}

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface CountdownTimerProps {
   drawDate: Date | string;
-  variant?: "compact" | "full" | "detailed";
+  variant?: "compact" | "full" | "detailed" | "card-header";
   className?: string;
   onExpire?: () => void;
 }
@@ -94,6 +94,40 @@ export function CountdownTimer({
     );
   }
   
+  if (variant === "card-header") {
+    return (
+      <div className={cn("flex justify-center items-center bg-[#002147] text-white p-2 w-full", className)}>
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center">
+            <div className="bg-[#bbd665] text-black font-medium text-xs px-2 py-0.5 rounded-md mr-2 animate-pulse">LIVE</div>
+            <span className="text-xs font-semibold hidden sm:inline">TIME REMAINING</span>
+          </div>
+          <div className="flex space-x-2">
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.days).padStart(2, '0')}</div>
+              <div className="text-[10px] opacity-80">Days</div>
+            </div>
+            <span className="text-white self-start mt-1">:</span>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.hours).padStart(2, '0')}</div>
+              <div className="text-[10px] opacity-80">Hrs</div>
+            </div>
+            <span className="text-white self-start mt-1">:</span>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.minutes).padStart(2, '0')}</div>
+              <div className="text-[10px] opacity-80">Min</div>
+            </div>
+            <span className="text-white self-start mt-1">:</span>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.seconds).padStart(2, '0')}</div>
+              <div className="text-[10px] opacity-80">Sec</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Default compact variant
   return (
     <div className={cn("flex items-center space-x-1", className)}>
