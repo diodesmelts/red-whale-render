@@ -396,7 +396,7 @@ export default function CompetitionDetails() {
               {/* Buy Tabs */}
               <div className="mb-8">
                 <div className="grid grid-cols-2 gap-1">
-                  <button className="bg-[#0099ff] text-white font-medium py-3 rounded-l-md text-center">
+                  <button className="bg-[#002147] text-white font-medium py-3 rounded-l-md text-center">
                     ONLINE ENTRY
                   </button>
                   <button className="bg-gray-200 text-gray-700 font-medium py-3 rounded-r-md text-center">
@@ -468,7 +468,7 @@ export default function CompetitionDetails() {
                     addToCart(competition, ticketQuantity);
                     navigate("/cart");
                   }}
-                  className="w-full bg-[#0099ff] hover:bg-[#0088ee] text-white font-semibold py-3 px-4 rounded-md flex items-center justify-center gap-2"
+                  className="w-full bg-[#002147] hover:bg-[#001c3a] text-white font-semibold py-3 px-4 rounded-md flex items-center justify-center gap-2"
                   disabled={isProcessing}
                 >
                   {isProcessing ? (
