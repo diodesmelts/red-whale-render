@@ -42,13 +42,13 @@ export default function HomePage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto text-[#002147]">
+            <h2 className="text-5xl font-extrabold mb-4 tracking-tight mx-auto text-[#002147]">
               <span className="text-[#002147] relative inline-block">Live
                 <span className="absolute -top-1 -right-4 text-[#bbd665] text-lg">🔥</span>
               </span> Competitions
             </h2>
-            <p className="text-[#002147]/80 mt-4 max-w-2xl mx-auto text-lg font-light">
-              Don't miss your chance to win these <span className="text-[#bbd665] font-medium">amazing prizes</span>! New competitions added regularly.
+            <p className="text-[#002147]/80 mt-4 max-w-2xl mx-auto text-xl font-medium">
+              Don't miss your chance to win these <span className="text-[#bbd665] font-semibold">amazing prizes</span>! New competitions added regularly.
             </p>
             
             {/* Decorative line with highlight */}

@@ -95,7 +95,39 @@ export function CountdownTimer({
   }
   
   if (variant === "badge") {
-    // Format the draw date
+    // Check if it's within 7 days - if so, show the countdown timer
+    const isWithin7Days = timeRemaining.days < 7;
+    
+    if (isWithin7Days) {
+      return (
+        <div className="flex items-center justify-center w-full">
+          <div className="bg-[#bbd665] text-[#002147] font-bold text-xs px-2 py-0.5 rounded-full mr-2 animate-pulse">LIVE</div>
+          <div className="flex items-center space-x-1">
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.days).padStart(2, '0')}</div>
+              <div className="text-[10px] text-white/80">d</div>
+            </div>
+            <span className="text-white self-start mt-0.5 text-xs">:</span>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.hours).padStart(2, '0')}</div>
+              <div className="text-[10px] text-white/80">h</div>
+            </div>
+            <span className="text-white self-start mt-0.5 text-xs">:</span>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.minutes).padStart(2, '0')}</div>
+              <div className="text-[10px] text-white/80">m</div>
+            </div>
+            <span className="text-white self-start mt-0.5 text-xs">:</span>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.seconds).padStart(2, '0')}</div>
+              <div className="text-[10px] text-white/80">s</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Otherwise, show the date
     const formattedDate = new Date(drawDate).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'short',
