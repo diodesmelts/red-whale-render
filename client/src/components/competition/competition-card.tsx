@@ -53,11 +53,13 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
       <CountdownTimer drawDate={competition.drawDate} variant="card-header" />
       
       <div className="relative">
-        <img 
-          className="w-full h-64 object-cover" 
-          src={competition.imageUrl || "https://placehold.co/600x400/f0f0f0/333333/png?text=No+Image"}
-          alt={competition.title}
-        />
+        <div className="aspect-square overflow-hidden flex items-center justify-center">
+          <img 
+            className="w-full h-full object-cover" 
+            src={competition.imageUrl || "https://placehold.co/600x400/f0f0f0/333333/png?text=No+Image"}
+            alt={competition.title}
+          />
+        </div>
         
         {/* Draw date badge */}
         <div className="absolute -bottom-4 w-full flex justify-center">
