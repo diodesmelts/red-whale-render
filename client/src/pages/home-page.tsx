@@ -33,7 +33,7 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* Featured Competitions Section */}
-      <section className="py-20 bg-[#f9fdf2] relative overflow-hidden">
+      <section className="py-20 bg-white relative overflow-hidden">
         {/* Fun background elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#bbd665]/10 rounded-full blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-20 left-0 w-80 h-80 bg-[#002147]/5 rounded-full blur-3xl"></div>
