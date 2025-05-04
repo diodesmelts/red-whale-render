@@ -482,6 +482,21 @@ export default function CompetitionDetails() {
                     </>
                   )}
                 </button>
+                
+                {/* Trustpilot rating */}
+                <div className="mt-4 flex items-center justify-center">
+                  <div className="text-sm text-gray-700 mr-2">Excellent</div>
+                  <div className="flex">
+                    <span className="bg-green-500 text-white text-xs px-1">★★★★★</span>
+                  </div>
+                  <div className="text-xs text-gray-600 ml-2">4,202 reviews on <span className="text-gray-800 font-medium">Trustpilot</span></div>
+                </div>
+                
+                {/* Competition closes notice */}
+                <div className="mt-3 text-center bg-gray-50 p-3 rounded border border-gray-200">
+                  <div className="text-sm font-medium">Competition closes Today at 8:45 PM</div>
+                  <div className="text-xs text-gray-500">or when all tickets are sold</div>
+                </div>
               </div>
             </div>
           </div>
@@ -518,6 +533,50 @@ export default function CompetitionDetails() {
                 <li>Draw takes place regardless of sell out</li>
                 <li>Competition will close sooner if the maximum entries are received</li>
               </ul>
+            </div>
+            
+            {/* How it works section */}
+            <div className="mt-12 mb-8">
+              <h2 className="text-2xl font-bold text-center mb-4">How it works</h2>
+              <p className="text-center text-gray-600 mb-8">Instantly find out if you are a lucky winner!</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="border border-gray-200 rounded-lg p-6 text-center">
+                  <div className="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-blue-500 font-semibold">1</span>
+                  </div>
+                  <div className="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold mb-1">Buy your tickets</h3>
+                </div>
+                
+                <div className="border border-gray-200 rounded-lg p-6 text-center">
+                  <div className="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-blue-500 font-semibold">2</span>
+                  </div>
+                  <div className="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold mb-1">Reveal if you've won</h3>
+                </div>
+                
+                <div className="border border-gray-200 rounded-lg p-6 text-center">
+                  <div className="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-blue-500 font-semibold">3</span>
+                  </div>
+                  <div className="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold mb-1">Claim your prize</h3>
+                </div>
+              </div>
             </div>
           </div>
         </div>
