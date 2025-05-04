@@ -327,12 +327,6 @@ export default function CompetitionDetails() {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/competitions">
-          <div className="inline-flex items-center text-primary hover:text-primary/80 mb-6 cursor-pointer">
-            <ChevronLeft className="mr-2 h-4 w-4" /> Back to Competitions
-          </div>
-        </Link>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Left column: Image */}
           <div className="bg-white rounded-lg p-4">
@@ -409,7 +403,7 @@ export default function CompetitionDetails() {
               <div className="bg-gray-100 p-6 rounded-md mb-8">
                 <div className="mb-4 text-center">
                   <h3 className="text-gray-700 font-medium mb-2">How many tickets?</h3>
-                  <div className="bg-[#0099ff] text-white font-bold py-1 px-4 rounded-full inline-block">
+                  <div className="bg-[#002147] text-white font-bold py-1 px-4 rounded-full inline-block">
                     {ticketQuantity}
                   </div>
                 </div>
