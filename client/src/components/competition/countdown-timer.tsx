@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface CountdownTimerProps {
   drawDate: Date | string;
-  variant?: "compact" | "full" | "detailed" | "card-header";
+  variant?: "compact" | "full" | "detailed" | "card-header" | "badge";
   className?: string;
   onExpire?: () => void;
 }
@@ -90,6 +90,23 @@ export function CountdownTimer({
           <div className="text-[#bbd665] font-bold text-xl">{String(timeRemaining.seconds).padStart(2, '0')}</div>
           <div className="text-xs text-white font-medium">Seconds</div>
         </div>
+      </div>
+    );
+  }
+  
+  if (variant === "badge") {
+    // Format the draw date
+    const formattedDate = new Date(drawDate).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+    
+    return (
+      <div className="flex items-center justify-center">
+        <span className="text-[#bbd665] font-semibold text-xs mr-2">Draw:</span>
+        <span>{formattedDate}</span>
+        <div className="bg-[#bbd665] text-[#002147] font-medium text-xs px-2 py-0.5 rounded-full ml-2 animate-pulse">LIVE</div>
       </div>
     );
   }

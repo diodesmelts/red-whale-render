@@ -29,18 +29,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
     return isToday ? "bg-[#bbd665] text-black" : "bg-[#bbd665] text-black";
   };
   
-  const getDrawLabelText = () => {
-    const isToday = timeRemaining.days === 0 && timeRemaining.hours < 24;
-    const drawDate = new Date(competition.drawDate);
-    if (isToday) {
-      const hours = drawDate.getHours();
-      const minutes = String(drawDate.getMinutes()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'pm' : 'am';
-      const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
-      return `Draw Today ${displayHours}${minutes !== '00' ? ':' + minutes : ''}${ampm}`;
-    }
-    return "Automated Draw";
-  };
+  // Countdown timer is now handled directly by the CountdownTimer component
 
   return (
     <motion.div
@@ -48,10 +37,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
       whileHover={{ scale: 1.02, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-    >
-      {/* Live Countdown Timer */}
-      <CountdownTimer drawDate={competition.drawDate} variant="card-header" />
-      
+    >      
       <div className="relative">
         <div className="aspect-square overflow-hidden flex items-center justify-center">
           <img 
@@ -61,10 +47,10 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
           />
         </div>
         
-        {/* Draw date badge */}
+        {/* Draw date badge with countdown timer */}
         <div className="absolute -bottom-4 w-full flex justify-center">
-          <div className="bg-[#002147] text-white font-medium py-1.5 px-6 rounded-full shadow-md text-center w-4/5 text-sm">
-            {getDrawLabelText()}
+          <div className="bg-[#002147] text-white font-medium py-1.5 px-6 rounded-full shadow-md text-center w-4/5 text-sm flex items-center justify-center">
+            <CountdownTimer drawDate={competition.drawDate} variant="badge" />
           </div>
         </div>
       </div>
