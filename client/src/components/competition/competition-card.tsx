@@ -61,13 +61,13 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         
         {/* Draw date badge */}
         <div className="absolute -bottom-4 w-full flex justify-center">
-          <div className="bg-[#bbd665] text-black font-medium py-1.5 px-6 rounded-full shadow-md text-center w-4/5 text-sm">
+          <div className="bg-[#002147] text-white font-medium py-1.5 px-6 rounded-full shadow-md text-center w-4/5 text-sm">
             {getDrawLabelText()}
           </div>
         </div>
       </div>
       
-      <div className="px-4 pt-8 pb-4">
+      <div className="px-4 pt-8 pb-4 flex flex-col h-full">
         <Link href={`/competitions/${competition.id}`}>
           <h3 className="text-xl font-bold text-[#002147] mb-2 cursor-pointer hover:text-[#3bbff2] transition-colors text-center">
             {competition.title}
@@ -84,7 +84,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         </div>
         
         {/* Ticket price */}
-        <div className="text-[#3bbff2] text-4xl font-bold mb-3 text-center">
+        <div className="text-[#bbd665] text-4xl font-bold mb-3 text-center">
           {ticketPrice}
         </div>
         
@@ -93,7 +93,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
           <div className="text-xs text-gray-600 mb-1">SOLD: {percentSold}%</div>
           <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
             <div 
-              className="h-1.5 bg-[#3bbff2] rounded-full" 
+              className="h-1.5 bg-[#002147] rounded-full" 
               style={{ width: `${percentSold}%` }}
             ></div>
           </div>
@@ -101,15 +101,15 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         
         {/* Instant win badge */}
         <div className="mb-3 flex justify-center">
-          <div className="text-[#005dff] border-2 border-[#005dff] font-bold py-1 px-4 rounded-full flex items-center">
+          <div className="text-[#002147] border-2 border-[#002147] font-bold py-1 px-4 rounded-full flex items-center">
             <span className="mr-1">INSTANT</span>
-            <Zap className="fill-[#005dff] h-5 w-5 stroke-white" />
+            <Zap className="fill-[#002147] h-5 w-5 stroke-white" />
             <span className="ml-0.5">WIN</span>
           </div>
         </div>
         
-        <Link href={`/competitions/${competition.id}`}>
-          <div className="bg-[#002147] border-2 border-[#002147] text-white hover:bg-[#003167] hover:border-[#003167] text-center py-2 px-4 rounded-full font-medium cursor-pointer flex items-center justify-center transition-colors">
+        <Link href={`/competitions/${competition.id}`} className="mt-auto w-full">
+          <div className="bg-[#002147] border-2 border-[#002147] text-white hover:bg-[#003167] hover:border-[#003167] text-center py-3 px-4 rounded-xl font-medium cursor-pointer flex items-center justify-center transition-colors w-full">
             Enter now <Ticket className="h-5 w-5 ml-2" />
           </div>
         </Link>
