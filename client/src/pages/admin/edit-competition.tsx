@@ -119,7 +119,18 @@ export default function EditCompetition() {
   // Update competition mutation
   const updateCompetitionMutation = useMutation({
     mutationFn: async (data: FormValues) => {
-      const res = await apiRequest("PATCH", `/api/admin/competitions/${id}`, data);
+      // Convert Date object to ISO string for API
+      const apiData = {
+        ...data,
+        drawDate: data.drawDate instanceof Date 
+          ? data.drawDate.toISOString() 
+          : (typeof data.drawDate === 'string' 
+              ? new Date(data.drawDate).toISOString() 
+              : new Date().toISOString())
+      };
+      
+      console.log("Sending to API:", apiData);
+      const res = await apiRequest("PATCH", `/api/admin/competitions/${id}`, apiData);
       return await res.json();
     },
     onSuccess: (data: Competition) => {
@@ -146,33 +157,15 @@ export default function EditCompetition() {
     setIsSubmitting(true);
     
     // Ensure boolean fields are properly set
-    const booleanFields = {
+    const processedData = {
+      ...data,
       isLive: Boolean(data.isLive),
       isFeatured: Boolean(data.isFeatured),
       pushToHeroBanner: Boolean(data.pushToHeroBanner)
     };
     
-    // Ensure drawDate is properly handled
-    let drawDateValue;
-    if (data.drawDate instanceof Date) {
-      drawDateValue = data.drawDate;
-    } else if (typeof data.drawDate === 'string') {
-      // If it's a string, try to parse it
-      const parsedDate = new Date(data.drawDate);
-      drawDateValue = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
-    } else {
-      // Fallback to current date if invalid
-      drawDateValue = new Date();
-    }
-    
-    const submissionData = {
-      ...data,
-      ...booleanFields,
-      drawDate: drawDateValue
-    };
-    
-    console.log("Submitting competition data:", submissionData);
-    updateCompetitionMutation.mutate(submissionData);
+    console.log("Submitting competition data:", processedData);
+    updateCompetitionMutation.mutate(processedData);
   };
 
   if (isLoading) {
