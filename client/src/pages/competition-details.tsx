@@ -317,10 +317,10 @@ export default function CompetitionDetails() {
               <span className="font-semibold">ENTRIES ONLY £{competition.ticketPrice.toFixed(2)}</span>
             </div>
             <div className="flex items-center">
-              <span className="font-semibold">MAX ENTRIES £49</span>
+              <span className="font-semibold">MAX ENTRIES £{(competition.maxTicketsPerUser * competition.ticketPrice).toFixed(2)}</span>
             </div>
             <div className="flex items-center">
-              <span className="font-semibold">MAX 50 PER PERSON</span>
+              <span className="font-semibold">MAX {competition.maxTicketsPerUser} PER PERSON</span>
             </div>
           </div>
         </div>
@@ -359,7 +359,13 @@ export default function CompetitionDetails() {
               {/* Draw Date Box */}
               <div className="flex justify-center gap-2 mb-6">
                 <div className="py-1.5 px-4 bg-green-500 text-white rounded-md text-sm inline-flex items-center">
-                  <span className="font-semibold">Draw Tomorrow 9pm</span>
+                  <span className="font-semibold">
+                    Draw {new Date(competition.drawDate).toLocaleDateString('en-GB', { 
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </span>
                 </div>
                 <div className="py-1.5 px-4 bg-blue-500 text-white rounded-md text-sm inline-flex items-center">
                   <span className="font-semibold">Automated Draw</span>
@@ -459,7 +465,6 @@ export default function CompetitionDetails() {
                     }
                     
                     // Add to cart and navigate
-                    const { addToCart } = useCart();
                     addToCart(competition, ticketQuantity);
                     navigate("/cart");
                   }}
