@@ -128,7 +128,12 @@ export default function EditCompetition() {
   // Form submission handler
   const onSubmit = (data: FormValues) => {
     setIsSubmitting(true);
-    updateCompetitionMutation.mutate(data);
+    // Ensure drawDate is a properly formatted ISO string
+    const submissionData = {
+      ...data,
+      drawDate: data.drawDate instanceof Date ? data.drawDate.toISOString() : data.drawDate
+    };
+    updateCompetitionMutation.mutate(submissionData);
   };
 
   if (isLoading) {
