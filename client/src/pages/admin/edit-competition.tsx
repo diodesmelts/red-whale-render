@@ -144,11 +144,34 @@ export default function EditCompetition() {
   // Form submission handler
   const onSubmit = (data: FormValues) => {
     setIsSubmitting(true);
-    // Ensure drawDate is a properly formatted ISO string
+    
+    // Ensure boolean fields are properly set
+    const booleanFields = {
+      isLive: Boolean(data.isLive),
+      isFeatured: Boolean(data.isFeatured),
+      pushToHeroBanner: Boolean(data.pushToHeroBanner)
+    };
+    
+    // Ensure drawDate is properly handled
+    let drawDateValue;
+    if (data.drawDate instanceof Date) {
+      drawDateValue = data.drawDate;
+    } else if (typeof data.drawDate === 'string') {
+      // If it's a string, try to parse it
+      const parsedDate = new Date(data.drawDate);
+      drawDateValue = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+    } else {
+      // Fallback to current date if invalid
+      drawDateValue = new Date();
+    }
+    
     const submissionData = {
       ...data,
-      drawDate: data.drawDate instanceof Date ? data.drawDate.toISOString() : data.drawDate
+      ...booleanFields,
+      drawDate: drawDateValue
     };
+    
+    console.log("Submitting competition data:", submissionData);
     updateCompetitionMutation.mutate(submissionData);
   };
 
@@ -435,8 +458,8 @@ export default function EditCompetition() {
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                         <FormControl>
                           <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
+                            checked={Boolean(field.value)}
+                            onCheckedChange={(checked) => field.onChange(Boolean(checked))}
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -456,8 +479,8 @@ export default function EditCompetition() {
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                         <FormControl>
                           <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
+                            checked={Boolean(field.value)}
+                            onCheckedChange={(checked) => field.onChange(Boolean(checked))}
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -477,8 +500,8 @@ export default function EditCompetition() {
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-blue-50 dark:bg-blue-950/30">
                         <FormControl>
                           <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
+                            checked={Boolean(field.value)}
+                            onCheckedChange={(checked) => field.onChange(Boolean(checked))}
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
