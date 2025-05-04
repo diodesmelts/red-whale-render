@@ -136,11 +136,11 @@ export function Navbar() {
                               {user.displayName ? user.displayName[0].toUpperCase() : user.username[0].toUpperCase()}
                             </span>
                           </div>
-                          <span className="mr-1 text-sm truncate max-w-[80px]">{user.displayName || user.username}</span>
+                          <span className="mr-1 text-sm truncate max-w-[120px]">{user.displayName || user.username}</span>
                           <ChevronDown className="h-3 w-3" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56" align="end">
+                      <DropdownMenuContent className="w-72" align="end">
                         <DropdownMenuLabel>
                           <div className="flex flex-col space-y-1">
                             <p className="text-sm font-medium text-primary">{user.displayName || user.username}</p>
