@@ -140,7 +140,7 @@ export function Navbar() {
                           <ChevronDown className="h-3 w-3" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-72" align="end">
+                      <DropdownMenuContent className="w-72 mt-2 p-2" align="end">
                         <DropdownMenuLabel>
                           <div className="flex flex-col space-y-1">
                             <p className="text-sm font-medium text-primary">{user.displayName || user.username}</p>
