@@ -33,28 +33,28 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* Featured Competitions Section */}
-      <section className="py-20 bg-[#002147] relative overflow-hidden">
+      <section className="py-20 bg-white relative overflow-hidden">
         {/* Fun background elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#bbd665]/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-20 left-0 w-80 h-80 bg-[#bbd665]/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-40 left-1/4 w-40 h-40 bg-white/5 rounded-full blur-xl animate-bounce-slow"></div>
-        <div className="absolute bottom-40 right-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl animate-spin-slow"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#bbd665]/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-20 left-0 w-80 h-80 bg-[#002147]/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-40 left-1/4 w-40 h-40 bg-[#002147]/5 rounded-full blur-xl animate-bounce-slow"></div>
+        <div className="absolute bottom-40 right-1/4 w-24 h-24 bg-[#002147]/5 rounded-full blur-xl animate-spin-slow"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto text-white">
-              <span className="text-[#bbd665] relative inline-block">Live
+            <h2 className="text-4xl font-extrabold mb-4 tracking-tight mx-auto text-[#002147]">
+              <span className="text-[#002147] relative inline-block">Live
                 <span className="absolute -top-1 -right-4 text-[#bbd665] text-lg">🔥</span>
               </span> Competitions
             </h2>
-            <p className="text-white/80 mt-4 max-w-2xl mx-auto text-lg font-light">
+            <p className="text-[#002147]/80 mt-4 max-w-2xl mx-auto text-lg font-light">
               Don't miss your chance to win these <span className="text-[#bbd665] font-medium">amazing prizes</span>! New competitions added regularly.
             </p>
             
             {/* Decorative line with highlight */}
-            <div className="relative w-32 h-1.5 bg-white/20 mx-auto mt-8 rounded-full overflow-hidden">
+            <div className="relative w-32 h-1.5 bg-[#002147]/20 mx-auto mt-8 rounded-full overflow-hidden">
               <div className="absolute inset-0 w-full h-full bg-[#bbd665] animate-shine" 
-                style={{ backgroundImage: 'linear-gradient(to right, transparent, rgba(255,255,255,0.2) 50%, transparent 100%)' }}>
+                style={{ backgroundImage: 'linear-gradient(to right, transparent, rgba(255,255,255,0.5) 50%, transparent 100%)' }}>
               </div>
             </div>
           </div>
@@ -62,19 +62,19 @@ export default function HomePage() {
           {isLoading ? (
             <div className="flex flex-col justify-center items-center py-32">
               <Loader2 className="h-12 w-12 animate-spin text-[#bbd665] mb-4" />
-              <p className="text-white/80 animate-pulse">Loading amazing competitions...</p>
+              <p className="text-[#002147]/80 animate-pulse">Loading amazing competitions...</p>
             </div>
           ) : featuredCompetitions?.length === 0 ? (
-            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-[#bbd665]/30 bg-white/5 rounded-xl">
+            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-[#bbd665]/30 bg-[#002147]/5 rounded-xl">
               <div className="w-20 h-20 bg-[#bbd665]/20 rounded-full flex items-center justify-center mb-6 animate-pulse-slow">
                 <i className="fas fa-trophy text-[#bbd665] text-3xl"></i>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">No Active Competitions</h3>
-              <p className="text-white/70 max-w-md text-center mb-6">
+              <h3 className="text-2xl font-bold text-[#002147] mb-3">No Active Competitions</h3>
+              <p className="text-[#002147]/70 max-w-md text-center mb-6">
                 We're preparing some exciting new competitions. Check back soon or follow us on social media for updates!
               </p>
               <Link to="/how-to-play">
-                <Button variant="outline" className="border-[#bbd665] border-2 text-white hover:bg-[#bbd665]/20 hover:text-white">
+                <Button variant="outline" className="border-[#bbd665] border-2 text-[#002147] hover:bg-[#bbd665]/20 hover:text-[#002147]">
                   Learn How Competitions Work
                 </Button>
               </Link>
