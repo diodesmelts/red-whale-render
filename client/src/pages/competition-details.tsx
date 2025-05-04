@@ -9,11 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
-import { ChevronLeft, Heart, ShieldCheck, Plus, Minus, CreditCard, AppleIcon, Lock } from "lucide-react";
+import { ChevronLeft, Heart, ShieldCheck, Plus, Minus, CreditCard, AppleIcon, Lock, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { AddToCart } from "@/components/cart/add-to-cart";
 import { CartIcon } from "@/components/cart/cart-icon";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function CompetitionDetails() {
   const [location, navigate] = useLocation();
@@ -23,6 +30,7 @@ export default function CompetitionDetails() {
   const [ticketQuantity, setTicketQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
+  const [competencyAnswer, setCompetencyAnswer] = useState("");
   
   // Extract competition ID from the URL
   const competitionId = location.split("/")[2];
@@ -429,6 +437,37 @@ export default function CompetitionDetails() {
                     </button>
                   </div>
                   
+                  {/* Competency Question */}
+                  <div className="mb-4 border border-gray-200 rounded-md p-3 bg-gray-50">
+                    <div className="flex items-start mb-2">
+                      <AlertCircle className="h-4 w-4 text-[#002147] mr-2 mt-0.5" />
+                      <div>
+                        <h4 className="text-sm font-medium text-[#002147]">Security Check</h4>
+                        <p className="text-xs text-gray-500 mt-0.5">Please answer the following question correctly to continue</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <label className="block text-sm font-medium mb-1">
+                        How many months are in a year?
+                      </label>
+                      <Select
+                        value={competencyAnswer}
+                        onValueChange={setCompetencyAnswer}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select your answer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="6">6</SelectItem>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="12">12</SelectItem>
+                          <SelectItem value="14">14</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
                   {/* Add to cart button */}
                   <button 
                     onClick={() => {
@@ -442,12 +481,22 @@ export default function CompetitionDetails() {
                         return;
                       }
                       
+                      // Check competency question
+                      if (competencyAnswer !== "12") {
+                        toast({
+                          title: "Incorrect Answer",
+                          description: "Please correctly answer the security question to continue",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      
                       // Add to cart and navigate
                       addToCart(competition, ticketQuantity);
                       navigate("/cart");
                     }}
                     className="w-full bg-[#002147] hover:bg-[#001c3a] text-white font-semibold py-2 px-4 text-sm rounded-md flex items-center justify-center gap-2"
-                    disabled={isProcessing}
+                    disabled={isProcessing || !competencyAnswer}
                   >
                     {isProcessing ? (
                       <>
