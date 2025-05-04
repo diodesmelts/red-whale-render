@@ -307,26 +307,12 @@ export default function CompetitionDetails() {
     );
   }
 
+  const [activeTab, setActiveTab] = useState("details");
+  
   return (
     <section className="flex-grow bg-white">
-      {/* Top info bar */}
-      <div className="w-full bg-gray-100 py-3 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-10 text-sm text-gray-700">
-            <div className="flex items-center">
-              <span className="font-semibold">ENTRIES ONLY £{competition.ticketPrice.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center">
-              <span className="font-semibold">MAX ENTRIES £{(competition.maxTicketsPerUser * competition.ticketPrice).toFixed(2)}</span>
-            </div>
-            <div className="flex items-center">
-              <span className="font-semibold">MAX {competition.maxTicketsPerUser} PER PERSON</span>
-            </div>
-          </div>
-        </div>
-      </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Left column: Image */}
           <div className="bg-white rounded-lg p-4">
@@ -543,36 +529,89 @@ export default function CompetitionDetails() {
         {/* Details Tabs */}
         <div className="border-t border-gray-200 pt-6">
           <div className="flex border-b border-gray-200 mb-6">
-            <button className="py-2 px-6 border-b-2 border-[#0099ff] text-[#0099ff] font-semibold">
+            <button 
+              onClick={() => setActiveTab("details")}
+              className={`py-2 px-6 border-b-2 ${activeTab === "details" ? "border-[#0099ff] text-[#0099ff]" : "border-transparent text-gray-500"} font-semibold`}
+            >
               Competition Details
             </button>
-            <button className="py-2 px-6 text-gray-500">
+            <button 
+              onClick={() => setActiveTab("faq")}
+              className={`py-2 px-6 border-b-2 ${activeTab === "faq" ? "border-[#0099ff] text-[#0099ff]" : "border-transparent text-gray-500"} font-semibold`}
+            >
               FAQ
             </button>
           </div>
           
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-[#002147] mb-4">
-              {competition.title}
-            </h2>
-            
-            <p className="text-gray-700 mb-6">
-              {competition.description || 
-               "We are giving you the opportunity to win a " + competition.title + " All for just £" + competition.ticketPrice.toFixed(2) + "!"}
-            </p>
-            
-            <p className="text-gray-700 mb-6">
-              Our tech competitions always sell super fast, enter now before it's too late and you could be our next winner!
-            </p>
-            
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-[#002147] mb-2">Draw Information</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Draw takes place regardless of sell out</li>
-                <li>Competition will close sooner if the maximum entries are received</li>
-              </ul>
+          {activeTab === "details" && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-[#002147] mb-4">
+                {competition.title}
+              </h2>
+              
+              <p className="text-gray-700 mb-6">
+                {competition.description || 
+                "We are giving you the opportunity to win a " + competition.title + " All for just £" + competition.ticketPrice.toFixed(2) + "!"}
+              </p>
+              
+              <p className="text-gray-700 mb-6">
+                Our tech competitions always sell super fast, enter now before it's too late and you could be our next winner!
+              </p>
+              
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-[#002147] mb-2">Draw Information</h3>
+                <ul className="list-disc list-inside text-gray-700 space-y-2">
+                  <li>Draw takes place regardless of sell out</li>
+                  <li>Competition will close sooner if the maximum entries are received</li>
+                </ul>
+              </div>
             </div>
-          </div>
+          )}
+          
+          {activeTab === "faq" && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-[#002147] mb-4">
+                Frequently Asked Questions
+              </h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002147] mb-2">How do I know if I've won?</h3>
+                  <p className="text-gray-700">
+                    Once the competition closes and the draw takes place, winners will be notified via email. You can also check your account dashboard for any winning notifications.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002147] mb-2">When will I receive my prize?</h3>
+                  <p className="text-gray-700">
+                    If you're the lucky winner, your prize will be dispatched within 14 working days of the draw date. For high-value items, we may arrange a delivery date with you directly.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002147] mb-2">Can I get a refund on my tickets?</h3>
+                  <p className="text-gray-700">
+                    All ticket purchases are final and non-refundable once completed.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002147] mb-2">What's the cash alternative?</h3>
+                  <p className="text-gray-700">
+                    A cash alternative is available for this prize at the value shown in the competition details. You must notify us within 14 days of winning if you prefer the cash alternative.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002147] mb-2">How are the winners selected?</h3>
+                  <p className="text-gray-700">
+                    Winners are selected via an automated random selection system which is overseen by an independent adjudicator.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
