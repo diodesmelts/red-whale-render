@@ -48,14 +48,14 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         </div>
         
         {/* Draw date badge with countdown timer */}
-        <div className="absolute -bottom-4 w-full flex justify-center">
-          <div className="bg-[#002147] text-white font-medium py-2 px-3 rounded-full shadow-md text-center w-11/12 text-sm flex items-center justify-center">
+        <div className="absolute -bottom-5 w-full flex justify-center">
+          <div className="w-[95%] shadow-lg">
             <CountdownTimer drawDate={competition.drawDate} variant="badge" />
           </div>
         </div>
       </div>
       
-      <div className="px-4 pt-8 pb-4 flex flex-col h-full">
+      <div className="px-4 pt-10 pb-4 flex flex-col h-full">
         <Link href={`/competitions/${competition.id}`}>
           <h3 className="text-xl font-bold text-[#002147] mb-2 cursor-pointer hover:text-[#3bbff2] transition-colors text-center">
             {competition.title}

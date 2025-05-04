@@ -95,31 +95,34 @@ export function CountdownTimer({
   }
   
   if (variant === "badge") {
-    // Always show the countdown timer with days, hours, minutes, and seconds
+    // Create a sleek, modern countdown timer
     return (
       <div className="flex items-center justify-center w-full">
-        <div className="bg-[#bbd665] text-[#002147] font-bold text-[10px] px-2 py-0.5 rounded-full mr-2 animate-pulse flex items-center">
-          <span className="mr-0.5">•</span>LIVE
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="flex flex-col items-center">
-            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.days).padStart(2, '0')}</div>
-            <div className="text-[10px] text-white/80">d</div>
+        <div className="flex items-center justify-between bg-gradient-to-r from-[#002147] to-[#003167] w-full px-4 py-1.5 rounded-full shadow-inner">
+          <div className="bg-[#bbd665] text-[#002147] font-bold text-[10px] px-2 py-0.5 rounded-full flex items-center animate-pulse">
+            <span className="mr-0.5 text-xs">•</span><span>LIVE</span>
           </div>
-          <span className="text-white self-start mt-0.5 text-xs">:</span>
-          <div className="flex flex-col items-center">
-            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.hours).padStart(2, '0')}</div>
-            <div className="text-[10px] text-white/80">h</div>
-          </div>
-          <span className="text-white self-start mt-0.5 text-xs">:</span>
-          <div className="flex flex-col items-center">
-            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.minutes).padStart(2, '0')}</div>
-            <div className="text-[10px] text-white/80">m</div>
-          </div>
-          <span className="text-white self-start mt-0.5 text-xs">:</span>
-          <div className="flex flex-col items-center">
-            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.seconds).padStart(2, '0')}</div>
-            <div className="text-[10px] text-white/80">s</div>
+          
+          <div className="flex items-center justify-center space-x-0.5 mx-auto">
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-base tracking-wider">{String(timeRemaining.days).padStart(2, '0')}</div>
+              <div className="text-[9px] uppercase tracking-tight text-white/60 font-medium">d</div>
+            </div>
+            <div className="text-white/40 text-sm mx-0.5 font-light">:</div>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-base tracking-wider">{String(timeRemaining.hours).padStart(2, '0')}</div>
+              <div className="text-[9px] uppercase tracking-tight text-white/60 font-medium">h</div>
+            </div>
+            <div className="text-white/40 text-sm mx-0.5 font-light">:</div>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-base tracking-wider">{String(timeRemaining.minutes).padStart(2, '0')}</div>
+              <div className="text-[9px] uppercase tracking-tight text-white/60 font-medium">m</div>
+            </div>
+            <div className="text-white/40 text-sm mx-0.5 font-light">:</div>
+            <div className="flex flex-col items-center">
+              <div className="text-[#bbd665] font-bold text-base tracking-wider">{String(timeRemaining.seconds).padStart(2, '0')}</div>
+              <div className="text-[9px] uppercase tracking-tight text-white/60 font-medium">s</div>
+            </div>
           </div>
         </div>
       </div>
