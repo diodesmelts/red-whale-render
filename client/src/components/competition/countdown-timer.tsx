@@ -97,20 +97,20 @@ export function CountdownTimer({
   // Default compact variant
   return (
     <div className={cn("flex items-center space-x-1", className)}>
-      <div className="bg-[#002147] border border-white text-xs text-white px-2 py-1 rounded-md shadow-sm flex items-center">
-        <Calendar className="h-3 w-3 mr-1 text-[#bbd665]" />
+      <div className="bg-white border border-gray-200 text-xs text-[#36b4ff] px-2 py-1 rounded-md shadow-sm flex items-center">
+        <Calendar className="h-3 w-3 mr-1 text-[#36b4ff]" />
         <span>{String(timeRemaining.days).padStart(2, '0')}</span>
       </div>
-      <div className="bg-[#002147] border border-white text-xs text-white px-2 py-1 rounded-md shadow-sm flex items-center">
-        <Clock className="h-3 w-3 mr-1 text-[#bbd665]" />
+      <div className="bg-white border border-gray-200 text-xs text-[#36b4ff] px-2 py-1 rounded-md shadow-sm flex items-center">
+        <Clock className="h-3 w-3 mr-1 text-[#36b4ff]" />
         <span>{String(timeRemaining.hours).padStart(2, '0')}</span>
       </div>
-      <div className="bg-[#002147] border border-white text-xs text-white px-2 py-1 rounded-md shadow-sm flex items-center">
-        <Hourglass className="h-3 w-3 mr-1 text-[#bbd665]" />
+      <div className="bg-white border border-gray-200 text-xs text-[#36b4ff] px-2 py-1 rounded-md shadow-sm flex items-center">
+        <Hourglass className="h-3 w-3 mr-1 text-[#36b4ff]" />
         <span>{String(timeRemaining.minutes).padStart(2, '0')}</span>
       </div>
-      <div className="bg-[#002147] border border-white text-xs text-white px-2 py-1 rounded-md shadow-sm flex items-center">
-        <Timer className="h-3 w-3 mr-1 text-[#bbd665]" />
+      <div className="bg-white border border-gray-200 text-xs text-[#36b4ff] px-2 py-1 rounded-md shadow-sm flex items-center">
+        <Timer className="h-3 w-3 mr-1 text-[#36b4ff]" />
         <span>{String(timeRemaining.seconds).padStart(2, '0')}</span>
       </div>
     </div>

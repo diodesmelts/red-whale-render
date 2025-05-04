@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { useState } from "react";
 import { Competition } from "@shared/schema";
 import { formatCurrency, formatDate, calculateTimeRemaining, getCategoryColor } from "@/lib/utils";
-import { Ticket, Calendar, Clock, Hourglass } from "lucide-react";
+import { Ticket, Calendar, Clock, Hourglass, Zap } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import { CategoryBadge } from "./category-badge";
 import { motion } from "framer-motion";
@@ -14,117 +14,105 @@ interface CompetitionCardProps {
 
 export function CompetitionCard({ competition }: CompetitionCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const categoryColor = getCategoryColor(competition.category);
   const timeRemaining = calculateTimeRemaining(competition.drawDate);
   
   const ticketsSold = competition.ticketsSold || 0;
   const remainingTickets = competition.totalTickets - ticketsSold;
-  const percentSold = (ticketsSold / competition.totalTickets) * 100;
+  const percentSold = Math.round((ticketsSold / competition.totalTickets) * 100);
   
   // Format ticket price
   const ticketPrice = formatCurrency(competition.ticketPrice);
   
-  // Get color classes based on category
-  const getBorderColorClass = () => {
-    switch (competition.category) {
-      case "family":
-        return "border-accent";
-      case "household":
-        return "border-pink-400";
-      case "cash":
-        return "border-primary";
-      default:
-        return "border-primary";
-    }
+  // Determine the draw date label text and color
+  const getDrawLabelClass = () => {
+    const isToday = timeRemaining.days === 0 && timeRemaining.hours < 24;
+    return isToday ? "bg-green-400 text-white" : "bg-[#3bbff2] text-white";
   };
   
-  const getButtonColorClass = () => {
-    switch (competition.category) {
-      case "family":
-        return "bg-accent hover:bg-accent/90";
-      case "household":
-        return "bg-pink-500 hover:bg-pink-600";
-      case "cash":
-        return "bg-primary hover:bg-primary/90";
-      default:
-        return "bg-primary hover:bg-primary/90";
+  const getDrawLabelText = () => {
+    const isToday = timeRemaining.days === 0 && timeRemaining.hours < 24;
+    const drawDate = new Date(competition.drawDate);
+    if (isToday) {
+      const hours = drawDate.getHours();
+      const minutes = String(drawDate.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'pm' : 'am';
+      const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+      return `Draw Today ${displayHours}${minutes !== '00' ? ':' + minutes : ''}${ampm}`;
     }
-  };
-  
-  const getGlowColorClass = () => {
-    switch (competition.category) {
-      case "family":
-        return "shadow-[0_0_15px_rgba(255,149,40,0.5)]";
-      case "household":
-        return "shadow-[0_0_15px_rgba(255,77,148,0.5)]";
-      case "cash":
-        return "shadow-[0_0_15px_rgba(5,138,99,0.5)]";
-      default:
-        return "shadow-[0_0_15px_rgba(5,138,99,0.5)]";
-    }
+    return "Automated Draw";
   };
 
   return (
     <motion.div
-      className={cn(
-        "bg-[#002147] text-white rounded-xl overflow-hidden shadow-lg border-2 border-white transform transition-all duration-300",
-        isHovered && `${getBorderColorClass()} ${getGlowColorClass()}`
-      )}
-      whileHover={{ scale: 1.03 }}
+      className="bg-white text-[#002147] rounded-xl overflow-hidden shadow-lg transition-all duration-300 flex flex-col h-full"
+      whileHover={{ scale: 1.02, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
       <div className="relative">
+        {/* Draw date label at top */}
+        <div className={`absolute top-2 left-0 right-0 ${getDrawLabelClass()} py-2 px-6 text-center font-medium z-10 mx-auto w-max rounded-full shadow-md text-sm`}>
+          {getDrawLabelText()}
+        </div>
+
         <img 
-          className="w-full h-60 object-cover" 
+          className="w-full h-48 object-cover" 
           src={competition.imageUrl || "https://placehold.co/600x400/f0f0f0/333333/png?text=No+Image"}
           alt={competition.title}
         />
         
-        <CategoryBadge category={competition.category} brand={competition.brand || undefined} className="absolute top-0 left-0 m-2" />
-        
-        {/* Highlight badges for special competitions */}
-        {percentSold > 80 && (
-          <div className="absolute top-0 right-0 bg-accent text-white text-xs font-bold px-2 py-1 m-2 rounded-md animate-pulse">
-            HOT ITEM
+        {/* Automated Draw button */}
+        <div className="absolute -bottom-4 w-full flex justify-center">
+          <div className="bg-white text-[#3bbff2] border border-[#3bbff2] font-medium py-1.5 px-6 rounded-full shadow-md text-center w-3/4 text-sm">
+            Automated Draw
           </div>
-        )}
-        {timeRemaining.days === 0 && timeRemaining.hours < 12 && (
-          <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 py-1 m-2 rounded-md animate-pulse">
-            ENDING SOON
-          </div>
-        )}
-        
-        {/* Gradient overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/70 to-transparent h-16"></div>
+        </div>
       </div>
       
-      <div className="p-6">
+      <div className="px-3 pt-6 pb-3">
         <Link href={`/competitions/${competition.id}`}>
-          <h3 className="text-xl font-semibold text-white mb-2 cursor-pointer hover:text-[#bbd665] transition-colors">{competition.title}</h3>
+          <h3 className="text-lg font-bold text-[#002147] mb-1 cursor-pointer hover:text-[#3bbff2] transition-colors text-center">
+            {competition.title}
+          </h3>
         </Link>
         
-        <div className="flex justify-between items-center mb-4">
-          <span className="font-bold text-[#bbd665] text-xl">
-            {ticketPrice} <span className="text-white/80 text-sm">per ticket</span>
-          </span>
-          <span className="text-white/80 text-sm">
-            <Ticket className="h-4 w-4 inline mr-1 text-[#bbd665]" /> {remainingTickets} tickets remaining
-          </span>
+        {/* Chance of winning badge */}
+        <div className="flex justify-center mb-2">
+          <div className="py-1 px-2 inline-block text-center">
+            <span className="text-sm text-gray-600 flex items-center justify-center">
+              <span className="text-amber-500 mr-1">👉</span> 1 in 10 Chance Of Winning! <span className="text-amber-500 ml-1">👈</span>
+            </span>
+          </div>
         </div>
         
-        <div className="flex justify-between items-center mb-5">
-          <CountdownTimer drawDate={competition.drawDate} />
+        {/* Ticket price */}
+        <div className="text-[#3bbff2] text-3xl font-bold mb-2 text-center">
+          {ticketPrice}
+        </div>
+        
+        {/* Progress bar for tickets sold */}
+        <div className="mb-3">
+          <div className="text-xs text-gray-600 mb-1">SOLD: {percentSold}%</div>
+          <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              className="h-1.5 bg-[#3bbff2] rounded-full" 
+              style={{ width: `${percentSold}%` }}
+            ></div>
+          </div>
+        </div>
+        
+        {/* Instant win badge */}
+        <div className="mb-3 flex justify-center">
+          <div className="text-[#005dff] border-2 border-[#005dff] font-bold py-1 px-4 rounded-full flex items-center">
+            <span className="mr-1">INSTANT</span>
+            <Zap className="fill-[#005dff] h-5 w-5 stroke-white" />
+            <span className="ml-0.5">WIN</span>
+          </div>
         </div>
         
         <Link href={`/competitions/${competition.id}`}>
-          <div className={cn(
-            "block w-full px-4 py-3 text-[#002147] text-center rounded-md font-medium transform transition-all duration-200 cursor-pointer shadow-md",
-            "bg-[#bbd665] hover:bg-[#bbd665]/90",
-            "relative overflow-hidden group text-lg border border-white/50"
-          )}>
-            <div className="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-300"></div>
-            <Ticket className="h-5 w-5 inline mr-2" /> GET TICKETS
+          <div className="border-2 border-[#3bbff2] text-[#3bbff2] hover:bg-[#3bbff2] hover:text-white text-center py-2 px-4 rounded-full font-medium cursor-pointer flex items-center justify-center transition-colors">
+            Enter now <Ticket className="h-5 w-5 ml-2" />
           </div>
         </Link>
       </div>
