@@ -5,6 +5,7 @@ import { Menu, ChevronDown, User, Shield, ClipboardList, Wallet, Settings, LogOu
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { CartIcon } from "@/components/cart/cart-icon";
+import { Logo } from "@/components/ui/logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,7 +52,7 @@ export function Navbar() {
               <div className="flex-shrink-0 pl-2 sm:pl-4">
                 <Link href="/">
                   <div className="flex items-center space-x-2 cursor-pointer">
-                    <span className="text-2xl font-bold text-white">MobyComps</span>
+                    <Logo size="md" />
                   </div>
                 </Link>
               </div>
@@ -227,7 +228,9 @@ export function Navbar() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[80%]">
-                  <div className="text-2xl font-bold mb-6">MobyComps</div>
+                  <div className="mb-6">
+                    <Logo size="md" />
+                  </div>
                   <div className="flex flex-col space-y-6">
                     <Link href="/" 
                       onClick={() => setIsMenuOpen(false)}
