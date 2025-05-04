@@ -352,7 +352,7 @@ export default function CompetitionDetails() {
               
               {/* Draw Date Box */}
               <div className="flex justify-center gap-2 mb-6">
-                <div className="py-1.5 px-4 bg-green-500 text-white rounded-md text-sm inline-flex items-center">
+                <div className="py-1.5 px-4 bg-[#bbd665] text-white rounded-md text-sm inline-flex items-center">
                   <span className="font-semibold">
                     Draw {new Date(competition.drawDate).toLocaleDateString('en-GB', { 
                       day: '2-digit',
@@ -361,7 +361,7 @@ export default function CompetitionDetails() {
                     })}
                   </span>
                 </div>
-                <div className="py-1.5 px-4 bg-blue-500 text-white rounded-md text-sm inline-flex items-center">
+                <div className="py-1.5 px-4 bg-[#002147] text-white rounded-md text-sm inline-flex items-center">
                   <span className="font-semibold">Automated Draw</span>
                 </div>
               </div>
