@@ -95,50 +95,33 @@ export function CountdownTimer({
   }
   
   if (variant === "badge") {
-    // Check if it's within 7 days - if so, show the countdown timer
-    const isWithin7Days = timeRemaining.days < 7;
-    
-    if (isWithin7Days) {
-      return (
-        <div className="flex items-center justify-center w-full">
-          <div className="bg-[#bbd665] text-[#002147] font-bold text-xs px-2 py-0.5 rounded-full mr-2 animate-pulse">LIVE</div>
-          <div className="flex items-center space-x-1">
-            <div className="flex flex-col items-center">
-              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.days).padStart(2, '0')}</div>
-              <div className="text-[10px] text-white/80">d</div>
-            </div>
-            <span className="text-white self-start mt-0.5 text-xs">:</span>
-            <div className="flex flex-col items-center">
-              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.hours).padStart(2, '0')}</div>
-              <div className="text-[10px] text-white/80">h</div>
-            </div>
-            <span className="text-white self-start mt-0.5 text-xs">:</span>
-            <div className="flex flex-col items-center">
-              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.minutes).padStart(2, '0')}</div>
-              <div className="text-[10px] text-white/80">m</div>
-            </div>
-            <span className="text-white self-start mt-0.5 text-xs">:</span>
-            <div className="flex flex-col items-center">
-              <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.seconds).padStart(2, '0')}</div>
-              <div className="text-[10px] text-white/80">s</div>
-            </div>
+    // Always show the countdown timer with days, hours, minutes, and seconds
+    return (
+      <div className="flex items-center justify-center w-full">
+        <div className="bg-[#bbd665] text-[#002147] font-bold text-[10px] px-2 py-0.5 rounded-full mr-2 animate-pulse flex items-center">
+          <span className="mr-0.5">•</span>LIVE
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="flex flex-col items-center">
+            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.days).padStart(2, '0')}</div>
+            <div className="text-[10px] text-white/80">d</div>
+          </div>
+          <span className="text-white self-start mt-0.5 text-xs">:</span>
+          <div className="flex flex-col items-center">
+            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.hours).padStart(2, '0')}</div>
+            <div className="text-[10px] text-white/80">h</div>
+          </div>
+          <span className="text-white self-start mt-0.5 text-xs">:</span>
+          <div className="flex flex-col items-center">
+            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.minutes).padStart(2, '0')}</div>
+            <div className="text-[10px] text-white/80">m</div>
+          </div>
+          <span className="text-white self-start mt-0.5 text-xs">:</span>
+          <div className="flex flex-col items-center">
+            <div className="text-[#bbd665] font-bold text-sm">{String(timeRemaining.seconds).padStart(2, '0')}</div>
+            <div className="text-[10px] text-white/80">s</div>
           </div>
         </div>
-      );
-    }
-    
-    // Otherwise, show the date
-    const formattedDate = new Date(drawDate).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
-    
-    return (
-      <div className="flex items-center justify-center">
-        <span className="text-[#bbd665] font-semibold text-xs mr-2">Draw:</span>
-        <span>{formattedDate}</span>
-        <div className="bg-[#bbd665] text-[#002147] font-medium text-xs px-2 py-0.5 rounded-full ml-2 animate-pulse">LIVE</div>
       </div>
     );
   }
@@ -149,7 +132,9 @@ export function CountdownTimer({
         <div className="flex justify-center items-center p-2">
           <div className="flex items-center space-x-3">
             <div className="flex items-center">
-              <div className="bg-[#bbd665] text-[#002147] font-medium text-xs px-2 py-0.5 rounded-md mr-2 animate-pulse">LIVE</div>
+              <div className="bg-[#bbd665] text-[#002147] font-bold text-[11px] px-2 py-0.5 rounded-md mr-2 animate-pulse flex items-center">
+                <span className="mr-0.5">•</span>LIVE
+              </div>
               <span className="text-xs font-semibold hidden sm:inline text-white">TIME REMAINING</span>
             </div>
             <div className="flex space-x-2">

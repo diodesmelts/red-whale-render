@@ -49,7 +49,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         
         {/* Draw date badge with countdown timer */}
         <div className="absolute -bottom-4 w-full flex justify-center">
-          <div className="bg-[#002147] text-white font-medium py-2 px-4 rounded-full shadow-md text-center w-4/5 text-sm flex items-center justify-center">
+          <div className="bg-[#002147] text-white font-medium py-2 px-3 rounded-full shadow-md text-center w-11/12 text-sm flex items-center justify-center">
             <CountdownTimer drawDate={competition.drawDate} variant="badge" />
           </div>
         </div>
