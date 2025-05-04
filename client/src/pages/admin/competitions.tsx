@@ -502,11 +502,10 @@ export default function CompetitionsManager() {
                                         <span>View</span>
                                       </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                      <Link href={`/admin/edit-competition/${competition.id}`}>
+                                    <DropdownMenuItem 
+                                      onClick={() => navigate(`/admin/edit-competition/${competition.id}`)}>
                                         <Edit className="mr-2 h-4 w-4" />
                                         <span>Edit</span>
-                                      </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={() => handleDeleteCompetition(competition.id)} className="text-red-600">
