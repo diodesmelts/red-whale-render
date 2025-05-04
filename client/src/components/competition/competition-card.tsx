@@ -111,7 +111,7 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
         </div>
         
         <Link href={`/competitions/${competition.id}`}>
-          <div className="border-2 border-[#3bbff2] text-[#3bbff2] hover:bg-[#3bbff2] hover:text-white text-center py-2 px-4 rounded-full font-medium cursor-pointer flex items-center justify-center transition-colors">
+          <div className="bg-[#002147] border-2 border-[#002147] text-white hover:bg-[#003167] hover:border-[#003167] text-center py-2 px-4 rounded-full font-medium cursor-pointer flex items-center justify-center transition-colors">
             Enter now <Ticket className="h-5 w-5 ml-2" />
           </div>
         </Link>
