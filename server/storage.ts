@@ -716,9 +716,38 @@ export class DatabaseStorage implements IStorage {
   }
   
   async updateCompetition(id: number, competitionData: Partial<Competition>): Promise<Competition | undefined> {
+    // Handle drawDate specially to ensure it's a valid Date object before updating
+    let dataToUpdate = { ...competitionData };
+    
+    if (dataToUpdate.drawDate) {
+      try {
+        // Ensure drawDate is a proper Date object
+        const drawDateVal = dataToUpdate.drawDate;
+        
+        if (typeof drawDateVal === 'string') {
+          // If it's a string, convert to Date
+          dataToUpdate.drawDate = new Date(drawDateVal);
+        } else if (!(drawDateVal instanceof Date)) {
+          // If it's neither a string nor a Date, use current date as fallback
+          console.warn('Invalid drawDate format, using current date instead');
+          dataToUpdate.drawDate = new Date();
+        }
+        
+        // Validate that we have a proper Date object now
+        if (!(dataToUpdate.drawDate instanceof Date) || isNaN(dataToUpdate.drawDate.getTime())) {
+          console.warn('Invalid date after conversion, using current date instead');
+          dataToUpdate.drawDate = new Date();
+        }
+      } catch (error) {
+        console.error('Error processing drawDate:', error);
+        // Remove problematic drawDate from update if it can't be processed
+        delete dataToUpdate.drawDate;
+      }
+    }
+    
     const [updatedCompetition] = await db
       .update(competitions)
-      .set(competitionData)
+      .set(dataToUpdate)
       .where(eq(competitions.id, id))
       .returning();
     return updatedCompetition;
