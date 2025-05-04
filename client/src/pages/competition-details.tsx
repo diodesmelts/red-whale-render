@@ -313,7 +313,7 @@ export default function CompetitionDetails() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Left column: Image */}
-          <div className="bg-white rounded-lg p-3">
+          <div className="bg-white rounded-lg p-3 shadow-md border border-gray-100">
             <div className="aspect-square relative bg-white rounded-lg overflow-hidden">
               <img 
                 className="w-full h-full object-contain" 
@@ -325,141 +325,147 @@ export default function CompetitionDetails() {
           
           {/* Right column: Details */}
           <div>
-            <div className="bg-white">
-              <h1 className="text-2xl font-bold text-[#002147] mb-3 uppercase tracking-tight text-center">
-                {competition.title}
-              </h1>
-              
-              <div className="text-center mb-2">
-                <div className="text-gray-600 text-xs">Cash Alternative: {formatCurrency(competition.prizeValue)}</div>
-              </div>
-              
-              {/* Draw Date Box */}
-              <div className="flex justify-center gap-1 mb-4">
-                <div className="py-1 px-3 bg-[#bbd665] text-white rounded-md text-xs inline-flex items-center">
-                  <span className="font-semibold">
-                    Draw {new Date(competition.drawDate).toLocaleDateString('en-GB', { 
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </span>
-                </div>
-                <div className="py-1 px-3 bg-[#002147] text-white rounded-md text-xs inline-flex items-center">
-                  <span className="font-semibold">Automated Draw</span>
+            <div className="bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+              {/* Header with title */}
+              <div className="bg-[#002147] text-white p-4">
+                <h1 className="text-xl font-bold uppercase tracking-tight text-center">
+                  {competition.title}
+                </h1>
+                <div className="text-center mt-1">
+                  <div className="text-white/90 text-xs">Cash Alternative: {formatCurrency(competition.prizeValue)}</div>
                 </div>
               </div>
               
-              {/* Price */}
-              <div className="text-center mb-4">
-                <div className="text-black text-3xl font-bold">
-                  {formatCurrency(competition.ticketPrice)}
-                </div>
-              </div>
-              
-              {/* Progress Bar */}
-              <div className="mb-5">
-                <div className="mb-1 flex justify-between text-xs text-gray-600">
-                  <span>SOLD: {Math.round((competition.ticketsSold || 0) / competition.totalTickets * 100)}%</span>
-                  <span>{competition.ticketsSold || 0} / {competition.totalTickets}</span>
-                </div>
-                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-2 bg-[#0099ff] rounded-full" 
-                    style={{ width: `${Math.round((competition.ticketsSold || 0) / competition.totalTickets * 100)}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              {/* Entry Mode */}
-              <div className="mb-5">
-                <button className="w-full bg-[#002147] text-white font-medium py-2 text-sm rounded-md text-center">
-                  ONLINE ENTRY
-                </button>
-              </div>
-              
-              {/* Ticket Quantity Selector */}
-              <div className="bg-gray-100 p-4 rounded-md mb-5">
-                <div className="mb-3 text-center">
-                  <h3 className="text-gray-700 font-medium mb-1 text-sm">How many tickets?</h3>
-                  <div className="bg-[#002147] text-white font-bold py-0.5 px-3 rounded-full inline-block text-sm">
-                    {ticketQuantity}
+              <div className="p-4">
+                {/* Draw Date Box */}
+                <div className="flex justify-center gap-1 mb-4">
+                  <div className="py-1 px-3 bg-[#bbd665] text-white rounded-md text-xs inline-flex items-center">
+                    <span className="font-semibold">
+                      Draw {new Date(competition.drawDate).toLocaleDateString('en-GB', { 
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  <div className="py-1 px-3 bg-[#002147] text-white rounded-md text-xs inline-flex items-center">
+                    <span className="font-semibold">Automated Draw</span>
                   </div>
                 </div>
                 
-                {/* Slider */}
-                <div className="mb-3">
-                  <input 
-                    type="range" 
-                    min="1" 
-                    max={competition.maxTicketsPerUser} 
-                    value={ticketQuantity}
-                    onChange={(e) => setTicketQuantity(parseInt(e.target.value))}
-                    className="w-full bg-gray-300 h-1.5 rounded-full outline-none appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#0099ff] [&::-webkit-slider-thumb]:cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>1</span>
-                    <span>{competition.maxTicketsPerUser}</span>
+                {/* Price */}
+                <div className="text-center mb-4">
+                  <div className="text-black text-3xl font-bold">
+                    {formatCurrency(competition.ticketPrice)}
                   </div>
                 </div>
                 
-                {/* +/- Controls */}
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <button 
-                    onClick={decreaseQuantity}
-                    className="bg-white border border-gray-300 rounded-md h-6 w-6 flex items-center justify-center"
-                  >
-                    <Minus className="h-3 w-3" />
-                  </button>
-                  
-                  <div className="text-center">
-                    <div className="text-xs text-gray-700">Number of tickets: <span className="font-semibold">{ticketQuantity}</span> (£{(ticketQuantity * competition.ticketPrice).toFixed(2)})</div>
+                {/* Progress Bar */}
+                <div className="mb-5">
+                  <div className="mb-1 flex justify-between text-xs text-gray-600">
+                    <span>SOLD: {Math.round((competition.ticketsSold || 0) / competition.totalTickets * 100)}%</span>
+                    <span>{competition.ticketsSold || 0} / {competition.totalTickets}</span>
                   </div>
-                  
-                  <button 
-                    onClick={increaseQuantity}
-                    className="bg-white border border-gray-300 rounded-md h-6 w-6 flex items-center justify-center"
-                  >
-                    <Plus className="h-3 w-3" />
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-2 bg-[#002147] rounded-full" 
+                      style={{ width: `${Math.round((competition.ticketsSold || 0) / competition.totalTickets * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+                
+                {/* Entry Mode */}
+                <div className="mb-5">
+                  <h3 className="text-[#002147] font-semibold mb-2 text-sm text-center uppercase">Entry Method</h3>
+                  <button className="w-full bg-[#002147] text-white font-medium py-2 text-sm rounded-md text-center">
+                    ONLINE ENTRY
                   </button>
                 </div>
                 
-                {/* Add to cart button */}
-                <button 
-                  onClick={() => {
-                    if (!user) {
-                      toast({
-                        title: "Login required",
-                        description: "Please log in to purchase tickets",
-                        variant: "destructive",
-                      });
-                      navigate("/auth");
-                      return;
-                    }
+                {/* Ticket Quantity Section */}
+                <div className="bg-gray-100 p-4 rounded-md mb-5">
+                  <h3 className="text-[#002147] font-semibold mb-3 text-sm text-center uppercase border-b border-gray-200 pb-2">Select Your Tickets</h3>
+                  
+                  <div className="mb-3 text-center">
+                    <div className="bg-[#002147] text-white font-bold py-0.5 px-3 rounded-full inline-block text-sm">
+                      {ticketQuantity}
+                    </div>
+                  </div>
+                  
+                  {/* Slider */}
+                  <div className="mb-3">
+                    <input 
+                      type="range" 
+                      min="1" 
+                      max={competition.maxTicketsPerUser} 
+                      value={ticketQuantity}
+                      onChange={(e) => setTicketQuantity(parseInt(e.target.value))}
+                      className="w-full bg-gray-300 h-1.5 rounded-full outline-none appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#002147] [&::-webkit-slider-thumb]:cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>1</span>
+                      <span>{competition.maxTicketsPerUser}</span>
+                    </div>
+                  </div>
+                  
+                  {/* +/- Controls */}
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <button 
+                      onClick={decreaseQuantity}
+                      className="bg-white border border-gray-300 rounded-md h-6 w-6 flex items-center justify-center"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
                     
-                    // Add to cart and navigate
-                    addToCart(competition, ticketQuantity);
-                    navigate("/cart");
-                  }}
-                  className="w-full bg-[#002147] hover:bg-[#001c3a] text-white font-semibold py-2 px-4 text-sm rounded-md flex items-center justify-center gap-2"
-                  disabled={isProcessing}
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Add tickets to basket <CreditCard className="h-4 w-4 ml-1" />
-                    </>
-                  )}
-                </button>
-                
-                {/* Competition closes notice */}
-                <div className="mt-4 text-center bg-gray-50 p-2 rounded border border-gray-200">
-                  <div className="text-xs font-medium">Competition closes Today at 8:45 PM</div>
-                  <div className="text-xs text-gray-500">or when all tickets are sold</div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-700">Number of tickets: <span className="font-semibold">{ticketQuantity}</span> (£{(ticketQuantity * competition.ticketPrice).toFixed(2)})</div>
+                    </div>
+                    
+                    <button 
+                      onClick={increaseQuantity}
+                      className="bg-white border border-gray-300 rounded-md h-6 w-6 flex items-center justify-center"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
+                  
+                  {/* Add to cart button */}
+                  <button 
+                    onClick={() => {
+                      if (!user) {
+                        toast({
+                          title: "Login required",
+                          description: "Please log in to purchase tickets",
+                          variant: "destructive",
+                        });
+                        navigate("/auth");
+                        return;
+                      }
+                      
+                      // Add to cart and navigate
+                      addToCart(competition, ticketQuantity);
+                      navigate("/cart");
+                    }}
+                    className="w-full bg-[#002147] hover:bg-[#001c3a] text-white font-semibold py-2 px-4 text-sm rounded-md flex items-center justify-center gap-2"
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        Add tickets to basket <CreditCard className="h-4 w-4 ml-1" />
+                      </>
+                    )}
+                  </button>
+                  
+                  {/* Competition closes notice */}
+                  <div className="mt-4 text-center bg-gray-50 p-2 rounded border border-gray-200">
+                    <div className="text-xs font-medium">Competition closes Today at 8:45 PM</div>
+                    <div className="text-xs text-gray-500">or when all tickets are sold</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -472,40 +478,40 @@ export default function CompetitionDetails() {
           <p className="text-center text-gray-600 mb-5 text-sm">Instantly find out if you are a lucky winner!</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="border border-gray-200 rounded-lg p-4 text-center">
-              <div className="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-blue-500 font-semibold text-sm">1</span>
+            <div className="border border-gray-200 rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="bg-[#bbd665]/20 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-[#002147] font-semibold text-sm">1</span>
               </div>
               <div className="mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-[#002147]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-sm mb-1">Buy your tickets</h3>
+              <h3 className="font-semibold text-sm mb-1 text-[#002147]">Buy your tickets</h3>
             </div>
             
-            <div className="border border-gray-200 rounded-lg p-4 text-center">
-              <div className="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-blue-500 font-semibold text-sm">2</span>
+            <div className="border border-gray-200 rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="bg-[#bbd665]/20 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-[#002147] font-semibold text-sm">2</span>
               </div>
               <div className="mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-[#002147]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-sm mb-1">Reveal if you've won</h3>
+              <h3 className="font-semibold text-sm mb-1 text-[#002147]">Reveal if you've won</h3>
             </div>
             
-            <div className="border border-gray-200 rounded-lg p-4 text-center">
-              <div className="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-blue-500 font-semibold text-sm">3</span>
+            <div className="border border-gray-200 rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="bg-[#bbd665]/20 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-[#002147] font-semibold text-sm">3</span>
               </div>
               <div className="mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-[#002147]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-sm mb-1">Claim your prize</h3>
+              <h3 className="font-semibold text-sm mb-1 text-[#002147]">Claim your prize</h3>
             </div>
           </div>
         </div>
@@ -515,13 +521,13 @@ export default function CompetitionDetails() {
           <div className="flex border-b border-gray-200 mb-4">
             <button 
               onClick={() => setActiveTab("details")}
-              className={`py-2 px-4 border-b-2 ${activeTab === "details" ? "border-[#0099ff] text-[#0099ff]" : "border-transparent text-gray-500"} font-semibold text-sm`}
+              className={`py-2 px-4 border-b-2 ${activeTab === "details" ? "border-[#002147] text-[#002147]" : "border-transparent text-gray-500"} font-semibold text-sm`}
             >
               Competition Details
             </button>
             <button 
               onClick={() => setActiveTab("faq")}
-              className={`py-2 px-4 border-b-2 ${activeTab === "faq" ? "border-[#0099ff] text-[#0099ff]" : "border-transparent text-gray-500"} font-semibold text-sm`}
+              className={`py-2 px-4 border-b-2 ${activeTab === "faq" ? "border-[#002147] text-[#002147]" : "border-transparent text-gray-500"} font-semibold text-sm`}
             >
               FAQ
             </button>
