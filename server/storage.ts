@@ -993,8 +993,15 @@ export class DatabaseStorage implements IStorage {
         needsUpdate = true;
       }
       
-      // Update password if either ADMIN_PASSWORD_HASH or ADMIN_PASSWORD is set
-      if ((process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD) && adminUser.password !== adminPassword) {
+      // Always update password if ADMIN_PASSWORD is explicitly set (since we'll hash it freshly)
+      if (process.env.ADMIN_PASSWORD) {
+        console.log("Updating admin password from ADMIN_PASSWORD environment variable");
+        updates.password = adminPassword;
+        needsUpdate = true;
+      } 
+      // Or update if ADMIN_PASSWORD_HASH is set and different from current
+      else if (process.env.ADMIN_PASSWORD_HASH && adminUser.password !== process.env.ADMIN_PASSWORD_HASH) {
+        console.log("Updating admin password from ADMIN_PASSWORD_HASH environment variable");
         updates.password = adminPassword;
         needsUpdate = true;
       }

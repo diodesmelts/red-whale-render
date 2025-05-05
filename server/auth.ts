@@ -72,6 +72,7 @@ export function setupAuth(app: Express) {
     saveUninitialized: true,
     store: storage.sessionStore,
     name: 'bw.sid',
+    proxy: isProduction || isRender, // Important for Render
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       // In production, especially on Render, we need secure cookies with sameSite=none
