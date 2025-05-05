@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { db } from './db';
-import { competitions, entries, winners } from '@shared/schema';
+import { competitions, entries, winners, siteConfig } from '@shared/schema';
 import { eq, desc } from 'drizzle-orm';
 
 // Create a router
@@ -349,6 +349,86 @@ adminRouter.delete('/competitions/:id', isAdmin, async (req, res) => {
   } catch (error: any) {
     console.error('Error deleting competition:', error);
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Utility to fix image URLs in database (convert absolute URLs to relative)
+adminRouter.post('/fix-image-urls', isAdmin, async (req, res) => {
+  try {
+    console.log('🔧 Starting image URL fix process...');
+    
+    // 1. Find competitions with absolute URLs
+    const competitionList = await db.select().from(competitions);
+    let competitionsFixed = 0;
+    
+    for (const competition of competitionList) {
+      if (competition.imageUrl && (
+          competition.imageUrl.includes('replit.dev') || 
+          competition.imageUrl.includes('replit.app') ||
+          competition.imageUrl.includes('repl.co') ||
+          competition.imageUrl.includes('onrender.com')
+      )) {
+        // Extract just the path from the URL
+        try {
+          const urlObj = new URL(competition.imageUrl);
+          const relativePath = urlObj.pathname;
+          console.log(`🔧 Converting competition image URL: "${competition.imageUrl}" -> "${relativePath}"`);
+          
+          // Update the competition with the relative URL
+          await db.update(competitions)
+            .set({ imageUrl: relativePath })
+            .where(eq(competitions.id, competition.id));
+          
+          competitionsFixed++;
+        } catch (e) {
+          console.error(`❌ Error parsing URL ${competition.imageUrl}:`, e);
+        }
+      }
+    }
+    
+    // 2. Fix site config URLs
+    const configList = await db.select().from(siteConfig);
+    let configsFixed = 0;
+    
+    for (const config of configList) {
+      if (config.value && (
+          config.value.includes('replit.dev') || 
+          config.value.includes('replit.app') ||
+          config.value.includes('repl.co') ||
+          config.value.includes('onrender.com')
+      )) {
+        // Extract just the path from the URL
+        try {
+          const urlObj = new URL(config.value);
+          const relativePath = urlObj.pathname;
+          console.log(`🔧 Converting site config URL: "${config.value}" -> "${relativePath}"`);
+          
+          // Update the config with the relative URL
+          await db.update(siteConfig)
+            .set({ value: relativePath, updatedAt: new Date() })
+            .where(eq(siteConfig.id, config.id));
+          
+          configsFixed++;
+        } catch (e) {
+          console.error(`❌ Error parsing URL ${config.value}:`, e);
+        }
+      }
+    }
+    
+    console.log(`✅ Fixed ${competitionsFixed} competition URLs and ${configsFixed} config URLs`);
+    
+    return res.status(200).json({
+      success: true,
+      message: `Successfully fixed image URLs`,
+      competitionsFixed,
+      configsFixed
+    });
+  } catch (error: any) {
+    console.error('❌ Error fixing image URLs:', error);
+    res.status(500).json({ 
+      message: 'Failed to fix image URLs',
+      error: error.message
+    });
   }
 });
 

@@ -137,24 +137,33 @@ export function getImageUrl(url: string | null | undefined): string {
     origin: window.location.origin
   });
   
-  // Special case for Replit domains when viewing on custom domain
+  // Special case for platform domains when viewing on custom domain
   if (cleanUrl.startsWith('http')) {
-    // If the URL contains a replit domain but we're on a custom domain, strip it to make it relative
-    const replitDomains = [
-      'replit.dev', 
-      'replit.app', 
-      'repl.co'
+    // If the URL contains a platform domain (Replit/Render) but we're on a custom domain, 
+    // strip it to make it relative
+    const platformDomains = [
+      'replit.dev',
+      'replit.app',
+      'repl.co',
+      'onrender.com',
+      'replit', // includes all replit subdomains
+      'render'  // includes all render subdomains
     ];
     
-    const isReplitUrl = replitDomains.some(domain => cleanUrl.includes(domain));
-    const onCustomDomain = !window.location.hostname.includes('replit');
+    // Check if this is a platform URL
+    const isPlatformUrl = platformDomains.some(domain => cleanUrl.includes(domain));
     
-    if (isReplitUrl && onCustomDomain) {
+    // Check if we're on a custom domain (not on Replit or Render)
+    const isOnPlatformDomain = window.location.hostname.includes('replit') || 
+                              window.location.hostname.includes('render');
+    const onCustomDomain = !isOnPlatformDomain;
+    
+    if (isPlatformUrl && onCustomDomain) {
       // Extract just the path portion from the URL
       try {
         const urlObj = new URL(cleanUrl);
         const relativePath = urlObj.pathname;
-        console.log(`🖼️ Converting replit URL to relative path: "${cleanUrl}" -> "${relativePath}"`);
+        console.log(`🖼️ Converting platform URL to relative path: "${cleanUrl}" -> "${relativePath}"`);
         return window.location.origin + relativePath;
       } catch (e) {
         console.log(`🖼️ Failed to parse URL, using as is: "${cleanUrl}"`);
@@ -162,7 +171,7 @@ export function getImageUrl(url: string | null | undefined): string {
       }
     }
     
-    // Not a replit URL or we're on replit - use as is
+    // Not a platform URL or we're on the platform - use as is
     console.log(`🖼️ Using absolute URL as is: "${cleanUrl}"`);
     return cleanUrl;
   }
