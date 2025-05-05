@@ -765,6 +765,117 @@ async function ensureUsersTable() {
 ensureUsersTable().catch(console.error);
 
 // Admin competition deletion endpoint
+// Admin competition update endpoint (PATCH)
+app.patch('/api/admin/competitions/:id', async (req, res) => {
+  try {
+    // Check admin authentication
+    if (!req.isAuthenticated() || !req.user.isAdmin) {
+      console.log('❌ Unauthorized update attempt');
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    
+    const { id } = req.params;
+    console.log(`✏️ Admin update request for competition ID: ${id}`);
+    console.log('📝 Update data:', req.body);
+    
+    // Validate that the competition exists
+    const checkResult = await pool.query(
+      `SELECT id FROM competitions WHERE id = $1`,
+      [id]
+    );
+    
+    if (checkResult.rows.length === 0) {
+      console.log(`❌ Competition not found for update: ID=${id}`);
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Build the SET clause for the SQL UPDATE statement
+    const updateFields = [];
+    const values = [];
+    let valueIndex = 1;
+    
+    // Map from API field names to database column names
+    const fieldMapping = {
+      title: 'title',
+      description: 'description',
+      imageUrl: 'image_url',
+      category: 'category',
+      prizeValue: 'prize_value',
+      ticketPrice: 'ticket_price',
+      maxTicketsPerUser: 'max_tickets_per_user',
+      totalTickets: 'total_tickets',
+      drawDate: 'draw_date',
+      isLive: 'is_live',
+      isFeatured: 'is_featured',
+      brand: 'brand',
+      pushToHeroBanner: 'push_to_hero_banner'
+    };
+    
+    // For each field in the request body, add it to the update if it exists
+    Object.keys(fieldMapping).forEach(apiField => {
+      if (req.body[apiField] !== undefined) {
+        updateFields.push(`${fieldMapping[apiField]} = $${valueIndex}`);
+        values.push(req.body[apiField]);
+        valueIndex++;
+      }
+    });
+    
+    // If no fields were provided, return an error
+    if (updateFields.length === 0) {
+      console.log('❌ No valid fields provided for update');
+      return res.status(400).json({ message: 'No valid fields provided for update' });
+    }
+    
+    // Add the competition ID as the last parameter
+    values.push(id);
+    
+    // Build and execute the update query
+    const updateQuery = `
+      UPDATE competitions 
+      SET ${updateFields.join(', ')} 
+      WHERE id = $${valueIndex}
+      RETURNING *
+    `;
+    
+    console.log('🔄 Executing update query:', updateQuery);
+    console.log('🔢 Update values:', values);
+    
+    const result = await pool.query(updateQuery, values);
+    
+    if (result.rows.length === 0) {
+      console.log(`❌ Update failed for competition: ID=${id}`);
+      return res.status(500).json({ message: 'Update failed' });
+    }
+    
+    // Transform the response to match API format
+    const comp = result.rows[0];
+    const updatedCompetition = {
+      id: comp.id,
+      title: comp.title,
+      description: comp.description,
+      imageUrl: comp.image_url,
+      category: comp.category,
+      prizeValue: comp.prize_value,
+      ticketPrice: comp.ticket_price,
+      maxTicketsPerUser: comp.max_tickets_per_user,
+      totalTickets: comp.total_tickets,
+      ticketsSold: comp.tickets_sold || 0,
+      drawDate: comp.draw_date,
+      isLive: comp.is_live,
+      isFeatured: comp.is_featured,
+      brand: comp.brand,
+      createdAt: comp.created_at,
+      pushToHeroBanner: comp.push_to_hero_banner
+    };
+    
+    console.log(`✅ Competition updated successfully: ID=${id}, Title="${updatedCompetition.title}"`);
+    res.status(200).json(updatedCompetition);
+  } catch (error) {
+    console.error('❌ Error updating competition:', error);
+    res.status(500).json({ message: 'Error updating competition', error: error.message });
+  }
+});
+
 app.delete('/api/admin/competitions/:id', async (req, res) => {
   try {
     // Check admin authentication

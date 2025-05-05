@@ -1,0 +1,92 @@
+CORS request from origin: undefined
+wfz6z
+Allowing request with no origin
+wfz6z
+🔍 Request to GET /favicon.ico {
+wfz6z
+  hasSession: false,
+wfz6z
+  sessionID: 'no-session-id',
+wfz6z
+  hasSessionData: false
+wfz6z
+}
+wfz6z
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+wfz6z
+Using customized select query for user
+wfz6z
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+wfz6z
+CORS request from origin: undefined
+wfz6z
+Allowing request with no origin
+wfz6z
+🔍 Request to GET /api/competitions/5 {
+wfz6z
+  hasSession: false,
+wfz6z
+  sessionID: 'no-session-id',
+wfz6z
+  hasSessionData: false
+wfz6z
+}
+wfz6z
+🔍 Production GET competition request for ID: 5
+wfz6z
+📝 Request context: {
+wfz6z
+  id: '5',
+wfz6z
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+wfz6z
+  isAuthenticated: false,
+wfz6z
+  origin: 'no-origin',
+wfz6z
+  sessionID: 'no-session'
+wfz6z
+}
+wfz6z
+CORS request from origin: undefined
+wfz6z
+Allowing request with no origin
+wfz6z
+🔍 Request to GET /favicon.ico {
+wfz6z
+  hasSession: false,
+wfz6z
+  sessionID: 'no-session-id',
+wfz6z
+  hasSessionData: false
+wfz6z
+}
+wfz6z
+✅ Successfully retrieved competition: ID=5, Title="Ninja Air Fryer"
+wfz6z
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+wfz6z
+Using customized select query for user
+wfz6z
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+wfz6z
+CORS request from origin: https://www.mobycomps.co.uk
+wfz6z
+Origin https://www.mobycomps.co.uk is allowed by CORS
+wfz6z
+🔍 Request to PATCH /api/admin/competitions/5 {
+wfz6z
+  hasSession: false,
+wfz6z
+  sessionID: 'no-session-id',
+wfz6z
+  hasSessionData: false
+wfz6z
+}
+wfz6z
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+
+wfz6z
+Using customized select query for user
+wfz6z
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
