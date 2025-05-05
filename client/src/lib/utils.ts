@@ -124,10 +124,14 @@ export function getImageUrl(url: string | null | undefined): string {
   // Return empty string for empty URLs
   if (cleanUrl === '') return '';
   
-  // Environment detection - critical for Render
-  const isProduction = import.meta.env.MODE === 'production';
+  // Environment detection - critical for production domains
+  const isProduction = import.meta.env.MODE === 'production' || 
+                    window.location.hostname.includes('mobycomps.co.uk') || 
+                    window.location.hostname.includes('bluewhalecompetitions.co.uk');
   const hostname = window.location.hostname;
-  const isRender = hostname.includes('onrender.com');
+  const isRender = hostname.includes('onrender.com') || 
+                  hostname.includes('mobycomps.co.uk') || 
+                  hostname.includes('bluewhalecompetitions.co.uk');
   
   // Debug logging for image URL resolution
   console.log(`🖼️ Processing image URL: "${cleanUrl}"`, {
@@ -156,7 +160,11 @@ export function getImageUrl(url: string | null | undefined): string {
     // Check if we're on a custom domain (not on Replit or Render)
     const isOnPlatformDomain = window.location.hostname.includes('replit') || 
                               window.location.hostname.includes('render');
-    const onCustomDomain = !isOnPlatformDomain;
+    // Check if we're on our official domains
+    const isOnOfficialDomain = window.location.hostname.includes('mobycomps.co.uk') || 
+                             window.location.hostname.includes('bluewhalecompetitions.co.uk');
+    // We're on a custom domain if not on platform and on official domain
+    const onCustomDomain = !isOnPlatformDomain || isOnOfficialDomain;
     
     if (isPlatformUrl && onCustomDomain) {
       // Extract just the path portion from the URL

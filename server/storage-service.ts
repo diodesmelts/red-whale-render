@@ -96,7 +96,7 @@ export const storageService = {
       const uploadOptions = {
         public_id: `blue-whale/${uuidv4()}`,
         folder: 'competitions',
-        resource_type: 'auto'
+        resource_type: 'auto' as const
       };
       
       console.log('Cloudinary upload options:', JSON.stringify(uploadOptions));

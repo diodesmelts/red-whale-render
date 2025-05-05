@@ -32,9 +32,12 @@ const corsOptions = {
       'https://www.bluewhalecompetitions.co.uk',
       'https://mobycomps.co.uk',
       'https://www.mobycomps.co.uk',
+      'http://mobycomps.co.uk',   // Allow HTTP during transition
+      'http://www.mobycomps.co.uk', // Allow HTTP during transition
       // Render domains (for testing/development)
       'https://blue-whale-competitions.onrender.com',
-      'https://blue-whale-competitions-api.onrender.com'
+      'https://blue-whale-competitions-api.onrender.com',
+      'https://redwhale.onrender.com'
     );
     
     // Log the allowed origins for debugging
