@@ -95,6 +95,11 @@ export function Footer() {
                   <span className="w-2 h-2 inline-block bg-purple-500 rounded-full mr-2"></span> Travel
                 </Link>
               </li>
+              <li>
+                <Link to="/competitions?category=beauty" className="text-muted-foreground hover:text-rose-500 transition-colors">
+                  <span className="w-2 h-2 inline-block bg-rose-500 rounded-full mr-2"></span> Beauty
+                </Link>
+              </li>
             </ul>
           </div>
           
