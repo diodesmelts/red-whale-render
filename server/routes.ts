@@ -513,13 +513,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Create entry record
+      // Create entry record with selected numbers if provided
       const entry = await dataStorage.createEntry({
         userId: req.user!.id,
         competitionId: validatedData.competitionId,
         ticketCount: validatedData.ticketCount,
         paymentStatus: validatedData.paymentStatus,
-        stripePaymentId: validatedData.stripePaymentId
+        stripePaymentId: validatedData.stripePaymentId,
+        selectedNumbers: validatedData.selectedNumbers || []
       });
       
       res.status(201).json(entry);
