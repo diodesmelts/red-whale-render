@@ -41,7 +41,17 @@ const cors = require('cors');
 // Determine allowed origins
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
   process.env.ALLOWED_ORIGINS.split(',') : 
-  ['http://localhost:3000', 'https://bluewhalecompetitions.co.uk'];
+  [
+    'http://localhost:3000', 
+    'https://bluewhalecompetitions.co.uk',
+    'http://bluewhalecompetitions.co.uk',
+    'https://www.bluewhalecompetitions.co.uk',
+    'http://www.bluewhalecompetitions.co.uk',
+    'https://mobycomps.co.uk',
+    'http://mobycomps.co.uk',
+    'https://www.mobycomps.co.uk',
+    'http://www.mobycomps.co.uk'
+  ];
 
 console.log('Allowed CORS origins:', allowedOrigins);
 console.log('Environment:', process.env.NODE_ENV);
@@ -351,20 +361,30 @@ const sessionStore = new PgSessionStore({
 });
 
 // Update session configuration
+const isProduction = process.env.NODE_ENV === 'production';
+const isRender = !!process.env.RENDER_SERVICE_ID;
+
 app.use(session({
   store: sessionStore,
   secret: process.env.SESSION_SECRET || 'dev-secret',
   resave: false,
   saveUninitialized: false,
+  proxy: isProduction || isRender, // Important for proper cookie handling behind proxies
   cookie: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    secure: process.env.NODE_ENV === 'production', // Only secure in production
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: isProduction, // Only secure in production
+    sameSite: isProduction ? 'none' : 'lax',
     path: "/",
     httpOnly: true,
   },
   name: "bw.sid"
 }));
+
+// Trust proxy when in production (needed for secure cookies behind load balancers)
+if (isProduction || isRender) {
+  console.log('🔒 Setting trust proxy to handle secure cookies in production');
+  app.set('trust proxy', 1);
+}
 
 // Initialize Passport
 app.use(passport.initialize());
@@ -598,7 +618,35 @@ async function ensureUsersTable() {
     
     if (parseInt(rows[0].count) === 0) {
       console.log('Creating admin user...');
-      const hashedPassword = await hashPassword('Admin123!');
+      
+      // Determine the password to use
+      let adminPassword = 'Admin123!'; // Default fallback
+      
+      // Check if there's an environment variable with the admin password
+      if (process.env.ADMIN_PASSWORD) {
+        console.log('Using admin password from ADMIN_PASSWORD environment variable');
+        adminPassword = process.env.ADMIN_PASSWORD;
+      } else if (process.env.ADMIN_PASSWORD_HASH) {
+        console.log('Using pre-hashed admin password from ADMIN_PASSWORD_HASH environment variable');
+        // We'll insert this directly since it's already hashed
+        await client.query(`
+          INSERT INTO users (
+            username, email, password, display_name, 
+            mascot, is_admin
+          ) VALUES (
+            'admin', 'admin@bluewhalecompetitions.com', $1, 
+            'Admin', 'whale', TRUE
+          )
+        `, [process.env.ADMIN_PASSWORD_HASH]);
+        
+        console.log('Admin user created with pre-hashed password');
+        return; // Skip the password hashing below
+      } else {
+        console.log('Using default admin password (not secure for production)');
+      }
+      
+      // Hash the password and create the user
+      const hashedPassword = await hashPassword(adminPassword);
       await client.query(`
         INSERT INTO users (
           username, email, password, display_name, 
@@ -608,6 +656,8 @@ async function ensureUsersTable() {
           'Admin', 'whale', TRUE
         )
       `, [hashedPassword]);
+      
+      console.log('Admin user created with hashed password');
     }
     
     client.release();

@@ -1,0 +1,107 @@
+2025-05-05T21:26:42.018425692Z     at origin (/app/server-docker.cjs:66:21)
+2025-05-05T21:26:42.018430962Z     at /app/node_modules/cors/lib/index.js:219:13
+2025-05-05T21:26:42.018436192Z     at optionsCallback (/app/node_modules/cors/lib/index.js:199:9)
+2025-05-05T21:26:42.018440512Z     at corsMiddleware (/app/node_modules/cors/lib/index.js:204:7)
+2025-05-05T21:26:42.018445443Z     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+2025-05-05T21:26:42.018449692Z     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+2025-05-05T21:26:42.018453903Z     at /app/node_modules/express/lib/router/index.js:286:9
+2025-05-05T21:26:42.018458163Z     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+2025-05-05T21:26:42.018462243Z     at next (/app/node_modules/express/lib/router/index.js:280:10)
+2025-05-05T21:26:42.018466603Z     at expressInit (/app/node_modules/express/lib/middleware/init.js:40:5)
+2025-05-05T21:26:42.205439007Z CORS request from origin: undefined
+2025-05-05T21:26:42.205457507Z Allowing request with no origin
+2025-05-05T21:26:44.813373099Z CORS request from origin: undefined
+2025-05-05T21:26:44.81339205Z Allowing request with no origin
+2025-05-05T21:26:45.003647411Z CORS request from origin: https://www.mobycomps.co.uk
+2025-05-05T21:26:45.003688551Z Origin https://www.mobycomps.co.uk is NOT allowed by CORS
+2025-05-05T21:26:45.004772257Z Error: Not allowed by CORS
+2025-05-05T21:26:45.004801828Z     at origin (/app/server-docker.cjs:66:21)
+2025-05-05T21:26:45.004805358Z     at /app/node_modules/cors/lib/index.js:219:13
+2025-05-05T21:26:45.004807948Z     at optionsCallback (/app/node_modules/cors/lib/index.js:199:9)
+2025-05-05T21:26:45.004812738Z     at corsMiddleware (/app/node_modules/cors/lib/index.js:204:7)
+2025-05-05T21:26:45.004815358Z     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+2025-05-05T21:26:45.004817148Z     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+2025-05-05T21:26:45.004818818Z     at /app/node_modules/express/lib/router/index.js:286:9
+2025-05-05T21:26:45.004864129Z     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+2025-05-05T21:26:45.004866489Z     at next (/app/node_modules/express/lib/router/index.js:280:10)
+2025-05-05T21:26:45.004868319Z     at expressInit (/app/node_modules/express/lib/middleware/init.js:40:5)
+2025-05-05T21:26:45.005251068Z CORS request from origin: https://www.mobycomps.co.uk
+2025-05-05T21:26:45.005257678Z Origin https://www.mobycomps.co.uk is NOT allowed by CORS
+2025-05-05T21:26:45.005907454Z Error: Not allowed by CORS
+2025-05-05T21:26:45.005918354Z     at origin (/app/server-docker.cjs:66:21)
+2025-05-05T21:26:45.005921234Z     at /app/node_modules/cors/lib/index.js:219:13
+2025-05-05T21:26:45.005924094Z     at optionsCallback (/app/node_modules/cors/lib/index.js:199:9)
+2025-05-05T21:26:45.005926224Z     at corsMiddleware (/app/node_modules/cors/lib/index.js:204:7)
+2025-05-05T21:26:45.005928784Z     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+2025-05-05T21:26:45.005931064Z     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+2025-05-05T21:26:45.005933154Z     at /app/node_modules/express/lib/router/index.js:286:9
+2025-05-05T21:26:45.005935785Z     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+2025-05-05T21:26:45.005937885Z     at next (/app/node_modules/express/lib/router/index.js:280:10)
+2025-05-05T21:26:45.005940005Z     at expressInit (/app/node_modules/express/lib/middleware/init.js:40:5)
+2025-05-05T21:26:45.205984266Z CORS request from origin: undefined
+2025-05-05T21:26:45.206002026Z Allowing request with no origin
+2025-05-05T21:26:50.95213879Z CORS request from origin: undefined
+2025-05-05T21:26:50.952156961Z Allowing request with no origin
+2025-05-05T21:26:51.154192169Z CORS request from origin: https://redwhale.onrender.com
+2025-05-05T21:26:51.154208889Z Origin https://redwhale.onrender.com is allowed by CORS
+2025-05-05T21:26:51.167208025Z CORS request from origin: https://redwhale.onrender.com
+2025-05-05T21:26:51.167220436Z Origin https://redwhale.onrender.com is allowed by CORS
+2025-05-05T21:26:51.5690621Z CORS request from origin: undefined
+2025-05-05T21:26:51.569082961Z Allowing request with no origin
+2025-05-05T21:26:51.572949712Z CORS request from origin: undefined
+2025-05-05T21:26:51.572962162Z Allowing request with no origin
+2025-05-05T21:26:51.573894604Z CORS request from origin: undefined
+2025-05-05T21:26:51.573909294Z Allowing request with no origin
+2025-05-05T21:26:51.574324924Z Fetching site config for key: heroBannerTitle
+2025-05-05T21:26:51.57501987Z CORS request from origin: undefined
+2025-05-05T21:26:51.575030401Z Allowing request with no origin
+2025-05-05T21:26:51.577192232Z CORS request from origin: undefined
+2025-05-05T21:26:51.577200482Z Allowing request with no origin
+2025-05-05T21:26:51.577884568Z CORS request from origin: undefined
+2025-05-05T21:26:51.577896908Z Allowing request with no origin
+2025-05-05T21:26:51.578140114Z Fetching site config for key: heroBanner
+2025-05-05T21:26:51.578744938Z CORS request from origin: undefined
+2025-05-05T21:26:51.578754558Z Allowing request with no origin
+2025-05-05T21:26:51.579052255Z Fetching site config for key: siteLogo
+2025-05-05T21:26:51.693424109Z CORS request from origin: undefined
+2025-05-05T21:26:51.69344329Z Allowing request with no origin
+2025-05-05T21:26:51.882389029Z CORS request from origin: undefined
+2025-05-05T21:26:51.88240812Z Allowing request with no origin
+2025-05-05T21:26:51.88285834Z 🔒 Current user request received
+2025-05-05T21:26:51.882868001Z Session ID: XUHz5YixjYclu50zU3Eilzr3YyWE7Ltd
+2025-05-05T21:26:51.882926932Z Is authenticated: false
+2025-05-05T21:26:51.882930882Z ❌ Unauthorized - user not authenticated
+2025-05-05T21:26:53.224022478Z CORS request from origin: undefined
+2025-05-05T21:26:53.224047088Z Allowing request with no origin
+2025-05-05T21:26:53.224744155Z 🌐 Serving SPA for client route: /auth
+2025-05-05T21:26:53.423612648Z CORS request from origin: https://redwhale.onrender.com
+2025-05-05T21:26:53.423636339Z Origin https://redwhale.onrender.com is allowed by CORS
+2025-05-05T21:26:53.425298128Z CORS request from origin: https://redwhale.onrender.com
+2025-05-05T21:26:53.425309679Z Origin https://redwhale.onrender.com is allowed by CORS
+2025-05-05T21:26:53.639829271Z CORS request from origin: undefined
+2025-05-05T21:26:53.639867912Z Allowing request with no origin
+2025-05-05T21:26:53.6402269Z Fetching site config for key: siteLogo
+2025-05-05T21:26:53.64405385Z CORS request from origin: undefined
+2025-05-05T21:26:53.644081941Z Allowing request with no origin
+2025-05-05T21:26:53.6444483Z 🔒 Current user request received
+2025-05-05T21:26:53.64445466Z Session ID: -4WmIegIFn54U7BMKDesTwO3f9jo4x4y
+2025-05-05T21:26:53.64447536Z Is authenticated: false
+2025-05-05T21:26:53.644490441Z ❌ Unauthorized - user not authenticated
+2025-05-05T21:26:53.645410852Z CORS request from origin: undefined
+2025-05-05T21:26:53.645437073Z Allowing request with no origin
+2025-05-05T21:26:53.674740463Z CORS request from origin: undefined
+2025-05-05T21:26:53.674761544Z Allowing request with no origin
+2025-05-05T21:27:00.176087753Z CORS request from origin: https://redwhale.onrender.com
+2025-05-05T21:27:00.176111544Z Origin https://redwhale.onrender.com is allowed by CORS
+2025-05-05T21:27:00.185139966Z Login attempt: { username: 'admin' }
+2025-05-05T21:27:00.185490184Z 🔍 Authenticating user: admin
+2025-05-05T21:27:00.223744685Z Database columns check for login: { isBannedExists: true, stripeCustomerIdExists: true }
+2025-05-05T21:27:00.308940332Z ❌ Authentication failed: Invalid password for admin
+2025-05-05T21:27:00.30928685Z Authentication failed: Invalid username or password
+2025-05-05T21:27:20.824886092Z CORS request from origin: https://redwhale.onrender.com
+2025-05-05T21:27:20.824913762Z Origin https://redwhale.onrender.com is allowed by CORS
+2025-05-05T21:27:20.825792913Z Login attempt: { username: 'admin' }
+2025-05-05T21:27:20.825817723Z 🔍 Authenticating user: admin
+2025-05-05T21:27:21.084032315Z Database columns check for login: { isBannedExists: true, stripeCustomerIdExists: true }
+2025-05-05T21:27:21.160996038Z ❌ Authentication failed: Invalid password for admin
+2025-05-05T21:27:21.161040919Z Authentication failed: Invalid username or password
