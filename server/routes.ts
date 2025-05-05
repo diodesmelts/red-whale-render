@@ -477,53 +477,138 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Create a modified request body that includes the userId from the session
-      const modifiedBody = {
-        ...req.body,
-        userId: req.user!.id
-      };
-      
-      // Validate the data with the userId included
-      const validatedData = insertEntrySchema.parse(modifiedBody);
-      
-      // Verify competition exists and has tickets available
-      const competition = await dataStorage.getCompetition(validatedData.competitionId);
-      if (!competition) {
-        return res.status(404).json({ message: "Competition not found" });
-      }
-      
-      if (!competition.isLive) {
-        return res.status(400).json({ message: "This competition is no longer active" });
-      }
-      
-      const remainingTickets = competition.totalTickets - competition.ticketsSold;
-      if (remainingTickets < validatedData.ticketCount) {
-        return res.status(400).json({ message: "Not enough tickets available" });
-      }
-      
-      // Check if user has exceeded max tickets
-      const userEntries = await dataStorage.getEntries(req.user!.id);
-      const ticketsForThisCompetition = userEntries
-        .filter(entry => entry.competitionId === validatedData.competitionId)
-        .reduce((sum, entry) => sum + entry.ticketCount, 0);
-      
-      if (ticketsForThisCompetition + validatedData.ticketCount > competition.maxTicketsPerUser) {
-        return res.status(400).json({ 
-          message: `You can only purchase up to ${competition.maxTicketsPerUser} tickets for this competition` 
+      // Check if this is a cart checkout with multiple items
+      if (req.body.cartItems && Array.isArray(req.body.cartItems)) {
+        console.log('Processing bulk entries from cart:', req.body.cartItems);
+        
+        const results = [];
+        const errors = [];
+        
+        // Process each cart item
+        for (const item of req.body.cartItems) {
+          try {
+            // Create a modified body for this item
+            const modifiedBody = {
+              userId: req.user!.id,
+              competitionId: item.competitionId,
+              ticketCount: item.ticketCount,
+              selectedNumbers: item.selectedNumbers || [],
+              paymentStatus: req.body.paymentStatus || 'completed',
+              stripePaymentId: req.body.stripePaymentId
+            };
+            
+            // Validate the data
+            const validatedData = insertEntrySchema.parse(modifiedBody);
+            
+            // Verify competition exists and has tickets available
+            const competition = await dataStorage.getCompetition(validatedData.competitionId);
+            if (!competition) {
+              errors.push(`Competition with ID ${validatedData.competitionId} not found`);
+              continue;
+            }
+            
+            if (!competition.isLive) {
+              errors.push(`Competition ${competition.title} is no longer active`);
+              continue;
+            }
+            
+            const remainingTickets = competition.totalTickets - competition.ticketsSold;
+            if (remainingTickets < validatedData.ticketCount) {
+              errors.push(`Not enough tickets available for ${competition.title}`);
+              continue;
+            }
+            
+            // Check if user has exceeded max tickets
+            const userEntries = await dataStorage.getEntries(req.user!.id);
+            const ticketsForThisCompetition = userEntries
+              .filter(entry => entry.competitionId === validatedData.competitionId)
+              .reduce((sum, entry) => sum + entry.ticketCount, 0);
+            
+            if (ticketsForThisCompetition + validatedData.ticketCount > competition.maxTicketsPerUser) {
+              errors.push(`You can only purchase up to ${competition.maxTicketsPerUser} tickets for ${competition.title}`);
+              continue;
+            }
+            
+            // Create entry record with selected numbers
+            const entry = await dataStorage.createEntry({
+              userId: req.user!.id,
+              competitionId: validatedData.competitionId,
+              ticketCount: validatedData.ticketCount,
+              paymentStatus: validatedData.paymentStatus,
+              stripePaymentId: validatedData.stripePaymentId,
+              selectedNumbers: validatedData.selectedNumbers
+            });
+            
+            results.push(entry);
+          } catch (itemError: any) {
+            console.error(`Error processing cart item:`, itemError, item);
+            errors.push(`Error processing item for competition ID ${item.competitionId}: ${itemError.message}`);
+          }
+        }
+        
+        if (results.length === 0 && errors.length > 0) {
+          // If all items failed, return an error
+          return res.status(400).json({ 
+            message: "Failed to create any entries", 
+            errors 
+          });
+        }
+        
+        // Return the results, including any errors
+        return res.status(201).json({ 
+          entries: results, 
+          errors: errors.length > 0 ? errors : undefined
         });
+      } else {
+        // Single entry creation (original code path)
+        // Create a modified request body that includes the userId from the session
+        const modifiedBody = {
+          ...req.body,
+          userId: req.user!.id
+        };
+        
+        // Validate the data with the userId included
+        const validatedData = insertEntrySchema.parse(modifiedBody);
+        
+        // Verify competition exists and has tickets available
+        const competition = await dataStorage.getCompetition(validatedData.competitionId);
+        if (!competition) {
+          return res.status(404).json({ message: "Competition not found" });
+        }
+        
+        if (!competition.isLive) {
+          return res.status(400).json({ message: "This competition is no longer active" });
+        }
+        
+        const remainingTickets = competition.totalTickets - competition.ticketsSold;
+        if (remainingTickets < validatedData.ticketCount) {
+          return res.status(400).json({ message: "Not enough tickets available" });
+        }
+        
+        // Check if user has exceeded max tickets
+        const userEntries = await dataStorage.getEntries(req.user!.id);
+        const ticketsForThisCompetition = userEntries
+          .filter(entry => entry.competitionId === validatedData.competitionId)
+          .reduce((sum, entry) => sum + entry.ticketCount, 0);
+        
+        if (ticketsForThisCompetition + validatedData.ticketCount > competition.maxTicketsPerUser) {
+          return res.status(400).json({ 
+            message: `You can only purchase up to ${competition.maxTicketsPerUser} tickets for this competition` 
+          });
+        }
+        
+        // Create entry record with selected numbers if provided
+        const entry = await dataStorage.createEntry({
+          userId: req.user!.id,
+          competitionId: validatedData.competitionId,
+          ticketCount: validatedData.ticketCount,
+          paymentStatus: validatedData.paymentStatus,
+          stripePaymentId: validatedData.stripePaymentId,
+          selectedNumbers: validatedData.selectedNumbers || []
+        });
+        
+        res.status(201).json(entry);
       }
-      
-      // Create entry record with selected numbers if provided
-      const entry = await dataStorage.createEntry({
-        userId: req.user!.id,
-        competitionId: validatedData.competitionId,
-        ticketCount: validatedData.ticketCount,
-        paymentStatus: validatedData.paymentStatus,
-        stripePaymentId: validatedData.stripePaymentId,
-        selectedNumbers: validatedData.selectedNumbers || []
-      });
-      
-      res.status(201).json(entry);
     } catch (error: any) {
       console.error("Entry creation error:", error);
       if (error instanceof z.ZodError) {

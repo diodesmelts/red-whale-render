@@ -125,16 +125,27 @@ export default function CartPage() {
       });
       
       if (!entryRes.ok) {
-        throw new Error("Failed to create entries");
+        const errorData = await entryRes.json();
+        throw new Error(errorData.message || "Failed to create entries");
       }
       
       return entryRes.json();
     },
-    onSuccess: () => {
-      toast({
-        title: "Purchase successful!",
-        description: "Thank you for your purchase!",
-      });
+    onSuccess: (data) => {
+      // Check if there were any errors in the response
+      if (data.errors && data.errors.length > 0) {
+        // Show a warning if some entries were created but others failed
+        toast({
+          title: "Partial success",
+          description: "Some entries were created but others failed. Check your entries page for details.",
+          variant: "warning",
+        });
+      } else {
+        toast({
+          title: "Purchase successful!",
+          description: "Thank you for your purchase!",
+        });
+      }
       
       // Clear the cart and redirect to entries page
       clearCart();
