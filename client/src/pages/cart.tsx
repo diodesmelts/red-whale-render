@@ -45,7 +45,8 @@ export default function CartPage() {
           amount: cartTotal,
           cartItems: cartItems.map(item => ({
             competitionId: item.competitionId,
-            ticketCount: item.ticketCount
+            ticketCount: item.ticketCount,
+            selectedNumbers: item.selectedNumbers || []
           }))
         });
         
@@ -118,7 +119,8 @@ export default function CartPage() {
         stripePaymentId,
         cartItems: cartItems.map(item => ({
           competitionId: item.competitionId,
-          ticketCount: item.ticketCount
+          ticketCount: item.ticketCount,
+          selectedNumbers: item.selectedNumbers || []
         }))
       });
       
@@ -199,7 +201,7 @@ export default function CartPage() {
                   key={item.competitionId} 
                   className="grid grid-cols-1 sm:grid-cols-12 gap-4 p-4 items-center"
                 >
-                  <div className="sm:col-span-6 flex gap-3 items-center">
+                  <div className="sm:col-span-6 flex gap-3 items-start">
                     <div className="w-16 h-16 bg-muted rounded flex-shrink-0 overflow-hidden">
                       {item.imageUrl && (
                         <img 
@@ -214,6 +216,22 @@ export default function CartPage() {
                       <p className="text-sm text-muted-foreground sm:hidden">
                         £{item.ticketPrice.toFixed(2)} per ticket
                       </p>
+                      
+                      {item.selectedNumbers && item.selectedNumbers.length > 0 && (
+                        <div className="mt-1">
+                          <p className="text-xs text-muted-foreground mb-1">Your selected numbers:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {item.selectedNumbers.map(number => (
+                              <span 
+                                key={`${item.competitionId}-${number}`}
+                                className="inline-flex items-center justify-center bg-[#002147] text-white text-xs rounded-full h-5 w-5"
+                              >
+                                {number}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   

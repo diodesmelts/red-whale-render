@@ -468,47 +468,26 @@ export default function CompetitionDetails() {
                     </div>
                   </div>
                   
-                  {/* Add to cart button */}
-                  <button 
-                    onClick={() => {
-                      if (!user) {
-                        toast({
-                          title: "Login required",
-                          description: "Please log in to purchase tickets",
-                          variant: "destructive",
-                        });
-                        navigate("/auth");
-                        return;
-                      }
-                      
-                      // Check competency question
-                      if (competencyAnswer !== "12") {
-                        toast({
-                          title: "Incorrect Answer",
-                          description: "Please correctly answer the security question to continue",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      
-                      // Add to cart and navigate
-                      addToCart(competition, ticketQuantity);
-                      navigate("/cart");
-                    }}
-                    className="w-full bg-[#002147] hover:bg-[#001c3a] text-white font-semibold py-2 px-4 text-sm rounded-md flex items-center justify-center gap-2"
-                    disabled={isProcessing || !competencyAnswer}
+                  {/* Add to cart component with number selection */}
+                  <div 
+                    className={competencyAnswer !== "12" ? "opacity-50 pointer-events-none" : ""}
+                    title={competencyAnswer !== "12" ? "Please correctly answer the security question to continue" : ""}
                   >
-                    {isProcessing ? (
-                      <>
-                        <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        Add tickets to basket <CreditCard className="h-4 w-4 ml-1" />
-                      </>
-                    )}
-                  </button>
+                    <AddToCart 
+                      competition={competition}
+                      layout="column"
+                      buttonVariant="default"
+                      withNavigation={true}
+                      showNumberPicker={true}
+                    />
+                  </div>
+                  
+                  {competencyAnswer !== "12" && (
+                    <div className="mt-2 text-xs text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      Please correctly answer the security question to continue
+                    </div>
+                  )}
                   
                   {/* Competition closes notice */}
                   <div className="mt-4 text-center bg-gray-50 p-2 rounded border border-gray-200">
