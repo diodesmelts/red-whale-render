@@ -74,12 +74,37 @@ export function AddToCart({
   };
 
   const handleAddToCart = () => {
+    // If number picker is enabled and we don't have the correct number of selected numbers
     if (showNumberPicker && selectedNumbers.length !== quantity) {
+      // Open the number picker dialog instead
       setIsNumberPickerOpen(true);
+      
+      toast({
+        title: "Select your numbers",
+        description: `Please select ${quantity} number${quantity !== 1 ? 's' : ''} for your ticket${quantity !== 1 ? 's' : ''}.`,
+      });
       return;
     }
     
+    // Add to cart with any selected numbers (or empty array if number picker isn't enabled)
     addToCart(competition, quantity, selectedNumbers);
+    
+    // Show appropriate toast message based on whether numbers are selected
+    if (selectedNumbers.length > 0) {
+      toast({
+        title: `${quantity} ticket${quantity !== 1 ? 's' : ''} added to cart`,
+        description: `With your selected numbers: ${selectedNumbers.sort((a, b) => a - b).join(", ")}`,
+        variant: "default",
+      });
+    } else {
+      toast({
+        title: `${quantity} ticket${quantity !== 1 ? 's' : ''} added to cart`,
+        description: `For ${competition.title}`,
+        variant: "default",
+      });
+    }
+    
+    // Navigate to cart if needed
     if (withNavigation) {
       navigate("/cart");
     }
@@ -88,11 +113,30 @@ export function AddToCart({
   const handleNumberPickerSave = () => {
     // Ensure we have the correct number of tickets selected
     if (selectedNumbers.length === quantity) {
+      // Add to cart with the selected numbers
       addToCart(competition, quantity, selectedNumbers);
+      
+      // Show a confirmation toast with the selected numbers
+      toast({
+        title: "Numbers selected",
+        description: `Your lucky numbers: ${selectedNumbers.sort((a, b) => a - b).join(", ")}`,
+        variant: "default",
+      });
+      
+      // Close the dialog
       setIsNumberPickerOpen(false);
+      
+      // Navigate to cart if needed
       if (withNavigation) {
         navigate("/cart");
       }
+    } else {
+      // Show an error toast if the correct number of tickets is not selected
+      toast({
+        title: "Selection incomplete",
+        description: `Please select exactly ${quantity} numbers to continue.`,
+        variant: "destructive",
+      });
     }
   };
 
@@ -172,7 +216,10 @@ export function AddToCart({
               <Button 
                 onClick={handleNumberPickerSave} 
                 disabled={selectedNumbers.length !== quantity}
+                className="bg-[#002147] hover:bg-[#002147]/90 flex items-center gap-2"
+                data-testid="save-numbers-btn"
               >
+                <Check className="h-4 w-4" />
                 Save & Add to Cart
               </Button>
             </DialogFooter>

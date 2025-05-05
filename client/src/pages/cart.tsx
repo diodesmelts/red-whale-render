@@ -219,12 +219,13 @@ export default function CartPage() {
                       
                       {item.selectedNumbers && item.selectedNumbers.length > 0 && (
                         <div className="mt-1">
-                          <p className="text-xs text-muted-foreground mb-1">Your selected numbers:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {item.selectedNumbers.map(number => (
+                          <p className="text-xs font-medium text-[#002147] mb-1">Your lucky numbers:</p>
+                          <div className="flex flex-wrap gap-1" data-testid={`selected-numbers-${item.competitionId}`}>
+                            {item.selectedNumbers.sort((a, b) => a - b).map(number => (
                               <span 
                                 key={`${item.competitionId}-${number}`}
-                                className="inline-flex items-center justify-center bg-[#002147] text-white text-xs rounded-full h-5 w-5"
+                                className="inline-flex items-center justify-center bg-[#002147] text-white text-xs rounded-full h-6 w-6 shadow-sm"
+                                data-testid={`cart-number-${item.competitionId}-${number}`}
                               >
                                 {number}
                               </span>
