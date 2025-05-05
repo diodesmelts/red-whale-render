@@ -204,7 +204,7 @@ export default function AuthPage() {
                           id="username"
                           placeholder="Enter your username"
                           {...loginForm.register("username")}
-                          className="bg-secondary"
+                          className="bg-black/10 border-gray-400/20"
                         />
                         {loginForm.formState.errors.username && (
                           <p className="text-red-500 text-sm mt-1">{loginForm.formState.errors.username.message}</p>
@@ -219,7 +219,7 @@ export default function AuthPage() {
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter your password"
                             {...loginForm.register("password")}
-                            className="bg-secondary pr-10"
+                            className="bg-black/10 border-gray-400/20 pr-10"
                           />
                           <button 
                             type="button" 
@@ -298,7 +298,7 @@ export default function AuthPage() {
                           id="register-username"
                           placeholder="Choose a username"
                           {...registerForm.register("username")}
-                          className="bg-secondary"
+                          className="bg-black/10 border-gray-400/20"
                         />
                         {registerForm.formState.errors.username && (
                           <p className="text-red-500 text-sm mt-1">{registerForm.formState.errors.username.message}</p>
@@ -312,7 +312,7 @@ export default function AuthPage() {
                           type="email"
                           placeholder="your.email@example.com"
                           {...registerForm.register("email")}
-                          className="bg-secondary"
+                          className="bg-black/10 border-gray-400/20"
                         />
                         {registerForm.formState.errors.email && (
                           <p className="text-red-500 text-sm mt-1">{registerForm.formState.errors.email.message}</p>
@@ -325,7 +325,7 @@ export default function AuthPage() {
                           id="display-name"
                           placeholder="How should we call you?"
                           {...registerForm.register("displayName")}
-                          className="bg-secondary"
+                          className="bg-black/10 border-gray-400/20"
                         />
                         {registerForm.formState.errors.displayName && (
                           <p className="text-red-500 text-sm mt-1">{registerForm.formState.errors.displayName.message}</p>
@@ -340,7 +340,7 @@ export default function AuthPage() {
                             type={showRegisterPassword ? "text" : "password"}
                             placeholder="Create a strong password"
                             {...registerForm.register("password")}
-                            className="bg-secondary pr-10"
+                            className="bg-black/10 border-gray-400/20 pr-10"
                           />
                           <button 
                             type="button" 
@@ -362,7 +362,7 @@ export default function AuthPage() {
                           type="password"
                           placeholder="Confirm your password"
                           {...registerForm.register("confirmPassword")}
-                          className="bg-secondary"
+                          className="bg-black/10 border-gray-400/20"
                         />
                         {registerForm.formState.errors.confirmPassword && (
                           <p className="text-red-500 text-sm mt-1">{registerForm.formState.errors.confirmPassword.message}</p>
