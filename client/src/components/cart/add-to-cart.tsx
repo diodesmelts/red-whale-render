@@ -5,7 +5,7 @@ import { ShoppingCart, Plus, Minus } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Competition } from "@shared/schema";
 import { useLocation } from "wouter";
-import NumberPicker from "../competition/number-picker";
+import { NumberPicker } from "@/components/competition/number-picker";
 import { 
   Dialog,
   DialogContent,
@@ -150,10 +150,10 @@ export function AddToCart({
             
             <div className="py-4">
               <NumberPicker
-                totalTickets={competition.totalTickets}
-                ticketCount={quantity}
-                selectedNumbers={selectedNumbers}
-                setSelectedNumbers={setSelectedNumbers}
+                maxNumber={competition.totalTickets}
+                selectedCount={quantity}
+                initialSelectedNumbers={selectedNumbers}
+                onChange={setSelectedNumbers}
               />
             </div>
             
