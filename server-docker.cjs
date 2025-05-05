@@ -75,8 +75,35 @@ app.use(cors({
     console.log(`Origin ${origin} is NOT allowed by CORS`);
     return callback(new Error('Not allowed by CORS'), false);
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
+
+// Add security headers
+app.use((req, res, next) => {
+  // Security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  
+  // Add some debugging information about the session
+  if (req.session) {
+    console.log('🔍 Request to ' + req.method + ' ' + req.originalUrl, {
+      hasSession: true,
+      sessionID: req.sessionID || 'no-session-id',
+      hasSessionData: !!req.session.passport
+    });
+  } else {
+    console.log('🔍 Request to ' + req.method + ' ' + req.originalUrl, {
+      hasSession: false,
+      sessionID: 'no-session-id',
+      hasSessionData: false
+    });
+  }
+  
+  next();
+});
 
 // We'll set up the session later with the PgSessionStore
 
