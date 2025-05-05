@@ -269,9 +269,9 @@ export default function EditCompetition() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Object.keys(COMPETITION_CATEGORIES).map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
+                            {Object.entries(COMPETITION_CATEGORIES).map(([key, value]) => (
+                              <SelectItem key={key} value={value}>
+                                {value.charAt(0).toUpperCase() + value.slice(1)}
                               </SelectItem>
                             ))}
                           </SelectContent>

@@ -75,6 +75,9 @@ export function CompetitionDropdown() {
             <Link href="/competitions?category=cash" className="flex items-center px-5 py-2.5 text-base font-medium text-green-500 hover:bg-green-500/5 hover:pl-6 transition-all">
               <span className="w-2.5 h-2.5 inline-block bg-green-400 rounded-full mr-2.5"></span> Cash
             </Link>
+            <Link href="/competitions?category=beauty" className="flex items-center px-5 py-2.5 text-base font-medium text-rose-500 hover:bg-rose-500/5 hover:pl-6 transition-all">
+              <span className="w-2.5 h-2.5 inline-block bg-rose-400 rounded-full mr-2.5"></span> Beauty
+            </Link>
           </div>
         </div>
       )}
