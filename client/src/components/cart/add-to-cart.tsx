@@ -140,7 +140,16 @@ export function AddToCart({
 
       {showNumberPicker && (
         <Dialog open={isNumberPickerOpen} onOpenChange={setIsNumberPickerOpen}>
-          <DialogContent className="sm:max-w-md">
+          <DialogTrigger asChild>
+            <button 
+              className="hidden" 
+              data-testid="select-numbers-btn"
+              onClick={() => setIsNumberPickerOpen(true)}
+            >
+              Open Number Picker
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md" data-testid="number-picker-dialog">
             <DialogHeader>
               <DialogTitle>Select Your Numbers</DialogTitle>
               <DialogDescription>

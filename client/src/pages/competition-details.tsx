@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
-import { ChevronLeft, Heart, ShieldCheck, Plus, Minus, CreditCard, AppleIcon, Lock, AlertCircle } from "lucide-react";
+import { ChevronLeft, Heart, ShieldCheck, Plus, Minus, CreditCard, AppleIcon, Lock, AlertCircle, Shuffle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { AddToCart } from "@/components/cart/add-to-cart";
@@ -461,11 +461,28 @@ export default function CompetitionDetails() {
                     </div>
                   </div>
                   
-                  {/* Add to cart component with number selection */}
+                  {/* Number Selection and Add to Cart */}
                   <div 
                     className={competencyAnswer !== "12" ? "opacity-50 pointer-events-none" : ""}
                     title={competencyAnswer !== "12" ? "Please correctly answer the security question to continue" : ""}
                   >
+                    {/* Select Numbers Button */}
+                    <div className="mb-3">
+                      <Button 
+                        variant="outline"
+                        className="w-full mb-2 bg-white border-[#002147] text-[#002147] hover:bg-gray-100"
+                        onClick={() => {
+                          if (!document.querySelector('[data-testid="number-picker-dialog"]')) {
+                            const selectNumbersBtn = document.querySelector('[data-testid="select-numbers-btn"]') as HTMLButtonElement;
+                            if (selectNumbersBtn) selectNumbersBtn.click();
+                          }
+                        }}
+                      >
+                        <Shuffle className="w-4 h-4 mr-2" />
+                        Select Ticket Numbers
+                      </Button>
+                    </div>
+                    
                     <AddToCart 
                       competition={competition}
                       layout="column"
