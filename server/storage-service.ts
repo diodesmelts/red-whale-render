@@ -75,8 +75,14 @@ export const storageService = {
     
     fs.writeFileSync(filePath, file);
     
+    // IMPORTANT: Always use a relative path for the URL, not an absolute URL with domain
+    // This ensures the URL works regardless of which domain the site is being accessed from
+    const relativeUrl = `/${uploadsDir}/${filename}`;
+    
+    console.log(`📸 Image saved to ${filePath}, relative URL: ${relativeUrl}`);
+    
     return {
-      url: `/${uploadsDir}/${filename}`
+      url: relativeUrl
     };
   },
 

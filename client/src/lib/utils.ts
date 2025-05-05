@@ -137,13 +137,39 @@ export function getImageUrl(url: string | null | undefined): string {
     origin: window.location.origin
   });
   
-  // Already absolute URL (http/https) or data URL or Cloudinary
-  if (
-    cleanUrl.startsWith('http') || 
-    cleanUrl.startsWith('data:') || 
-    cleanUrl.includes('cloudinary.com')
-  ) {
+  // Special case for Replit domains when viewing on custom domain
+  if (cleanUrl.startsWith('http')) {
+    // If the URL contains a replit domain but we're on a custom domain, strip it to make it relative
+    const replitDomains = [
+      'replit.dev', 
+      'replit.app', 
+      'repl.co'
+    ];
+    
+    const isReplitUrl = replitDomains.some(domain => cleanUrl.includes(domain));
+    const onCustomDomain = !window.location.hostname.includes('replit');
+    
+    if (isReplitUrl && onCustomDomain) {
+      // Extract just the path portion from the URL
+      try {
+        const urlObj = new URL(cleanUrl);
+        const relativePath = urlObj.pathname;
+        console.log(`🖼️ Converting replit URL to relative path: "${cleanUrl}" -> "${relativePath}"`);
+        return window.location.origin + relativePath;
+      } catch (e) {
+        console.log(`🖼️ Failed to parse URL, using as is: "${cleanUrl}"`);
+        return cleanUrl;
+      }
+    }
+    
+    // Not a replit URL or we're on replit - use as is
     console.log(`🖼️ Using absolute URL as is: "${cleanUrl}"`);
+    return cleanUrl;
+  }
+  
+  // Data URL or Cloudinary URL
+  if (cleanUrl.startsWith('data:') || cleanUrl.includes('cloudinary.com')) {
+    console.log(`🖼️ Using data or cloudinary URL as is: "${cleanUrl}"`);
     return cleanUrl;
   }
   
