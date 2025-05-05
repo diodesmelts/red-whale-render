@@ -16,6 +16,8 @@ export function CategoryBadge({ category, brand, className }: CategoryBadgeProps
         return "bg-pink-500";
       case "cash":
         return "bg-primary";
+      case "beauty":
+        return "bg-rose-500";
       default:
         return "bg-primary";
     }
@@ -30,6 +32,8 @@ export function CategoryBadge({ category, brand, className }: CategoryBadgeProps
         return "fas fa-blender";
       case "cash":
         return "fas fa-pound-sign";
+      case "beauty":
+        return "fas fa-spa";
       default:
         return "fas fa-trophy";
     }

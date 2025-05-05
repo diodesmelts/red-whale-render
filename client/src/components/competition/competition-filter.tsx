@@ -137,6 +137,16 @@ export function CompetitionFilter({ onFilterChange, className }: CompetitionFilt
         >
           <i className="fas fa-blender mr-1"></i> Household
         </Button>
+        <Button 
+          variant={activeCategory === "beauty" ? "default" : "outline"} 
+          onClick={() => handleCategoryChange("beauty")}
+          className={cn(
+            "flex items-center",
+            activeCategory === "beauty" ? "bg-rose-500 hover:bg-rose-600 text-white" : "text-foreground"
+          )}
+        >
+          <i className="fas fa-spa mr-1"></i> Beauty
+        </Button>
       </div>
       
       {/* Sort filters */}

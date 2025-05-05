@@ -5,6 +5,7 @@ export const COMPETITION_CATEGORIES = {
   CASH: "cash",
   ELECTRONICS: "electronics",
   TRAVEL: "travel",
+  BEAUTY: "beauty",
 };
 
 // Category colors
@@ -48,6 +49,14 @@ export const CATEGORY_COLORS = {
     border: "border-purple-500",
     glow: "shadow-[0_0_15px_rgba(155,89,182,0.5)]",
     icon: "fas fa-plane",
+  },
+  [COMPETITION_CATEGORIES.BEAUTY]: {
+    bg: "bg-rose-500",
+    text: "text-rose-400",
+    hover: "hover:bg-rose-600",
+    border: "border-rose-400",
+    glow: "shadow-[0_0_15px_rgba(244,63,94,0.5)]",
+    icon: "fas fa-spa",
   },
 };
 
