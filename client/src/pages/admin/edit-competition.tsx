@@ -347,10 +347,13 @@ export default function EditCompetition() {
                           <Input 
                             type="number" 
                             placeholder="0.00" 
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                            value={field.value / 100}  
+                            onChange={e => field.onChange(Math.round(parseFloat(e.target.value || "0") * 100))}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Enter the price in pounds (e.g., 1.00 for £1)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
