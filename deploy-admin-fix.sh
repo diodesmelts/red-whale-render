@@ -5,11 +5,11 @@ echo "🔧 Preparing admin fixes for production..."
 
 # Make scripts executable
 chmod +x deploy-to-github.sh
-chmod +x add-missing-column.cjs
+chmod +x remove-hero-banner-column.cjs
 
-# Add the missing column to database table
+# Remove the push_to_hero_banner column from database table
 echo "🔍 Running database schema update script..."
-node add-missing-column.cjs
+node remove-hero-banner-column.cjs
 
 # Execute GitHub deployment
 echo "🚀 Deploying changes to GitHub repository..."
@@ -53,13 +53,14 @@ echo "   - Ensures proper validation and error handling"
 echo "   - Maintains all schema validation"
 echo ""
 echo "📊 DATABASE SCHEMA FIX"
-echo "Added missing push_to_hero_banner column to competitions table:"
+echo "Removed push_to_hero_banner column from competitions table:"
 echo ""
-echo "1. Added column creation in initial table definition"
-echo "2. Included column in competition API responses"
-echo "3. Added add-missing-column.cjs script to update existing databases"
+echo "1. Removed column from API response transformations"
+echo "2. Removed field from field mapping for competition updates"
+echo "3. Created remove-hero-banner-column.cjs script to remove column from database"
 echo "   - This fixes the 'column \"push_to_hero_banner\" does not exist' error"
-echo "   - Safely adds column only if it doesn't already exist"
+echo "   - Simplifies competition data structure"
+echo "   - Safely removes column only if it exists"
 echo ""
 echo "After deploying, you should be able to:"
 echo "1. Log in as admin with your environment variables credentials"

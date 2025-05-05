@@ -309,8 +309,8 @@ app.get('/api/competitions', async (req, res) => {
       drawDate: comp.draw_date.toISOString(),
       isLive: comp.is_live,
       isFeatured: comp.is_featured,
-      pushToHeroBanner: comp.push_to_hero_banner || false,
       createdAt: comp.created_at.toISOString()
+      // Removed pushToHeroBanner field
     }));
     
     res.json(competitions);
@@ -361,8 +361,8 @@ app.get('/api/competitions/:id', async (req, res) => {
       drawDate: comp.draw_date.toISOString(),
       isLive: comp.is_live,
       isFeatured: comp.is_featured,
-      pushToHeroBanner: comp.push_to_hero_banner || false,
       createdAt: comp.created_at.toISOString()
+      // Removed pushToHeroBanner field
     };
     
     console.log(`✅ Successfully retrieved competition: ID=${id}, Title="${comp.title}"`);
@@ -810,8 +810,8 @@ app.patch('/api/admin/competitions/:id', async (req, res) => {
       drawDate: 'draw_date',
       isLive: 'is_live',
       isFeatured: 'is_featured',
-      brand: 'brand',
-      pushToHeroBanner: 'push_to_hero_banner'
+      brand: 'brand'
+      // Removed pushToHeroBanner field
     };
     
     // For each field in the request body, add it to the update if it exists
@@ -867,8 +867,8 @@ app.patch('/api/admin/competitions/:id', async (req, res) => {
       isLive: comp.is_live,
       isFeatured: comp.is_featured,
       brand: comp.brand,
-      createdAt: comp.created_at,
-      pushToHeroBanner: comp.push_to_hero_banner
+      createdAt: comp.created_at
+      // Removed pushToHeroBanner field
     };
     
     console.log(`✅ Competition updated successfully: ID=${id}, Title="${updatedCompetition.title}"`);
