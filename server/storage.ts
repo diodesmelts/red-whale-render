@@ -934,9 +934,34 @@ export class DatabaseStorage implements IStorage {
     // Get admin credentials from environment variables with fallbacks
     const adminUsername = process.env.ADMIN_USERNAME || "admin";
     const adminEmail = process.env.ADMIN_EMAIL || "admin@bluewhalecompetitions.co.uk";
-    // Use the hashed password from env or fallback to the default Admin123! password
-    const adminPassword = process.env.ADMIN_PASSWORD_HASH || 
-      "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5";
+    
+    // Support both plain text and hashed passwords
+    let adminPassword;
+    
+    // First check if we have a pre-hashed password
+    if (process.env.ADMIN_PASSWORD_HASH) {
+      console.log("Using pre-hashed admin password from ADMIN_PASSWORD_HASH");
+      adminPassword = process.env.ADMIN_PASSWORD_HASH;
+    } 
+    // Then check if we have a plain text password that needs hashing
+    else if (process.env.ADMIN_PASSWORD) {
+      console.log("Hashing plain text admin password from ADMIN_PASSWORD");
+      // Import the hashPassword function from auth.ts
+      const { scrypt, randomBytes } = await import('crypto');
+      const { promisify } = await import('util');
+      const scryptAsync = promisify(scrypt);
+      
+      // Hash the password using the same algorithm as in auth.ts
+      const salt = randomBytes(16).toString("hex");
+      const buf = (await scryptAsync(process.env.ADMIN_PASSWORD, salt, 64)) as Buffer;
+      adminPassword = `${buf.toString("hex")}.${salt}`;
+      console.log("Successfully hashed admin password");
+    }
+    // If neither is provided, use the default hashed password for Admin123!
+    else {
+      console.log("Using default hashed password for admin");
+      adminPassword = "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5";
+    }
     
     // Check if admin user exists
     const adminUser = await this.getUserByUsername(adminUsername);
@@ -968,8 +993,8 @@ export class DatabaseStorage implements IStorage {
         needsUpdate = true;
       }
       
-      // Only update password if explicitly set in env (to avoid overwriting custom passwords)
-      if (process.env.ADMIN_PASSWORD_HASH && adminUser.password !== adminPassword) {
+      // Update password if either ADMIN_PASSWORD_HASH or ADMIN_PASSWORD is set
+      if ((process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD) && adminUser.password !== adminPassword) {
         updates.password = adminPassword;
         needsUpdate = true;
       }
