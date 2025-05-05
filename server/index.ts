@@ -28,7 +28,9 @@ const corsOptions = {
     // Always include standard domains
     allowedOrigins.push(
       'https://bluewhalecompetitions.co.uk',
-      'https://www.bluewhalecompetitions.co.uk'
+      'https://www.bluewhalecompetitions.co.uk',
+      'https://mobycomps.co.uk',
+      'https://www.mobycomps.co.uk'
     );
     
     // If no origin header (same-origin request) or it's in our allowed list
