@@ -17,8 +17,8 @@ type CartContextType = {
   cartItems: CartItem[];
   cartCount: number;
   cartTotal: number;
-  addToCart: (competition: Competition, quantity: number) => void;
-  updateCartItem: (competitionId: number, quantity: number) => void;
+  addToCart: (competition: Competition, quantity: number, selectedNumbers?: number[]) => void;
+  updateCartItem: (competitionId: number, quantity: number, selectedNumbers?: number[]) => void;
   removeFromCart: (competitionId: number) => void;
   clearCart: () => void;
 };
@@ -59,7 +59,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     0
   );
 
-  const addToCart = (competition: Competition, quantity: number) => {
+  const addToCart = (competition: Competition, quantity: number, selectedNumbers: number[] = []) => {
     if (quantity <= 0) return;
 
     setCartItems((prevItems) => {
@@ -86,10 +86,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
           return prevItems;
         }
 
+        // Combine previously selected numbers with new ones
+        const updatedNumbers = [...item.selectedNumbers, ...selectedNumbers].slice(0, newQuantity);
+
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex] = {
           ...item,
           ticketCount: newQuantity,
+          selectedNumbers: updatedNumbers,
         };
 
         toast({
@@ -114,13 +118,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
           imageUrl: competition.imageUrl,
           ticketPrice: competition.ticketPrice,
           ticketCount: quantity,
+          selectedNumbers: selectedNumbers.slice(0, quantity),
           maxTicketsPerUser: competition.maxTicketsPerUser,
+          totalTickets: competition.totalTickets,
         },
       ];
     });
   };
 
-  const updateCartItem = (competitionId: number, quantity: number) => {
+  const updateCartItem = (competitionId: number, quantity: number, selectedNumbers?: number[]) => {
     if (quantity <= 0) {
       removeFromCart(competitionId);
       return;
@@ -133,13 +139,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Make sure we don't exceed the maximum tickets
       const newQuantity = Math.min(quantity, item.maxTicketsPerUser);
       
-      if (newQuantity === item.ticketCount) {
+      if (newQuantity === item.ticketCount && !selectedNumbers) {
         return prevItems;
+      }
+
+      // Handle the selected numbers
+      let updatedNumbers = item.selectedNumbers;
+      
+      // If new numbers are provided, use them
+      if (selectedNumbers) {
+        updatedNumbers = selectedNumbers.slice(0, newQuantity);
+      } 
+      // If quantity decreased, trim the selected numbers
+      else if (newQuantity < item.ticketCount) {
+        updatedNumbers = item.selectedNumbers.slice(0, newQuantity);
       }
 
       return prevItems.map((item) =>
         item.competitionId === competitionId
-          ? { ...item, ticketCount: newQuantity }
+          ? { ...item, ticketCount: newQuantity, selectedNumbers: updatedNumbers }
           : item
       );
     });
