@@ -382,14 +382,7 @@ export default function CompetitionDetails() {
                   </div>
                 </div>
                 
-                {/* Entry Mode */}
-                <div className="mb-5">
-                  <h3 className="text-[#002147] font-semibold mb-2 text-sm text-center uppercase">Entry Method</h3>
-                  <button className="w-full bg-[#002147] text-white font-medium py-2 text-sm rounded-md text-center">
-                    ONLINE ENTRY
-                  </button>
-                </div>
-                
+
                 {/* Ticket Quantity Section */}
                 <div className="bg-gray-100 p-4 rounded-md mb-5">
                   <h3 className="text-[#002147] font-semibold mb-3 text-sm text-center uppercase border-b border-gray-200 pb-2">Select Your Tickets</h3>
