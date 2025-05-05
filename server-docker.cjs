@@ -201,6 +201,7 @@ const checkDbConnection = async () => {
         draw_date TIMESTAMP NOT NULL,
         is_live BOOLEAN NOT NULL DEFAULT TRUE,
         is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+        push_to_hero_banner BOOLEAN NOT NULL DEFAULT FALSE,
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
       
@@ -308,6 +309,7 @@ app.get('/api/competitions', async (req, res) => {
       drawDate: comp.draw_date.toISOString(),
       isLive: comp.is_live,
       isFeatured: comp.is_featured,
+      pushToHeroBanner: comp.push_to_hero_banner || false,
       createdAt: comp.created_at.toISOString()
     }));
     
@@ -359,6 +361,7 @@ app.get('/api/competitions/:id', async (req, res) => {
       drawDate: comp.draw_date.toISOString(),
       isLive: comp.is_live,
       isFeatured: comp.is_featured,
+      pushToHeroBanner: comp.push_to_hero_banner || false,
       createdAt: comp.created_at.toISOString()
     };
     
