@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { ShoppingCart, Plus, Minus } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Check } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Competition } from "@shared/schema";
 import { useLocation } from "wouter";
 import { NumberPicker } from "@/components/competition/number-picker";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ export function AddToCart({
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const { addToCart } = useCart();
   const [, navigate] = useLocation();
+  const { toast } = useToast();
 
   const handleDecrement = () => {
     setQuantity((prev) => {
