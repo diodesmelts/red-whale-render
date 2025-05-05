@@ -37,7 +37,6 @@ export function ApiDiagnostics() {
       toast({
         title: "URL Fix Complete",
         description: `Fixed ${data.competitionsFixed} competition URLs and ${data.configsFixed} config URLs`,
-        variant: "success",
       });
     },
     onError: (error: Error) => {

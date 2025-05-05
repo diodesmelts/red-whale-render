@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
+import { UploadApiResponse, v2 as cloudinary, UploadResponseCallback } from 'cloudinary';
 import { Readable } from 'stream';
 
 // Create uploads directory if it doesn't exist
@@ -95,45 +95,46 @@ export const storageService = {
       
       const uploadOptions = {
         public_id: `blue-whale/${uuidv4()}`,
-        folder: 'competitions'
-        // Note: resource_type is specified in the upload_stream method, not here
+        folder: 'competitions',
+        resource_type: 'auto'
       };
       
       console.log('Cloudinary upload options:', JSON.stringify(uploadOptions));
 
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'auto', ...uploadOptions },
-        (error: any, result: UploadApiResponse) => {
-          if (error || !result) {
-            console.error('Cloudinary upload error:', error);
-            
-            // Create a more detailed error object
-            let errorMessage = 'Upload to Cloudinary failed';
-            if (error) {
-              if (typeof error === 'object') {
-                errorMessage = `Cloudinary error: ${error.message || JSON.stringify(error)}`;
-                console.error('Cloudinary error details:', error);
-              } else {
-                errorMessage = `Cloudinary error: ${error}`;
-              }
+      // Create a properly typed callback function
+      const handleUploadResult: UploadResponseCallback = (error, result) => {
+        if (error || !result) {
+          console.error('Cloudinary upload error:', error);
+          
+          let errorMessage = 'Upload to Cloudinary failed';
+          if (error) {
+            if (typeof error === 'object') {
+              errorMessage = `Cloudinary error: ${error.message || JSON.stringify(error)}`;
+              console.error('Cloudinary error details:', error);
+            } else {
+              errorMessage = `Cloudinary error: ${error}`;
             }
-            
-            return reject(new Error(errorMessage));
           }
           
-          console.log('Cloudinary upload success, result:', {
-            url: result.secure_url,
-            publicId: result.public_id,
-            format: result.format,
-            size: result.bytes
-          });
-          
-          resolve({
-            url: result.secure_url,
-            publicId: result.public_id
-          });
+          reject(new Error(errorMessage));
+          return;
         }
-      );
+        
+        console.log('Cloudinary upload success, result:', {
+          url: result.secure_url,
+          publicId: result.public_id,
+          format: result.format,
+          size: result.bytes
+        });
+        
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id
+        });
+      };
+
+      // Create the upload stream with our callback
+      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, handleUploadResult);
 
       // Convert buffer to stream and pipe it to the upload stream
       const readableStream = new Readable();

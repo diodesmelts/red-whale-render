@@ -27,11 +27,18 @@ const corsOptions = {
       
     // Always include standard domains
     allowedOrigins.push(
+      // Production domains
       'https://bluewhalecompetitions.co.uk',
       'https://www.bluewhalecompetitions.co.uk',
       'https://mobycomps.co.uk',
-      'https://www.mobycomps.co.uk'
+      'https://www.mobycomps.co.uk',
+      // Render domains (for testing/development)
+      'https://blue-whale-competitions.onrender.com',
+      'https://blue-whale-competitions-api.onrender.com'
     );
+    
+    // Log the allowed origins for debugging
+    console.log('🔒 Allowed origins:', allowedOrigins);
     
     // If no origin header (same-origin request) or it's in our allowed list
     if (!origin || allowedOrigins.includes(origin)) {
