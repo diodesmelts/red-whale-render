@@ -446,6 +446,72 @@ passport.use(new LocalStrategy(async (username, password, done) => {
   try {
     console.log(`🔍 Authenticating user: ${username}`);
     
+    // Special handling for admin users - check environment variables first
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    
+    if (username === adminUsername && adminPassword && password === adminPassword) {
+      console.log('✅ Admin authenticated via environment variables');
+      
+      // Check what columns exist in the users table
+      const columnsQuery = `
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'users'
+        AND column_name IN ('is_banned', 'stripe_customer_id');
+      `;
+      
+      const columnsCheck = await pool.query(columnsQuery);
+      const existingColumns = columnsCheck.rows.map(row => row.column_name);
+      
+      const isBannedColumnExists = existingColumns.includes('is_banned');
+      const stripeCustomerIdColumnExists = existingColumns.includes('stripe_customer_id');
+      
+      // Get the admin user from database
+      const { rows } = await pool.query(`
+        SELECT id, username, email, password, display_name as "displayName", 
+          mascot, is_admin as "isAdmin", notification_settings as "notificationSettings", 
+          created_at as "createdAt"
+          ${isBannedColumnExists ? ', is_banned as "isBanned"' : ''}
+          ${stripeCustomerIdColumnExists ? ', stripe_customer_id as "stripeCustomerId"' : ''}
+        FROM users WHERE username = $1 AND is_admin = TRUE
+        LIMIT 1
+      `, [username]);
+      
+      if (rows.length > 0) {
+        // Admin exists in database, use that record
+        let user = rows[0];
+        
+        // Set default values for missing columns
+        if (!isBannedColumnExists || user.isBanned === undefined) {
+          user.isBanned = false;
+        }
+        
+        if (!stripeCustomerIdColumnExists || user.stripeCustomerId === undefined) {
+          user.stripeCustomerId = null;
+        }
+        
+        return done(null, user);
+      } else {
+        // If admin doesn't exist in database or password is changed, fallback to minimal profile
+        console.log('⚠️ Using admin environment credentials directly (admin not in DB or password changed)');
+        const adminUser = {
+          id: 1,  // Use ID 1 for consistency
+          username: adminUsername,
+          email: 'admin@mobycomps.co.uk',
+          displayName: 'Administrator',
+          mascot: 'whale',
+          isAdmin: true,
+          isBanned: false,
+          stripeCustomerId: null,
+          notificationSettings: { email: true, inApp: true },
+          createdAt: new Date()
+        };
+        return done(null, adminUser);
+      }
+    }
+    
+    // Continue with standard authentication for non-admin users
     // Check what columns exist in the users table
     const columnsQuery = `
       SELECT column_name 
