@@ -8,7 +8,9 @@ export type CartItem = {
   imageUrl: string | null;
   ticketPrice: number;
   ticketCount: number;
+  selectedNumbers: number[];
   maxTicketsPerUser: number;
+  totalTickets: number;
 };
 
 type CartContextType = {

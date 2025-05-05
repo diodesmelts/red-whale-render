@@ -46,6 +46,7 @@ export const entries = pgTable("entries", {
   userId: integer("user_id").notNull(),
   competitionId: integer("competition_id").notNull(),
   ticketCount: integer("ticket_count").notNull(),
+  selectedNumbers: json("selected_numbers").$type<number[]>().default([]),
   paymentStatus: text("payment_status").notNull(), // pending, completed, failed
   stripePaymentId: text("stripe_payment_id"),
   createdAt: timestamp("created_at").defaultNow(),
