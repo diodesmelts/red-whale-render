@@ -1,0 +1,50 @@
+2025-05-05T21:53:09.976690386Z 🔍 Request to GET /assets/index-B7uNpmj_.css {
+2025-05-05T21:53:09.976695386Z   hasSession: false,
+2025-05-05T21:53:09.976698666Z   sessionID: 'no-session-id',
+2025-05-05T21:53:09.976701636Z   hasSessionData: false
+2025-05-05T21:53:09.976705627Z }
+2025-05-05T21:53:10.181087221Z CORS request from origin: undefined
+2025-05-05T21:53:10.181106851Z Allowing request with no origin
+2025-05-05T21:53:10.181224565Z 🔍 Request to GET /api/api/health {
+2025-05-05T21:53:10.181229375Z   hasSession: false,
+2025-05-05T21:53:10.181231735Z   sessionID: 'no-session-id',
+2025-05-05T21:53:10.181233405Z   hasSessionData: false
+2025-05-05T21:53:10.181235425Z }
+2025-05-05T21:53:10.182937944Z CORS request from origin: undefined
+2025-05-05T21:53:10.182950954Z Allowing request with no origin
+2025-05-05T21:53:10.183077548Z 🔍 Request to GET /api/site-config/siteLogo {
+2025-05-05T21:53:10.183092538Z   hasSession: false,
+2025-05-05T21:53:10.183096258Z   sessionID: 'no-session-id',
+2025-05-05T21:53:10.183099288Z   hasSessionData: false
+2025-05-05T21:53:10.183102768Z }
+2025-05-05T21:53:10.183344246Z Fetching site config for key: siteLogo
+2025-05-05T21:53:10.497534085Z CORS request from origin: undefined
+2025-05-05T21:53:10.497549066Z Allowing request with no origin
+2025-05-05T21:53:10.497795123Z 🔍 Request to GET /api/user {
+2025-05-05T21:53:10.497799943Z   hasSession: false,
+2025-05-05T21:53:10.497802783Z   sessionID: 'no-session-id',
+2025-05-05T21:53:10.497805413Z   hasSessionData: false
+2025-05-05T21:53:10.497808333Z }
+2025-05-05T21:53:10.498234495Z 🔒 Current user request received
+2025-05-05T21:53:10.498244956Z Session ID: 6BFLT61YGpNMFFs3og8qbe0zhKV7kCkT
+2025-05-05T21:53:10.498263946Z Is authenticated: false
+2025-05-05T21:53:10.498270296Z ❌ Unauthorized - user not authenticated
+2025-05-05T21:53:10.500571522Z CORS request from origin: undefined
+2025-05-05T21:53:10.500581863Z Allowing request with no origin
+2025-05-05T21:53:10.500677795Z 🔍 Request to GET /favicon.ico {
+2025-05-05T21:53:10.500681745Z   hasSession: false,
+2025-05-05T21:53:10.500684065Z   sessionID: 'no-session-id',
+2025-05-05T21:53:10.500685736Z   hasSessionData: false
+2025-05-05T21:53:10.500687426Z }
+2025-05-05T21:53:15.815036453Z CORS request from origin: https://www.mobycomps.co.uk
+2025-05-05T21:53:15.815066874Z Origin https://www.mobycomps.co.uk is allowed by CORS
+2025-05-05T21:53:15.815121545Z 🔍 Request to POST /api/login {
+2025-05-05T21:53:15.815127055Z   hasSession: false,
+2025-05-05T21:53:15.815130495Z   sessionID: 'no-session-id',
+2025-05-05T21:53:15.815133306Z   hasSessionData: false
+2025-05-05T21:53:15.815152116Z }
+2025-05-05T21:53:15.822726463Z Login attempt: { username: 'admin' }
+2025-05-05T21:53:15.823054642Z 🔍 Authenticating user: admin
+2025-05-05T21:53:15.858054615Z Database columns check for login: { isBannedExists: true, stripeCustomerIdExists: true }
+2025-05-05T21:53:15.933774004Z ❌ Authentication failed: Invalid password for admin
+2025-05-05T21:53:15.934137784Z Authentication failed: Invalid username or password
