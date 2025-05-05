@@ -442,7 +442,7 @@ export default function CompetitionDetails() {
                     
                     <div className="mb-3">
                       <label className="block text-sm font-medium mb-1">
-                        How many months are in a year?
+                        Question
                       </label>
                       <Select
                         value={competencyAnswer}
