@@ -90,13 +90,19 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000 // prune expired entries every 24h
     });
     
-    // Create admin test account with consistent credentials
+    // Create admin test account using env variables with fallbacks
+    const adminUsername = process.env.ADMIN_USERNAME || "admin";
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@bluewhalecompetitions.co.uk";
+    // Use the hashed password from env or fallback to the default Admin123! password
+    const adminPassword = process.env.ADMIN_PASSWORD_HASH || 
+      "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5";
+    
     const adminUser: User = {
       id: this.userCurrentId++,
-      username: "admin",
-      email: "admin@bluewhalecompetitions.co.uk",
-      password: "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5", // Password: Admin123!
-      displayName: "admin",
+      username: adminUsername,
+      email: adminEmail,
+      password: adminPassword,
+      displayName: adminUsername,
       mascot: "blue-whale",
       isAdmin: true,
       isBanned: false,
@@ -925,20 +931,27 @@ export class DatabaseStorage implements IStorage {
 
   // Method to seed the admin user if it doesn't exist
   async seedAdminUser() {
+    // Get admin credentials from environment variables with fallbacks
+    const adminUsername = process.env.ADMIN_USERNAME || "admin";
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@bluewhalecompetitions.co.uk";
+    // Use the hashed password from env or fallback to the default Admin123! password
+    const adminPassword = process.env.ADMIN_PASSWORD_HASH || 
+      "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5";
+    
     // Check if admin user exists
-    const adminUser = await this.getUserByUsername("admin");
+    const adminUser = await this.getUserByUsername(adminUsername);
     if (!adminUser) {
-      // Create admin user with consistent credentials
+      // Create admin user with credentials from environment
       await db.insert(users).values({
-        username: "admin",
-        email: "admin@bluewhalecompetitions.co.uk", 
-        password: "dc7e15589e3e3e7d4dcc85d1537a6e434e4ed9d2aa9714aaaaf2ec3e7911b713f65b4e01f359c0c1c90b0f4eab43c7a2c7783cbf60ccc926f37a834cd55d1e8b.84d311fb547ffd10efaf0fcbea1c52c5", // Password: Admin123!
-        displayName: "admin",
+        username: adminUsername,
+        email: adminEmail, 
+        password: adminPassword,
+        displayName: adminUsername,
         mascot: "blue-whale",
         isAdmin: true,
         notificationSettings: { email: true, inApp: true }
       });
-      console.log("Created admin user with email admin@bluewhalecompetitions.co.uk");
+      console.log(`Created admin user with email ${adminEmail}`);
     } else {
       // Ensure existing admin has proper privileges
       if (!adminUser.isAdmin) {
@@ -946,12 +959,26 @@ export class DatabaseStorage implements IStorage {
         console.log(`Promoted existing user '${adminUser.username}' to admin`);
       }
       
-      // Update email to match consistent format if different
-      if (adminUser.email !== "admin@bluewhalecompetitions.co.uk") {
+      // Update credentials if environment variables change
+      let needsUpdate = false;
+      const updates: Partial<User> = {};
+      
+      if (adminUser.email !== adminEmail) {
+        updates.email = adminEmail;
+        needsUpdate = true;
+      }
+      
+      // Only update password if explicitly set in env (to avoid overwriting custom passwords)
+      if (process.env.ADMIN_PASSWORD_HASH && adminUser.password !== adminPassword) {
+        updates.password = adminPassword;
+        needsUpdate = true;
+      }
+      
+      if (needsUpdate) {
         await db.update(users)
-          .set({ email: "admin@bluewhalecompetitions.co.uk" })
+          .set(updates)
           .where(eq(users.id, adminUser.id));
-        console.log(`Updated admin email to admin@bluewhalecompetitions.co.uk`);
+        console.log(`Updated admin credentials for user ${adminUser.username}`);
       }
     }
     

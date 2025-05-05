@@ -38,6 +38,11 @@ DATABASE_URL=postgres://username:password@host:port/database
 # Authentication
 SESSION_SECRET=your_session_secret
 
+# Admin Credentials (Optional - defaults will be used if not provided)
+ADMIN_USERNAME=custom_admin_username
+ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD_HASH=your_hashed_password  # Use hash-password.js tool to generate
+
 # Stripe (Payments)
 VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
@@ -88,8 +93,27 @@ This application is designed for deployment to platforms like Render or Heroku. 
 
 The application comes with an admin interface for managing competitions, users, and site configuration.
 
-Default admin credentials:
-- Username: admin@bluewhalecompetitions.com
+### Default Admin Credentials
+- Username: admin
+- Email: admin@bluewhalecompetitions.co.uk
 - Password: Admin123!
 
-For security, change the admin password after first login in a production environment.
+### Customizing Admin Credentials
+
+For security in production environments, you should change the default admin credentials by setting these environment variables:
+
+```
+ADMIN_USERNAME=your_preferred_username
+ADMIN_EMAIL=your_admin@email.com
+ADMIN_PASSWORD_HASH=your_secure_password_hash
+```
+
+To generate a secure password hash, you can use the included `hash-password.js` utility:
+
+```bash
+node hash-password.js YourSecurePassword123
+```
+
+This will output a hash that you can use in your ADMIN_PASSWORD_HASH environment variable.
+
+The admin credentials are automatically applied when the application starts, and any changes to these environment variables will update the admin user on the next application restart.
