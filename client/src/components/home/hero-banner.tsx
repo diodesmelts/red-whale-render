@@ -59,16 +59,9 @@ export function HeroBanner() {
     staleTime: 60 * 1000, // Cache for 1 minute
   });
 
-  // First priority: Competition with pushToHeroBanner flag
-  // Second priority: Featured cash competition
-  // Third priority: Any live cash competition
-  const heroBannerCompetition = competitions?.find(
-    comp => comp.pushToHeroBanner && comp.isLive
-  ) || competitions?.find(
-    comp => comp.category === "cash" && comp.isLive && comp.isFeatured
-  ) || competitions?.find(
-    comp => comp.category === "cash" && comp.isLive
-  );
+  // We're disabling the automatic competition prioritization to fix the hero banner image issue
+  // The hero banner will now use only the specific hero banner image set in site config
+  const heroBannerCompetition = null; // Removed competition image priority to fix hero banner image display
 
   const backgroundImage = heroBannerConfig?.value || "";
   const hasBackgroundImage = backgroundImage && backgroundImage.trim() !== "";
