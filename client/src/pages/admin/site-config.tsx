@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HeroBannerUpload } from "@/components/admin/site-config/hero-banner-upload";
 import { LogoUpload } from "@/components/admin/site-config/logo-upload";
 import { FooterSettings } from "@/components/admin/site-config/footer-settings";
+import { PaymentCardsUpload } from "@/components/admin/site-config/payment-cards-upload";
 import { useQuery } from "@tanstack/react-query";
 import { SiteConfig } from "@shared/schema";
 import { cn, getImageUrl } from "@/lib/utils";

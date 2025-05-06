@@ -2,8 +2,20 @@ import { Link } from "wouter";
 import { Facebook, Instagram, MapPin } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { SiteConfig } from "@shared/schema";
+import { getImageUrl } from "@/lib/utils";
 
 export function Footer() {
+  // Fetch payment cards image URL from site config
+  const { data: paymentCardsConfig } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config", "paymentCardsImage"],
+    queryFn: async () => {
+      const res = await fetch("/api/site-config/paymentCardsImage");
+      if (!res.ok) return null;
+      return res.json();
+    },
+  });
   return (
     <footer className="bg-[#002147] text-white pt-12 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -112,9 +124,12 @@ export function Footer() {
             </div>
             <div className="mt-6">
               <img 
-                src="/uploads/payment-cards.png" 
+                src={paymentCardsConfig?.value ? getImageUrl(paymentCardsConfig.value) : "/uploads/payment-cards.png"} 
                 alt="Payment methods: Mastercard and Visa" 
                 className="h-8"
+                onError={(e) => {
+                  e.currentTarget.src = "/uploads/payment-cards.png";
+                }}
               />
             </div>
           </div>
