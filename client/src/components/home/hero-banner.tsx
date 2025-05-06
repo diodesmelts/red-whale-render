@@ -161,7 +161,7 @@ export function HeroBanner() {
 
   return (
     <section 
-      className="relative w-full h-[600px] md:h-[450px] lg:h-[500px] overflow-hidden bg-gradient-to-r from-[#002147] to-[#002147]/95 text-white"
+      className="relative w-full h-[650px] md:h-[500px] lg:h-[550px] overflow-hidden bg-gradient-to-r from-[#002147] to-[#002147]/95 text-white"
     >
       {/* Full width hero image container */}
       <div 
@@ -200,6 +200,10 @@ export function HeroBanner() {
                 Enter now <Ticket className="h-5 w-5 ml-1" />
               </Button>
             </Link>
+            <div className="mt-3 flex items-center text-white/80 text-sm">
+              <CreditCard className="h-4 w-4 mr-2 text-primary" />
+              Secure payments with Mastercard and Visa
+            </div>
           </div>
         </div>
       </div>
