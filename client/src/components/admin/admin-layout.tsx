@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { BarChart, Home, Package, Settings, Users, Shield, Layout, Image, Terminal, PieChart, TicketIcon } from "lucide-react";
+import { Home, Package, Settings, Users, Shield, Image, Terminal, TicketIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 
@@ -26,7 +26,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/competitions", label: "Competitions", icon: Package },
     { href: "/admin/competitions-overview", label: "Ticket Stats", icon: TicketIcon },
     { href: "/admin/users", label: "Users", icon: Users },
-    { href: "/admin/analytics", label: "Analytics", icon: BarChart },
     { href: "/admin/settings", label: "Settings", icon: Settings },
     { href: "/admin/site-config", label: "Site Configuration", icon: Image },
     // Only show dev tools in development environment
