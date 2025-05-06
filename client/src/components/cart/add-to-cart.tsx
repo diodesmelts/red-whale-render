@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { useState, useEffect } from "react";
-import { ShoppingCart, Plus, Minus, Check, Shuffle, AlertCircle } from "lucide-react";
+import { ShoppingCart, Check, Shuffle, AlertCircle } from "lucide-react";
 import { Dice5 } from "lucide-react";
 import { Lock } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
@@ -54,39 +54,7 @@ export function AddToCart({
     enabled: isNumberPickerOpen
   });
 
-  const handleDecrement = () => {
-    setQuantity((prev) => {
-      const newQuantity = prev > 1 ? prev - 1 : 1;
-      // Trim the selected numbers if we decrease the quantity
-      if (selectedNumbers.length > newQuantity) {
-        setSelectedNumbers(selectedNumbers.slice(0, newQuantity));
-      }
-      return newQuantity;
-    });
-  };
-
-  const handleIncrement = () => {
-    // Make sure we don't exceed max tickets per user
-    if (quantity < competition.maxTicketsPerUser) {
-      setQuantity((prev) => prev + 1);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (isNaN(value) || value < 1) {
-      setQuantity(1);
-      setSelectedNumbers(selectedNumbers.slice(0, 1));
-    } else if (value > competition.maxTicketsPerUser) {
-      setQuantity(competition.maxTicketsPerUser);
-      setSelectedNumbers(selectedNumbers.slice(0, competition.maxTicketsPerUser));
-    } else {
-      setQuantity(value);
-      if (selectedNumbers.length > value) {
-        setSelectedNumbers(selectedNumbers.slice(0, value));
-      }
-    }
-  };
+  // We've replaced the increment/decrement/input functions with a single slider handler
 
   const handleAddToCart = () => {
     // If number picker is enabled and we don't have the correct number of selected numbers
@@ -203,43 +171,50 @@ export function AddToCart({
     });
   };
 
+  // Handler for slider change
+  const handleSliderChange = (value: number[]) => {
+    const newQuantity = value[0];
+    setQuantity(newQuantity);
+    
+    // Trim selected numbers if needed
+    if (selectedNumbers.length > newQuantity) {
+      setSelectedNumbers(selectedNumbers.slice(0, newQuantity));
+    }
+  };
+
   return (
     <>
-      <div className={`flex ${layout === "column" ? "flex-col gap-2" : "items-center gap-3"}`}>
-        <div className="flex items-center">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-r-none"
-            onClick={handleDecrement}
-            aria-label="Decrease quantity"
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Input
-            type="number"
-            min={1}
+      <div className={`flex ${layout === "column" ? "flex-col gap-4" : "flex-col md:flex-row items-center gap-4"}`}>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-gray-700">
+              Number of tickets: <span className="text-[#002147] font-bold">{quantity}</span>
+            </span>
+            <span className="text-sm text-gray-500">
+              (£{(quantity * competition.ticketPrice).toFixed(2)})
+            </span>
+          </div>
+          
+          <Slider 
+            defaultValue={[1]}
             max={competition.maxTicketsPerUser}
-            value={quantity}
-            onChange={handleInputChange}
-            className="h-8 w-16 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            min={1}
+            step={1}
+            value={[quantity]}
+            onValueChange={handleSliderChange}
+            className="py-1"
           />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-l-none"
-            onClick={handleIncrement}
-            aria-label="Increase quantity"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+          
+          <div className="flex justify-between">
+            <span className="text-xs text-gray-500">1</span>
+            <span className="text-xs text-gray-500">{competition.maxTicketsPerUser}</span>
+          </div>
         </div>
+        
         <Button
           type="button"
           variant={buttonVariant}
-          className="gap-2"
+          className="gap-2 w-full md:w-auto"
           onClick={handleAddToCart}
         >
           <ShoppingCart className="h-4 w-4" />
