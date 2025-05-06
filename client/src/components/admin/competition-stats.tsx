@@ -119,21 +119,36 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
                 <span>Purchased</span>
                 <span>{purchasedPercentage.toFixed(1)}%</span>
               </div>
-              <Progress value={purchasedPercentage} className="h-2 bg-gray-100" indicatorClassName="bg-green-500" />
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-green-500 transition-all" 
+                  style={{ width: `${purchasedPercentage}%` }}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
                 <span>In Cart (Reserved)</span>
                 <span>{inCartPercentage.toFixed(1)}%</span>
               </div>
-              <Progress value={inCartPercentage} className="h-2 bg-gray-100" indicatorClassName="bg-blue-500" />
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-500 transition-all" 
+                  style={{ width: `${inCartPercentage}%` }}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
                 <span>Available</span>
                 <span>{availablePercentage.toFixed(1)}%</span>
               </div>
-              <Progress value={availablePercentage} className="h-2 bg-gray-100" indicatorClassName="bg-amber-500" />
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-amber-500 transition-all" 
+                  style={{ width: `${availablePercentage}%` }}
+                />
+              </div>
             </div>
           </div>
         </CardContent>
