@@ -326,8 +326,14 @@ export default function EditCompetition() {
                         <FormLabel>Prize Value (£)</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="0.00" 
                             {...field}
+                            type="text" 
+                            placeholder="" 
+                            onChange={(e) => {
+                              const val = e.target.value.trim();
+                              const price = val === '' ? 0 : (parseFloat(val) || 0);
+                              field.onChange(price);
+                            }}
                           />
                         </FormControl>
                         <FormDescription>
@@ -341,44 +347,32 @@ export default function EditCompetition() {
                   <FormField
                     control={form.control}
                     name="ticketPrice"
-                    render={({ field: { value, onChange, ...field } }) => {
-                      // Convert stored pence value to pounds for display
-                      const displayValue = value !== undefined ? (value / 100).toFixed(2) : "";
-                      
-                      // Custom onChange handler to convert pounds to pence
-                      const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                        const input = e.target.value;
-                        if (input === '') {
-                          onChange(0);
-                          return;
-                        }
-                        
-                        // Parse the input as float and convert to pence
-                        const pounds = parseFloat(input);
-                        if (!isNaN(pounds)) {
-                          const pence = Math.round(pounds * 100);
-                          onChange(pence);
-                        }
-                      };
-                      
-                      return (
-                        <FormItem>
-                          <FormLabel>Ticket Price (£)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="0.00" 
-                              value={displayValue}
-                              onChange={handlePriceChange}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Enter the price in pounds (e.g., 0.47 for 47p, 1.37 for £1.37)
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ticket Price (£)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="text" 
+                            placeholder="" 
+                            value={field.value !== undefined ? (field.value / 100) : ""}
+                            onChange={(e) => {
+                              const val = e.target.value.trim();
+                              if (val === '') {
+                                field.onChange(0);
+                              } else {
+                                const pounds = parseFloat(val) || 0;
+                                const pence = Math.round(pounds * 100);
+                                field.onChange(pence);
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter the price in pounds (e.g., 0.47 for 47p, 1.37 for £1.37)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
                 
