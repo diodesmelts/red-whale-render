@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { CompetitionCard } from "@/components/competition/competition-card";
 import { Competition } from "@shared/schema";
-import { ChevronRight, Search, Ticket, Clock, Filter } from "lucide-react";
+import { ChevronRight, Search, Ticket, Clock, Filter, CreditCard } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { HeroBanner } from "@/components/home/hero-banner";
 import { CountdownTimer } from "@/components/countdown-timer";
@@ -56,6 +56,14 @@ export default function HomePage() {
     <div>
       {/* Hero Section */}
       <HeroBanner />
+      
+      {/* Secure Payments Banner */}
+      <div className="bg-white py-1 flex justify-center border-b">
+        <div className="bg-black/10 text-[#002147] px-4 py-1.5 rounded-full flex items-center text-sm mx-auto my-2 shadow-sm">
+          <CreditCard className="h-4 w-4 mr-2 text-primary" />
+          Secure payments with Mastercard and Visa
+        </div>
+      </div>
       
       {/* Featured Competitions Section */}
       <section className="py-20 bg-white relative overflow-hidden">
