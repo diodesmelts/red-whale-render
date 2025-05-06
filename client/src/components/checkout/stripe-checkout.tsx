@@ -218,12 +218,12 @@ export function StripeCheckout({
   }, []);
 
   const appearance = {
-    theme: 'night' as const,
+    theme: 'stripe' as const,
     variables: {
-      colorPrimary: '#3b82f6',
-      colorBackground: '#1f2937',
-      colorText: '#f9fafb',
-      colorDanger: '#ef4444',
+      colorPrimary: '#002147',
+      colorBackground: '#ffffff',
+      colorText: '#30313d',
+      colorDanger: '#df1b41',
       fontFamily: 'Open Sans, sans-serif',
       borderRadius: '0.5rem',
     },
@@ -237,9 +237,9 @@ export function StripeCheckout({
   // Show error if Stripe failed to initialize
   if (stripeError) {
     return (
-      <div className="bg-card border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
-        <h2 className="text-xl font-semibold mb-1">Complete your purchase</h2>
-        <p className="text-sm text-muted-foreground mb-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
+        <h2 className="text-xl font-semibold mb-1 text-[#002147]">Complete your purchase</h2>
+        <p className="text-sm text-gray-600 mb-4">
           Total: £{amount.toFixed(2)} for {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
         </p>
         
@@ -274,15 +274,15 @@ export function StripeCheckout({
   // Show loading message if stripePromise is null but we haven't timed out yet
   if (!stripePromise) {
     return (
-      <div className="bg-card border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
-        <h2 className="text-xl font-semibold mb-1">Complete your purchase</h2>
-        <p className="text-sm text-muted-foreground mb-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
+        <h2 className="text-xl font-semibold mb-1 text-[#002147]">Complete your purchase</h2>
+        <p className="text-sm text-gray-600 mb-4">
           Total: £{amount.toFixed(2)} for {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
         </p>
         
         <div className="flex flex-col items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-          <p className="text-sm text-muted-foreground">Initializing payment system...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-[#002147] mb-4" />
+          <p className="text-sm text-gray-600">Initializing payment system...</p>
         </div>
         
         <Button 
