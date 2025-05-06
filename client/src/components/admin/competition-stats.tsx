@@ -84,9 +84,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Ticket Status Overview</CardTitle>
+          <CardTitle>{competition.title}</CardTitle>
           <CardDescription>
-            Current status of all tickets for this competition
+            Ticket status overview for this competition
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -173,7 +173,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
       {showNumberGrid && (
         <Card>
           <CardHeader>
-            <CardTitle>Ticket Number Status</CardTitle>
+            <CardTitle>{competition.title} - Ticket Numbers</CardTitle>
             <CardDescription>
               View the status of individual ticket numbers
             </CardDescription>
