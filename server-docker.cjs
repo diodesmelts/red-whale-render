@@ -1894,6 +1894,202 @@ function isAdmin(req, res, next) {
 }
 
 // Admin routes
+
+// Admin endpoint to get ticket stats for a competition
+app.get('/api/admin/competitions/:id/ticket-stats', isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    console.log(`🎟️ Fetching ticket stats for competition ${numId}`);
+    
+    // Verify competition exists
+    const competition = await pool.query(
+      'SELECT id, total_tickets FROM competitions WHERE id = $1 LIMIT 1',
+      [numId]
+    );
+    
+    if (competition.rows.length === 0) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Get all entries for this competition
+    const entryList = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Get purchased numbers - tickets that have been successfully purchased
+    const purchasedNumbers = new Set();
+    const purchasedEntries = entryList.rows.filter(entry => entry.payment_status === 'completed');
+    
+    for (const entry of purchasedEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          purchasedNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Get in-cart numbers - tickets that are in active carts but not purchased
+    const inCartNumbers = new Set();
+    const pendingEntries = entryList.rows.filter(entry => entry.payment_status === 'pending');
+    
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Create a range of all possible ticket numbers
+    const totalRange = Array.from({ length: competition.rows[0].total_tickets }, (_, i) => i + 1);
+    
+    // Return comprehensive stats
+    res.json({
+      totalTickets: competition.rows[0].total_tickets,
+      purchasedTickets: purchasedNumbers.size,
+      inCartTickets: inCartNumbers.size,
+      availableTickets: competition.rows[0].total_tickets - purchasedNumbers.size - inCartNumbers.size,
+      soldTicketsCount: purchasedNumbers.size,
+      allNumbers: {
+        totalRange: totalRange,
+        purchased: Array.from(purchasedNumbers),
+        inCart: Array.from(inCartNumbers)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching competition ticket stats:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin endpoint to get cart items for a competition
+app.post('/api/admin/competitions/:id/cart-items', isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    // Get all pending entries (in cart) for this competition
+    const activeEntries = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Filter for pending entries
+    const pendingEntries = activeEntries.rows.filter(entry => entry.payment_status === 'pending');
+    
+    // Extract all numbers from pending entries
+    const inCartNumbers = new Set();
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    console.log(`Found ${inCartNumbers.size} in-cart numbers for competition ${numId}`);
+    
+    // Return the cart numbers
+    return res.json({
+      competitionId: numId,
+      inCartNumbers: Array.from(inCartNumbers)
+    });
+  } catch (error) {
+    console.error('Error fetching competition cart numbers:', error);
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin endpoint to lookup ticket owner by competition ID and ticket number
+app.get('/api/admin/competitions/:competitionId/ticket/:ticketNumber', isAdmin, async (req, res) => {
+  try {
+    console.log('🔍 TICKET OWNER LOOKUP request received:', {
+      competitionId: req.params.competitionId,
+      ticketNumber: req.params.ticketNumber,
+      userId: req.user?.id,
+      userIsAdmin: req.user?.isAdmin
+    });
+
+    const competitionId = parseInt(req.params.competitionId);
+    const ticketNumber = parseInt(req.params.ticketNumber);
+    
+    if (isNaN(competitionId) || isNaN(ticketNumber)) {
+      return res.status(400).json({ message: 'Invalid competition ID or ticket number' });
+    }
+    
+    console.log(`📌 Looking up owner for ticket #${ticketNumber} in competition #${competitionId}`);
+    
+    // First, verify the competition exists
+    const competition = await pool.query(
+      'SELECT id FROM competitions WHERE id = $1 LIMIT 1',
+      [competitionId]
+    );
+      
+    if (competition.rows.length === 0) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Find the entry that contains this ticket number
+    const allEntries = await pool.query(
+      'SELECT id, user_id, selected_numbers, created_at FROM entries WHERE competition_id = $1',
+      [competitionId]
+    );
+    
+    // Filter entries to find one with the matching ticket number
+    let ticketEntry = null;
+    
+    for (const entry of allEntries.rows) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers) && 
+          entry.selected_numbers.includes(ticketNumber)) {
+        ticketEntry = entry;
+        break;
+      }
+    }
+    
+    if (!ticketEntry) {
+      return res.status(404).json({ 
+        message: 'Ticket not found or not yet purchased' 
+      });
+    }
+    
+    // Get user details
+    const user = await pool.query(
+      'SELECT id, username, email, display_name, is_admin FROM users WHERE id = $1 LIMIT 1',
+      [ticketEntry.user_id]
+    );
+      
+    if (user.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Construct the response
+    const ticketOwner = {
+      ticketNumber,
+      userId: ticketEntry.user_id,
+      userDetails: user.rows[0],
+      purchaseDate: ticketEntry.created_at
+    };
+    
+    console.log(`✅ Found owner for ticket #${ticketNumber}: User ID #${ticketEntry.user_id}`);
+    
+    res.json(ticketOwner);
+  } catch (error) {
+    console.error('❌ Error looking up ticket owner:', error);
+    res.status(500).json({ message: 'Failed to lookup ticket owner' });
+  }
+});
+
 app.get('/api/admin/users', isAdmin, async (req, res) => {
   try {
     // Check what columns exist in the users table

@@ -104,7 +104,7 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
             <CardDescription className="flex items-center gap-1 text-sm">
               <span>Status: </span>
               <span className="font-medium bg-amber-100 text-amber-700 px-2 rounded-full text-xs">
-                {competition.status || 'Unknown'}
+                {competition.isLive ? 'Live' : 'Inactive'}
               </span>
             </CardDescription>
           )}
@@ -282,7 +282,7 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <div className="grid grid-cols-10 gap-2 md:grid-cols-20">
-              {allNumbers.totalRange.slice(0, 500).map((number) => {
+              {allNumbers.totalRange.slice(0, 500).map((number: number) => {
                 const isPurchased = allNumbers.purchased.includes(number);
                 const isInCart = allNumbers.inCart.includes(number);
                 
