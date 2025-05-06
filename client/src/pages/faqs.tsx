@@ -17,7 +17,7 @@ export default function FAQsPage() {
         />
       </Helmet>
 
-      <div className="container py-12 max-w-4xl relative">
+      <div className="container py-12 max-w-4xl relative mx-auto">
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute top-20 right-10 w-64 h-64 bg-[#7B39ED]/5 rounded-full blur-3xl opacity-40"></div>
