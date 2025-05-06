@@ -64,6 +64,12 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
         const res = await apiRequest('POST', `/api/competitions/${competition.id}/active-cart-items`, {
           cartItems: cartItems
         });
+        
+        if (!res.ok) {
+          console.error(`Error fetching active cart numbers for competition ${competition.id}: ${res.status}`);
+          return;
+        }
+        
         const data = await res.json();
         if (data && data.inCartNumbers) {
           setClientCartNumbers(prev => {
@@ -74,7 +80,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
           });
         }
       } catch (error) {
-        console.error("Error fetching active cart numbers:", error);
+        console.error(`Error fetching active cart numbers for competition ${competition.id}:`, error);
       }
     };
     
