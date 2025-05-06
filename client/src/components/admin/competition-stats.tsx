@@ -105,28 +105,47 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
 
   if (error || !stats) {
     return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-bold text-foreground">{competition.title}</CardTitle>
-          <CardDescription className="flex items-center gap-1 text-sm">
-            <span>Status: </span>
-            <span className="font-medium bg-amber-100 text-amber-700 px-2 rounded-full text-xs">
-              {competition.percentSold ? `${competition.percentSold}% sold` : 'N/A'}
-            </span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <div className="flex flex-col items-center justify-center py-6">
-            <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-            <p className="text-muted-foreground text-center font-medium">
-              Stats temporarily unavailable
-            </p>
-            <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
-              Statistics for this competition will be available soon.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-bold text-foreground">{competition.title}</CardTitle>
+            <CardDescription className="flex items-center gap-1 text-sm">
+              <span>Status: </span>
+              <span className="font-medium bg-amber-100 text-amber-700 px-2 rounded-full text-xs">
+                {competition.ticketsSold !== null ? `${((competition.ticketsSold / competition.totalTickets) * 100).toFixed(1)}% sold` : '0% sold'}
+              </span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="flex flex-col items-center justify-center py-6">
+              <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
+              <p className="text-muted-foreground text-center font-medium">
+                Stats temporarily unavailable
+              </p>
+              <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
+                Statistics for this competition will be available soon.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg text-foreground">Winner Lookup</CardTitle>
+            <CardDescription>
+              Lookup winner information for this competition
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-col items-center justify-center py-6">
+              <AlertCircle className="h-8 w-8 text-amber-500 mb-3" />
+              <p className="text-muted-foreground text-center text-sm">
+                Winner lookup temporarily unavailable
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
