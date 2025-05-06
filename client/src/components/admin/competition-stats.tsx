@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Competition } from "@shared/schema";
-import { Loader2, Lock, AlertCircle, TicketIcon, ShoppingCart, CheckCircle2 } from "lucide-react";
+import { Loader2, Lock, AlertCircle, TicketIcon, ShoppingCart, CheckCircle2, Trophy } from "lucide-react";
+import { WinnerLookup } from "./winner-lookup";
 import {
   Card,
   CardContent,
@@ -253,6 +254,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
           </Button>
         </CardFooter>
       </Card>
+
+      {/* Winner Lookup UI */}
+      <WinnerLookup competition={competition} />
 
       {showNumberGrid && (
         <Card>
