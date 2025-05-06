@@ -45,6 +45,11 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
   
   // Get active cart numbers from the client
   useEffect(() => {
+    // Make sure we have a valid competition ID
+    if (!competition || !competition.id) {
+      return;
+    }
+
     // Get active numbers for this competition from the current user's cart
     const competitionCartItems = cartItems.filter(item => 
       item.competitionId === competition.id && 
@@ -79,13 +84,19 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     };
     
     fetchAllCartData();
-  }, [competition.id, cartItems]);
+  }, [competition, competition.id, cartItems]);
   
   // Fetch ticket statistics
   const { data: stats, isLoading, error } = useQuery<TicketStats>({
-    queryKey: ['/api/competitions', competition.id, 'ticket-stats'],
-    enabled: !!competition.id,
+    queryKey: ['/api/competitions', competition?.id, 'ticket-stats'],
+    // Only enable the query if competition ID is valid
+    enabled: !!competition && !!competition.id,
     queryFn: async () => {
+      // Double-check competition ID exists to prevent API calls with undefined
+      if (!competition || !competition.id) {
+        throw new Error("No valid competition ID available");
+      }
+      
       const res = await apiRequest(
         'GET', 
         `/api/competitions/${competition.id}/ticket-stats`
@@ -102,7 +113,32 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     );
   }
 
+  // Handle error or missing data
   if (error || !stats) {
+    // Also handle the case where competition might be undefined or incomplete
+    if (!competition || !competition.id) {
+      return (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-bold text-foreground">Competition Data Unavailable</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="flex flex-col items-center justify-center py-6">
+                <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
+                <p className="text-muted-foreground text-center font-medium">
+                  Competition data could not be loaded
+                </p>
+                <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
+                  Please check the competition ID and try again.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+    
     return (
       <div className="space-y-6">
         <Card>
