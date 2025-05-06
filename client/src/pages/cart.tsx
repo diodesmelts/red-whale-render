@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2, AlertCircle } from "lucide-react";
 import { useCart } from "@/hooks/use-cart"; 
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
@@ -9,6 +9,8 @@ import { useLocation } from "wouter";
 import { useState } from "react";
 import { processImageUrl } from "@/lib/image-utils";
 import { CheckoutModal } from "@/components/checkout/checkout-modal";
+import { CartExpiryTimer } from "@/components/cart/cart-expiry-timer";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function CartPage() {
   const { cartItems, cartTotal, updateCartItem, removeFromCart, clearCart } = useCart();
@@ -198,6 +200,24 @@ export default function CartPage() {
         </div>
       ) : (
         <>
+          <Alert className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Your selected numbers are reserved</AlertTitle>
+            <AlertDescription className="flex flex-col gap-2">
+              <p>Numbers are reserved for 30 minutes from the time you add them to your cart. Complete your purchase before they expire to secure your tickets.</p>
+              
+              {cartItems.length > 0 && (
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                  {cartItems.map(item => item.expiresAt && (
+                    <div key={`timer-${item.competitionId}`} className="bg-muted p-2 rounded-md flex items-center justify-between">
+                      <span className="text-sm font-medium truncate max-w-[150px]">{item.title}:</span>
+                      <CartExpiryTimer expiresAt={item.expiresAt} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </AlertDescription>
+          </Alert>
           <div className="bg-card rounded-lg shadow-sm overflow-hidden mb-6">
             <div className="hidden sm:grid grid-cols-12 gap-4 bg-muted p-4 font-medium text-sm">
               <div className="col-span-6">Competition</div>
@@ -227,6 +247,12 @@ export default function CartPage() {
                       <p className="text-sm text-muted-foreground sm:hidden">
                         £{item.ticketPrice.toFixed(2)} per ticket
                       </p>
+                      
+                      {item.expiresAt && (
+                        <div className="mt-1">
+                          <CartExpiryTimer expiresAt={item.expiresAt} />
+                        </div>
+                      )}
                       
                       {item.selectedNumbers && item.selectedNumbers.length > 0 && (
                         <div className="mt-1">
