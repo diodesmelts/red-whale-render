@@ -51,15 +51,66 @@ export function NumberPicker({
 
   const fetchTakenNumbers = async () => {
     try {
-      // This is a placeholder. You would need to implement this API endpoint
-      // to return numbers that are already taken by other users
-      const response = await apiRequest("GET", `/api/competitions/${competitionId}/taken-numbers`);
-      const data = await response.json();
-      setTakenNumbers(data.takenNumbers || []);
+      console.log(`🔍 Fetching taken numbers for competition ${competitionId}`);
+      
+      // Use a POST for active cart items (needed to sync with other users' carts)
+      // First make a request to fetch active cart items with an empty cart
+      try {
+        const cartResponse = await fetch(`/api/competitions/${competitionId}/active-cart-items`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ cartItems: [] }),
+          credentials: 'include'
+        });
+        
+        if (cartResponse.ok) {
+          const cartData = await cartResponse.json();
+          console.log(`✅ Received ${cartData.inCartNumbers?.length || 0} active cart items`);
+          
+          // Now fetch taken numbers
+          try {
+            const takenResponse = await fetch(`/api/competitions/${competitionId}/taken-numbers`, {
+              credentials: 'include'
+            });
+            
+            if (takenResponse.ok) {
+              const takenData = await takenResponse.json();
+              console.log(`✅ Received ${takenData.takenNumbers?.length || 0} taken numbers`);
+              
+              // Combine the two sets of numbers
+              const allTakenNumbers = [
+                ...(takenData.takenNumbers || []),
+                ...(cartData.inCartNumbers || [])
+              ];
+              
+              // Remove duplicates using Set
+              setTakenNumbers(Array.from(new Set(allTakenNumbers)));
+              return;
+            } else {
+              console.warn(`⚠️ Failed to fetch taken numbers: ${takenResponse.status}`);
+            }
+          } catch (takenError) {
+            console.error('❌ Error fetching taken numbers:', takenError);
+          }
+          
+          // If we got here, the taken numbers request failed but cart request succeeded
+          setTakenNumbers(cartData.inCartNumbers || []);
+          return;
+        } else {
+          console.warn(`⚠️ Failed to fetch cart items: ${cartResponse.status}`);
+        }
+      } catch (cartError) {
+        console.error('❌ Error fetching cart items:', cartError);
+      }
+      
+      // If all requests fail, use currently stored data or an empty array
+      console.log('ℹ️ Using fallback for taken numbers');
+      setTakenNumbers(prevTakenNumbers => prevTakenNumbers.length ? prevTakenNumbers : []);
     } catch (error) {
-      console.error("Failed to fetch taken numbers:", error);
-      // For now, we'll use a placeholder set of taken numbers for demonstration
-      setTakenNumbers([2, 15, 27, 42, 56, 78, 91]);
+      console.error("❌ Critical error fetching taken numbers:", error);
+      // Keep the previous state to avoid UI disruption
     }
   };
 

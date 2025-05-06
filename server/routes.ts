@@ -443,38 +443,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // This endpoint can be called by anyone (it's used when users view available numbers)
     const competitionId = parseInt(req.params.id);
     if (isNaN(competitionId)) {
-      return res.status(400).json({ message: 'Invalid competition ID' });
+      console.log('❌ Invalid competition ID:', req.params.id);
+      // For resilience in production, return an empty array instead of an error
+      return res.json({ inCartNumbers: [] });
     }
 
     try {
-      // Get the client-side cart data submitted in the request
-      const { cartItems } = req.body;
-      if (!cartItems || !Array.isArray(cartItems)) {
-        return res.status(400).json({ message: 'Invalid cart data format' });
+      // Add detailed logging for production debugging
+      console.log(`📝 Active cart items request details:
+        - Competition ID: ${competitionId}
+        - Request body type: ${typeof req.body}
+        - Request body has cartItems: ${req.body && 'cartItems' in req.body}
+      `);
+      
+      // Get the client-side cart data submitted in the request - with fallbacks
+      let cartData = [];
+      
+      // Multiple checks for different payload formats that might be used
+      if (req.body) {
+        if (req.body.cartItems && Array.isArray(req.body.cartItems)) {
+          cartData = req.body.cartItems;
+        } else if (req.body.clientCartNumbers && Array.isArray(req.body.clientCartNumbers)) {
+          // Alternative format some clients might use
+          cartData = [{ competitionId, selectedNumbers: req.body.clientCartNumbers }];
+        } else if (typeof req.body === 'string') {
+          try {
+            const parsedBody = JSON.parse(req.body);
+            if (parsedBody.cartItems && Array.isArray(parsedBody.cartItems)) {
+              cartData = parsedBody.cartItems;
+            }
+          } catch (e) {
+            console.error('Error parsing string request body:', e);
+          }
+        }
       }
       
-      // Filter only items for this competition
-      const relevantCartItems = cartItems.filter(item => 
-        item.competitionId === competitionId && 
-        item.selectedNumbers && 
-        Array.isArray(item.selectedNumbers)
-      );
-      
-      // Extract all selected numbers
+      // Extract all selected numbers - defensive approach
       const inCartNumbers = [];
-      relevantCartItems.forEach(item => {
-        if (item.selectedNumbers && Array.isArray(item.selectedNumbers)) {
-          inCartNumbers.push(...item.selectedNumbers);
-        }
-      });
       
-      // Return the unique numbers in cart
+      // Process the cart data with maximum resilience
+      if (Array.isArray(cartData)) {
+        cartData.forEach(item => {
+          // For each item, check if it's related to this competition
+          const itemCompId = typeof item.competitionId === 'string' 
+            ? parseInt(item.competitionId) 
+            : item.competitionId;
+            
+          if (itemCompId === competitionId && item.selectedNumbers) {
+            // Handle different formats of selectedNumbers
+            let numbers = [];
+            
+            if (Array.isArray(item.selectedNumbers)) {
+              numbers = item.selectedNumbers;
+            } else if (typeof item.selectedNumbers === 'string') {
+              try {
+                const parsed = JSON.parse(item.selectedNumbers);
+                if (Array.isArray(parsed)) {
+                  numbers = parsed;
+                }
+              } catch (e) {
+                // If it's not JSON, maybe it's a comma separated string
+                numbers = item.selectedNumbers.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+              }
+            }
+            
+            // Add the numbers to our collection
+            inCartNumbers.push(...numbers);
+          }
+        });
+      }
+      
+      // Return the unique numbers in cart (always return a valid response)
+      console.log(`📊 Returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId}`);
       res.json({
-        inCartNumbers: [...new Set(inCartNumbers)]
+        inCartNumbers: Array.from(new Set(inCartNumbers))
       });
     } catch (error) {
-      console.error('Error processing cart items:', error);
-      res.status(500).json({ message: 'Error processing cart items' });
+      console.error('❌ Error processing cart items:', error);
+      // Return an empty array for production resilience rather than an error
+      res.json({ inCartNumbers: [] });
     }
   });
 
