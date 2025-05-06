@@ -38,7 +38,15 @@ export default function AuthPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate("/");
+      // Check if we should return to a specific page after login
+      const returnTo = localStorage.getItem('returnToAfterAuth');
+      if (returnTo) {
+        // Clear the saved return path
+        localStorage.removeItem('returnToAfterAuth');
+        navigate(returnTo);
+      } else {
+        navigate("/");
+      }
     }
   }, [user, navigate]);
   
@@ -78,7 +86,15 @@ export default function AuthPage() {
         setLoginError(error.message);
       },
       onSuccess: () => {
-        navigate("/");
+        // Check if we should return to a specific page after login
+        const returnTo = localStorage.getItem('returnToAfterAuth');
+        if (returnTo) {
+          // Clear the saved return path
+          localStorage.removeItem('returnToAfterAuth');
+          navigate(returnTo);
+        } else {
+          navigate("/");
+        }
       }
     });
   };
@@ -147,8 +163,15 @@ export default function AuthPage() {
           // Update auth context
           queryClient.setQueryData(["/api/user"], userData);
           
-          // Navigate to home
-          navigate("/");
+          // Check if we should return to a specific page after login
+          const returnTo = localStorage.getItem('returnToAfterAuth');
+          if (returnTo) {
+            // Clear the saved return path
+            localStorage.removeItem('returnToAfterAuth');
+            navigate(returnTo);
+          } else {
+            navigate("/");
+          }
           
         } catch (parseError) {
           throw new Error(`Failed to parse server response: ${responseText}`);
