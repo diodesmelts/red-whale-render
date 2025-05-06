@@ -61,7 +61,7 @@ export function HeroBanner() {
 
   // We're disabling the automatic competition prioritization to fix the hero banner image issue
   // The hero banner will now use only the specific hero banner image set in site config
-  const heroBannerCompetition = null; // Removed competition image priority to fix hero banner image display
+  const heroBannerCompetition: Competition | null = null; // Removed competition image priority to fix hero banner image display
 
   const backgroundImage = heroBannerConfig?.value || "";
   const hasBackgroundImage = backgroundImage && backgroundImage.trim() !== "";
