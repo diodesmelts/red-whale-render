@@ -576,92 +576,50 @@ export default function CompetitionDetails() {
         
 
       
-        {/* Details Tabs */}
+        {/* FAQs Section */}
         <div className="border-t border-gray-200 pt-4">
-          <div className="flex border-b border-gray-200 mb-4">
-            <button 
-              onClick={() => setActiveTab("details")}
-              className={`py-2 px-4 border-b-2 ${activeTab === "details" ? "border-[#002147] text-[#002147]" : "border-transparent text-gray-500"} font-semibold text-sm`}
-            >
-              Competition Details
-            </button>
-            <button 
-              onClick={() => setActiveTab("faq")}
-              className={`py-2 px-4 border-b-2 ${activeTab === "faq" ? "border-[#002147] text-[#002147]" : "border-transparent text-gray-500"} font-semibold text-sm`}
-            >
-              FAQ
-            </button>
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-[#002147] mb-3">
+              Frequently Asked Questions
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base font-semibold text-[#002147] mb-1">How do I know if I've won?</h3>
+                <p className="text-gray-700 text-sm">
+                  Once the competition closes and the draw takes place, winners will be notified via email. You can also check your account dashboard for any winning notifications.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-base font-semibold text-[#002147] mb-1">When will I receive my prize?</h3>
+                <p className="text-gray-700 text-sm">
+                  If you're the lucky winner, your prize will be dispatched within 14 working days of the draw date. For high-value items, we may arrange a delivery date with you directly.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-base font-semibold text-[#002147] mb-1">Can I get a refund on my tickets?</h3>
+                <p className="text-gray-700 text-sm">
+                  All ticket purchases are final and non-refundable once completed.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-base font-semibold text-[#002147] mb-1">What's the cash alternative?</h3>
+                <p className="text-gray-700 text-sm">
+                  A cash alternative is available for this prize at the value shown in the competition details. You must notify us within 14 days of winning if you prefer the cash alternative.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-base font-semibold text-[#002147] mb-1">How are the winners selected?</h3>
+                <p className="text-gray-700 text-sm">
+                  Winners are selected via an automated random selection system which is overseen by an independent adjudicator.
+                </p>
+              </div>
+            </div>
           </div>
-          
-          {activeTab === "details" && (
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-[#002147] mb-3">
-                {competition.title}
-              </h2>
-              
-              <p className="text-gray-700 mb-4 text-sm">
-                {competition.description || 
-                "We are giving you the opportunity to win a " + competition.title + " All for just £" + competition.ticketPrice.toFixed(2) + "!"}
-              </p>
-              
-              <p className="text-gray-700 mb-4 text-sm">
-                Our tech competitions always sell super fast, enter now before it's too late and you could be our next winner!
-              </p>
-              
-              <div className="mb-4">
-                <h3 className="text-base font-semibold text-[#002147] mb-2">Draw Information</h3>
-                <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
-                  <li>Draw takes place regardless of sell out</li>
-                  <li>Competition will close sooner if the maximum entries are received</li>
-                </ul>
-              </div>
-            </div>
-          )}
-          
-          {activeTab === "faq" && (
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-[#002147] mb-3">
-                Frequently Asked Questions
-              </h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-base font-semibold text-[#002147] mb-1">How do I know if I've won?</h3>
-                  <p className="text-gray-700 text-sm">
-                    Once the competition closes and the draw takes place, winners will be notified via email. You can also check your account dashboard for any winning notifications.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-base font-semibold text-[#002147] mb-1">When will I receive my prize?</h3>
-                  <p className="text-gray-700 text-sm">
-                    If you're the lucky winner, your prize will be dispatched within 14 working days of the draw date. For high-value items, we may arrange a delivery date with you directly.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-base font-semibold text-[#002147] mb-1">Can I get a refund on my tickets?</h3>
-                  <p className="text-gray-700 text-sm">
-                    All ticket purchases are final and non-refundable once completed.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-base font-semibold text-[#002147] mb-1">What's the cash alternative?</h3>
-                  <p className="text-gray-700 text-sm">
-                    A cash alternative is available for this prize at the value shown in the competition details. You must notify us within 14 days of winning if you prefer the cash alternative.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-base font-semibold text-[#002147] mb-1">How are the winners selected?</h3>
-                  <p className="text-gray-700 text-sm">
-                    Winners are selected via an automated random selection system which is overseen by an independent adjudicator.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </section>
