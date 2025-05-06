@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { Competition } from "@shared/schema";
 import { Loader2, Lock, AlertCircle, TicketIcon, ShoppingCart, CheckCircle2 } from "lucide-react";
 import {
@@ -43,111 +43,93 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
   const { cartItems } = useCart();
   const [clientCartNumbers, setClientCartNumbers] = useState<number[]>([]);
   
-  // Get active cart numbers from the client
-  useEffect(() => {
-    // Make sure we have a valid competition ID
-    if (!competition || !competition.id) {
-      return;
-    }
-
-    // Get active numbers for this competition from the current user's cart
-    const competitionCartItems = cartItems.filter(item => 
-      item.competitionId === competition.id && 
-      item.selectedNumbers && 
-      Array.isArray(item.selectedNumbers)
-    );
-    
-    const selectedNumbers = competitionCartItems.flatMap(item => 
-      item.selectedNumbers || []
-    );
-    
-    setClientCartNumbers(selectedNumbers);
-    
-    // Get cart data from all users by sending our cart to the server
-    const fetchAllCartData = async () => {
-      try {
-        const res = await apiRequest('POST', `/api/competitions/cart-items/${competition.id}`, {
-          cartItems: cartItems
-        });
-        const data = await res.json();
-        if (data && data.inCartNumbers) {
-          setClientCartNumbers(prev => {
-            // Combine with our existing numbers to ensure we include our own cart
-            const combined = [...prev, ...data.inCartNumbers];
-            // Remove duplicates
-            return [...new Set(combined)];
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching active cart numbers:", error);
-      }
-    };
-    
-    fetchAllCartData();
-  }, [competition, competition.id, cartItems]);
-  
   // Debug flag to help with troubleshooting
   const DEBUG = true;
   
-  // Fetch ticket statistics with proper production/development handling
-  const { data: stats, isLoading, error } = useQuery<TicketStats>({
-    queryKey: ['/api/competitions', competition?.id, 'ticket-stats'],
-    // Only enable the query if competition ID is valid
-    enabled: !!competition && !!competition.id,
-    queryFn: async () => {
-      // Double-check competition ID exists to prevent API calls with undefined
-      if (!competition || !competition.id) {
-        if (DEBUG) console.log("🛑 Query aborted: Competition ID is invalid:", competition?.id);
-        throw new Error("No valid competition ID available");
-      }
+  // Get cart numbers for this competition
+  useEffect(() => {
+    // Ensure we have a valid competition ID
+    if (!competition?.id) return;
+    
+    // Extract ticket numbers from client-side cart for this competition
+    const ticketNumbers = cartItems
+      .filter(item => item.competitionId === competition.id)
+      .flatMap(item => item.selectedNumbers || []);
+    
+    // Update state with client-side cart numbers
+    setClientCartNumbers(ticketNumbers);
+    
+    // Fetch server-side cart data
+    const fetchServerCartData = async () => {
+      if (DEBUG) console.log(`📦 Fetching cart data for competition ID: ${competition.id}`);
       
-      if (DEBUG) console.log("🔍 Fetching ticket stats for competition ID:", competition.id);
       try {
-        // Unified approach - try the admin endpoint first, then regular endpoint as fallback
-        // Using proper fetch with credentials
-        const adminEndpoint = `/api/admin/competitions/${competition.id}/ticket-stats`;
-        const regularEndpoint = `/api/competitions/ticket-stats/${competition.id}`;
-        
-        if (DEBUG) console.log(`🔍 Trying admin endpoint: ${adminEndpoint}`);
-        
-        try {
-          const adminRes = await fetch(adminEndpoint, {
-            credentials: 'include', // Essential for admin authentication
-            headers: { 'Cache-Control': 'no-cache' } // Avoid stale responses
-          });
-          
-          if (adminRes.ok) {
-            const data = await adminRes.json();
-            if (DEBUG) console.log("✅ Admin ticket stats data received:", data);
-            return data;
-          }
-          
-          if (DEBUG) console.warn(`Admin endpoint failed with ${adminRes.status}, trying regular endpoint`);
-        } catch (adminErr) {
-          if (DEBUG) console.warn("Admin endpoint error:", adminErr);
-          // Continue to fallback
-        }
-        
-        // Try regular endpoint as fallback
-        if (DEBUG) console.log(`🔍 Trying regular endpoint: ${regularEndpoint}`);
-        const regularRes = await fetch(regularEndpoint, {
-          credentials: 'include'
+        // Use the standard fetch API to ensure consistency across environments
+        const response = await fetch(`/api/admin/competitions/${competition.id}/cart-items`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ cartItems }),
         });
         
-        if (!regularRes.ok) {
-          throw new Error(`API Error: ${regularRes.status} ${regularRes.statusText}`);
+        // Handle response
+        if (response.ok) {
+          const data = await response.json();
+          if (DEBUG) console.log(`✅ Received cart data:`, data);
+          
+          if (data && Array.isArray(data.inCartNumbers)) {
+            // Combine with local cart numbers and remove duplicates
+            const allNumbers = [...new Set([...ticketNumbers, ...data.inCartNumbers])];
+            setClientCartNumbers(allNumbers);
+          }
+        } else {
+          console.error(`⚠️ Cart data fetch failed: ${response.status} ${response.statusText}`);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching cart data:", error);
+      }
+    };
+    
+    fetchServerCartData();
+  }, [competition?.id, cartItems]);
+  
+  // Fetch ticket statistics from admin endpoint
+  const { data: stats, isLoading, error } = useQuery<TicketStats>({
+    queryKey: ['/api/admin/competitions', competition?.id, 'ticket-stats'],
+    enabled: !!competition?.id,
+    queryFn: async () => {
+      // Verify competition ID again for safety
+      if (!competition?.id) {
+        throw new Error("Invalid competition ID");
+      }
+      
+      if (DEBUG) console.log(`🔍 Fetching ticket stats for competition ID: ${competition.id}`);
+      
+      try {
+        // Use the admin endpoint with proper credentials
+        const endpoint = `/api/admin/competitions/${competition.id}/ticket-stats`;
+        
+        const response = await fetch(endpoint, {
+          credentials: 'include',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status} ${response.statusText}`);
         }
         
-        const fallbackData = await regularRes.json();
-        if (DEBUG) console.log("✅ Regular endpoint stats data received:", fallbackData);
-        return fallbackData;
-      } catch (err) {
-        if (DEBUG) console.error("💥 Error fetching ticket stats:", err);
-        throw err;
+        const data = await response.json();
+        if (DEBUG) console.log("✅ Ticket stats data received:", data);
+        return data;
+      } catch (error) {
+        console.error("❌ Error fetching ticket stats:", error);
+        throw error;
       }
     },
-    staleTime: 30 * 1000, // 30 seconds cache - shorter for admin panel to see updates faster
-    retry: 2 // Allow a couple of retries
+    staleTime: 30 * 1000,
+    retry: 1
   });
 
   if (isLoading) {
