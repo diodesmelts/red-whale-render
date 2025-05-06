@@ -110,6 +110,13 @@ export function Footer() {
                 <i className="fas fa-headset mr-2"></i> Live Chat
               </Button>
             </div>
+            <div className="mt-6">
+              <img 
+                src="/images/payment-cards.png" 
+                alt="Payment methods: Mastercard and Visa" 
+                className="h-8"
+              />
+            </div>
           </div>
         </div>
         
