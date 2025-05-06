@@ -14,6 +14,7 @@ console.log('🚀 Starting Render integration process...');
 // Execute each fix script in sequence
 const fixScripts = [
   'production-direct-fix.cjs',
+  'render-syntax-error-fix.cjs', // Fix critical syntax error first
   'render-endpoint-fixes.cjs',
   'active-cart-items-fix.cjs',
   'render-db-query-fix.cjs'
