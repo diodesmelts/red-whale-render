@@ -38,8 +38,11 @@ export const getApiBaseUrl = () => {
       return '/api';
     }
     
-    // For official domain
-    if (hostname === 'bluewhalecompetitions.co.uk' || hostname === 'www.bluewhalecompetitions.co.uk') {
+    // For official domains
+    if (hostname === 'bluewhalecompetitions.co.uk' || 
+        hostname === 'www.bluewhalecompetitions.co.uk' ||
+        hostname === 'mobycomps.co.uk' ||
+        hostname === 'www.mobycomps.co.uk') {
       console.log('🔌 Production environment detected on official domain - using /api prefix');
       return '/api';
     }
@@ -136,10 +139,35 @@ export async function apiRequest(
       protocol: window.location.protocol
     });
     
-    // PRODUCTION DEBUG: Additional logging specifically for MobyComps domain
+    // PRODUCTION FIX: Special handling for MobyComps domain
     if (isMobyComps) {
       console.log(`🔍 MOBYCOMPS REQUEST DEBUGGING: ${method} ${url}`);
       console.log(`📌 Request data:`, data || {});
+      
+      // CRITICAL FIX: Handle cart-items endpoint specifically for MobyComps
+      if (url.includes('cart-items')) {
+        // Extract competition ID from the URL
+        const match = url.match(/\/competitions\/cart-items\/(\d+)/) || 
+                      url.match(/\/competitions\/(\d+)\/active-cart-items/);
+        
+        if (match && match[1]) {
+          const competitionId = match[1];
+          
+          console.log(`🛒 MOBYCOMPS CART COMPATIBILITY FIX: Detected cart-items request for competition ${competitionId}`, {
+            originalUrl: url,
+            method,
+            extracted: competitionId,
+            isLegacyFormat: url.includes('/active-cart-items')
+          });
+          
+          // Always use the legacy format
+          const fixedUrl = `/api/competitions/${competitionId}/active-cart-items`;
+          console.log(`🔧 REWRITING REQUEST URL: ${url} => ${fixedUrl}`);
+          
+          // Set adjusted URL
+          url = fixedUrl;
+        }
+      }
       
       // Log exactly where this is being called from (stack trace)
       console.log(`📚 Call stack:`, new Error().stack);
