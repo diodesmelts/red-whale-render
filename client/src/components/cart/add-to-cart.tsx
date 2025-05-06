@@ -7,7 +7,6 @@ import { Lock } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Competition } from "@shared/schema";
 import { useLocation } from "wouter";
-import { NumberPicker } from "@/components/competition/number-picker";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Dialog,
@@ -142,6 +141,45 @@ export function AddToCart({
     }
   };
 
+  // Function for Lucky Dip
+  const handleLuckyDip = () => {
+    // Generate random non-repeating numbers
+    const randomNumbers: number[] = [];
+    const availablePool = Array.from({ length: competition.totalTickets }, (_, i) => i + 1);
+    
+    // Handle case where there aren't enough numbers available
+    if (availablePool.length < quantity) {
+      toast({
+        title: "Not enough numbers available",
+        description: `Only ${availablePool.length} numbers are available. Please try again or select manually.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    for (let i = 0; i < quantity; i++) {
+      if (availablePool.length === 0) break;
+      
+      // Pick a random index from the remaining pool
+      const randomIndex = Math.floor(Math.random() * availablePool.length);
+      // Get the number at that index
+      const selectedNumber = availablePool[randomIndex];
+      // Remove the number from the pool to avoid duplicates
+      availablePool.splice(randomIndex, 1);
+      // Add the number to our selection
+      randomNumbers.push(selectedNumber);
+    }
+    
+    const sortedNumbers = randomNumbers.sort((a, b) => a - b);
+    setSelectedNumbers(sortedNumbers);
+    
+    toast({
+      title: "Lucky Dip",
+      description: `Randomly selected numbers: ${sortedNumbers.join(", ")}`,
+      variant: "default",
+    });
+  };
+
   return (
     <>
       <div className={`flex ${layout === "column" ? "flex-col gap-2" : "items-center gap-3"}`}>
@@ -211,7 +249,8 @@ export function AddToCart({
             <div className="max-h-[280px] overflow-y-auto pr-2 my-2 custom-scrollbar">
               <div className="grid grid-cols-5 gap-2 py-2" data-testid="number-grid">
                 {Array.from({ length: competition.totalTickets }, (_, i) => i + 1).map(number => {
-                  const isTaken = false; // TODO: Implement taken number check
+                  // This is a placeholder. In a real implementation, you would fetch taken numbers from the API
+                  const isTaken = [2, 15, 27, 42, 56, 78, 91].includes(number) && !selectedNumbers.includes(number);
                   return (
                     <div
                       key={number}
@@ -257,27 +296,7 @@ export function AddToCart({
                 <Button 
                   variant="outline" 
                   className="flex items-center gap-2 bg-[#bbd665]/10 border-[#bbd665] text-[#002147] hover:bg-[#bbd665]/20"
-                  onClick={() => {
-                    // Generate random non-repeating numbers
-                    const randomNumbers: number[] = [];
-                    const availablePool = Array.from({ length: competition.totalTickets }, (_, i) => i + 1);
-                    
-                    for (let i = 0; i < quantity; i++) {
-                      if (availablePool.length === 0) break;
-                      
-                      // Pick a random index from the remaining pool
-                      const randomIndex = Math.floor(Math.random() * availablePool.length);
-                      // Get the number at that index
-                      const selectedNumber = availablePool[randomIndex];
-                      // Remove the number from the pool to avoid duplicates
-                      availablePool.splice(randomIndex, 1);
-                      // Add the number to our selection
-                      randomNumbers.push(selectedNumber);
-                    }
-                    
-                    const sortedNumbers = randomNumbers.sort((a, b) => a - b);
-                    setSelectedNumbers(sortedNumbers);
-                  }}
+                  onClick={handleLuckyDip}
                   data-testid="lucky-dip-btn"
                 >
                   <Shuffle className="h-4 w-4" /> Lucky Dip
