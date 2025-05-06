@@ -160,8 +160,7 @@ export default function EditCompetition() {
     const processedData = {
       ...data,
       isLive: Boolean(data.isLive),
-      isFeatured: Boolean(data.isFeatured),
-      pushToHeroBanner: Boolean(data.pushToHeroBanner)
+      isFeatured: Boolean(data.isFeatured)
     };
     
     console.log("Submitting competition data:", processedData);
@@ -522,26 +521,7 @@ export default function EditCompetition() {
                     )}
                   />
                   
-                  <FormField
-                    control={form.control}
-                    name="pushToHeroBanner"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-blue-50 dark:bg-blue-950/30">
-                        <FormControl>
-                          <Checkbox
-                            checked={Boolean(field.value)}
-                            onCheckedChange={(checked) => field.onChange(Boolean(checked))}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>Push to Hero Banner</FormLabel>
-                          <FormDescription>
-                            If enabled, this competition will be featured prominently in the hero banner section
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+
                 </div>
               </div>
               
