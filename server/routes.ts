@@ -394,17 +394,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid competition ID" });
       }
 
-      // For now, return placeholder data
-      // In a production environment, this would be fetched from the database
-      const takenNumbers = [2, 15, 27, 42, 56, 78, 91];
+      // Get the competition to check if it exists
+      const competition = await dataStorage.getCompetition(id);
+      if (!competition) {
+        return res.status(404).json({ message: "Competition not found" });
+      }
+
+      // Fetch all entries for this competition
+      const entries = await dataStorage.getEntriesByCompetition(id);
       
+      // Extract all taken numbers (both purchased and in cart)
+      const takenNumbers = [];
+      entries.forEach(entry => {
+        if (entry.selectedNumbers) {
+          try {
+            const numbers = JSON.parse(entry.selectedNumbers);
+            takenNumbers.push(...numbers);
+          } catch (e) {
+            console.error('Error parsing selected numbers:', e);
+          }
+        }
+      });
+      
+      // Return the unique taken numbers
       return res.json({ 
         competitionId: id,
-        takenNumbers 
+        takenNumbers: [...new Set(takenNumbers)]
       });
     } catch (error: any) {
       console.error(`Failed to fetch taken numbers for competition ${req.params.id}:`, error);
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json({ message: error.message || "Failed to fetch taken numbers" });
+    }
+  });
+  
+  // Get ticket statistics for a competition (admin only)
+  app.get("/api/competitions/:id/ticket-stats", async (req, res) => {
+    console.log('📊 Request to get ticket statistics for competition:', req.params.id);
+    
+    // Admin only endpoint
+    if (!req.isAuthenticated() || !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Forbidden - Admin access required' });
+    }
+    
+    const competitionId = parseInt(req.params.id);
+    if (isNaN(competitionId)) {
+      return res.status(400).json({ message: 'Invalid competition ID' });
+    }
+
+    try {
+      const competition = await dataStorage.getCompetition(competitionId);
+      if (!competition) {
+        return res.status(404).json({ message: 'Competition not found' });
+      }
+      
+      // Get all entries for this competition
+      const entries = await dataStorage.getEntriesByCompetition(competitionId);
+      
+      // Calculate ticket statistics
+      const totalTickets = competition.maxTickets;
+      const soldTicketsCount = competition.ticketsSold || 0;
+      
+      // Extract purchased numbers (confirmed entries)
+      const purchasedNumbers = [];
+      // Extract numbers in cart (pending entries)
+      const inCartNumbers = [];
+      
+      entries.forEach(entry => {
+        if (entry.selectedNumbers) {
+          try {
+            const numbers = JSON.parse(entry.selectedNumbers);
+            if (entry.status === 'completed') {
+              purchasedNumbers.push(...numbers);
+            } else if (entry.status === 'cart') {
+              inCartNumbers.push(...numbers);
+            }
+          } catch (e) {
+            console.error('Error parsing selected numbers:', e);
+          }
+        }
+      });
+      
+      // Count unique numbers
+      const purchasedCount = new Set(purchasedNumbers).size;
+      const inCartCount = new Set(inCartNumbers).size;
+      const availableCount = totalTickets - purchasedCount - inCartCount;
+      
+      // Return the statistics
+      res.json({
+        totalTickets,
+        purchasedTickets: purchasedCount,
+        inCartTickets: inCartCount,
+        availableTickets: availableCount,
+        soldTicketsCount, // The official count from the competition record
+        allNumbers: {
+          totalRange: Array.from({ length: totalTickets }, (_, i) => i + 1),
+          purchased: [...new Set(purchasedNumbers)],
+          inCart: [...new Set(inCartNumbers)]
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching ticket statistics:', error);
+      res.status(500).json({ message: error.message || 'Error calculating ticket statistics' });
     }
   });
 
