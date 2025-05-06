@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, MapPin } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 
@@ -100,14 +100,6 @@ export function Footer() {
           <div>
             <h3 className="text-white font-semibold text-lg mb-4">Contact Us</h3>
             <ul className="space-y-2">
-              <li className="flex items-start">
-                <Mail className="text-primary h-5 w-5 mt-0.5 mr-3" />
-                <span className="text-gray-300">support@mobycomps.com</span>
-              </li>
-              <li className="flex items-start">
-                <Phone className="text-primary h-5 w-5 mt-0.5 mr-3" />
-                <span className="text-gray-300">+44 (0)123 456 7890</span>
-              </li>
               <li className="flex items-start">
                 <MapPin className="text-primary h-5 w-5 mt-0.5 mr-3" />
                 <span className="text-gray-300">Devon, United Kingdom</span>
