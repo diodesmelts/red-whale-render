@@ -326,12 +326,33 @@ export default function EditCompetition() {
                         <FormLabel>Prize Value (£)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
                             placeholder="0.00" 
                             {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                            value={field.value !== undefined ? field.value : ""}
+                            onChange={e => {
+                              // Allow only valid number formats: digits, one decimal point
+                              const value = e.target.value.replace(/[^0-9.]/g, '');
+                              
+                              // Only allow one decimal point
+                              const parts = value.split('.');
+                              const cleaned = parts.length > 2 
+                                ? parts[0] + '.' + parts.slice(1).join('')
+                                : value;
+                                
+                              // If empty, set to empty string instead of 0
+                              if (cleaned === '') {
+                                field.onChange('');
+                              } else {
+                                // Otherwise parse as float
+                                field.onChange(parseFloat(cleaned) || 0);
+                              }
+                            }}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Enter the exact prize value (e.g., 599.99 for £599.99)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -345,14 +366,33 @@ export default function EditCompetition() {
                         <FormLabel>Ticket Price (£)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
                             placeholder="0.00" 
-                            value={field.value / 100}  
-                            onChange={e => field.onChange(Math.round(parseFloat(e.target.value || "0") * 100))}
+                            value={field.value !== undefined ? (field.value / 100).toFixed(2) : ""}
+                            onChange={e => {
+                              // Allow only valid number formats: digits, one decimal point
+                              const value = e.target.value.replace(/[^0-9.]/g, '');
+                              
+                              // Only allow one decimal point
+                              const parts = value.split('.');
+                              const cleaned = parts.length > 2 
+                                ? parts[0] + '.' + parts.slice(1).join('')
+                                : value;
+                                
+                              // If empty, use 0
+                              if (cleaned === '') {
+                                field.onChange(0);
+                              } else {
+                                // Convert to pence/cents (stored as integer)
+                                const priceInPounds = parseFloat(cleaned) || 0;
+                                const priceInPence = Math.round(priceInPounds * 100);
+                                field.onChange(priceInPence);
+                              }
+                            }}
                           />
                         </FormControl>
                         <FormDescription>
-                          Enter the price in pounds (e.g., 1.00 for £1)
+                          Enter the price in pounds (e.g., 0.47 for 47p, 1.37 for £1.37)
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
