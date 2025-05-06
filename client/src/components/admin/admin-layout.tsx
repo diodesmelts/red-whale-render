@@ -21,7 +21,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: Home },
     { href: "/admin/competitions", label: "Competitions", icon: Package },
-    { href: "/admin/competitions-overview", label: "Ticket Stats", icon: TicketIcon },
+    { href: "/admin/competition-overview", label: "Ticket Stats", icon: TicketIcon },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/site-config", label: "Site Configuration", icon: Image },
   ];
