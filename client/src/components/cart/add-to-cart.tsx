@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShoppingCart, Plus, Minus, Check, Shuffle, AlertCircle } from "lucide-react";
 import { Dice5 } from "lucide-react";
 import { Lock } from "lucide-react";
@@ -8,6 +8,13 @@ import { useCart } from "@/hooks/use-cart";
 import { Competition } from "@shared/schema";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+
+// Define response type for taken numbers API
+interface TakenNumbersResponse {
+  competitionId: number;
+  takenNumbers: number[];
+}
 import { 
   Dialog,
   DialogContent,
@@ -39,6 +46,13 @@ export function AddToCart({
   const { addToCart } = useCart();
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  
+  // Fetch taken numbers from the API
+  const { data: takenNumbersData, isLoading: isLoadingTakenNumbers } = useQuery<TakenNumbersResponse>({
+    queryKey: ['/api/competitions', competition.id, 'taken-numbers'],
+    // Only fetch when the number picker is open
+    enabled: isNumberPickerOpen
+  });
 
   const handleDecrement = () => {
     setQuantity((prev) => {
@@ -143,29 +157,38 @@ export function AddToCart({
 
   // Function for Lucky Dip
   const handleLuckyDip = () => {
-    // Generate random non-repeating numbers
-    const randomNumbers: number[] = [];
-    const availablePool = Array.from({ length: competition.totalTickets }, (_, i) => i + 1);
+    // Get taken numbers from API or use fallback
+    const takenNumbers = takenNumbersData?.takenNumbers || [2, 15, 27, 42, 56, 78, 91];
     
-    // Handle case where there aren't enough numbers available
+    // Create pool of available numbers by filtering out taken numbers
+    const availablePool = Array.from(
+      { length: competition.totalTickets }, 
+      (_, i) => i + 1
+    ).filter(number => !takenNumbers.includes(number));
+    
+    // Handle case where there aren't enough available numbers
     if (availablePool.length < quantity) {
       toast({
         title: "Not enough numbers available",
-        description: `Only ${availablePool.length} numbers are available. Please try again or select manually.`,
+        description: `Only ${availablePool.length} numbers are available. Please try again later or select manually.`,
         variant: "destructive",
       });
       return;
     }
     
+    // Generate random non-repeating numbers
+    const randomNumbers: number[] = [];
+    const shuffledPool = [...availablePool];
+    
     for (let i = 0; i < quantity; i++) {
-      if (availablePool.length === 0) break;
+      if (shuffledPool.length === 0) break;
       
       // Pick a random index from the remaining pool
-      const randomIndex = Math.floor(Math.random() * availablePool.length);
+      const randomIndex = Math.floor(Math.random() * shuffledPool.length);
       // Get the number at that index
-      const selectedNumber = availablePool[randomIndex];
+      const selectedNumber = shuffledPool[randomIndex];
       // Remove the number from the pool to avoid duplicates
-      availablePool.splice(randomIndex, 1);
+      shuffledPool.splice(randomIndex, 1);
       // Add the number to our selection
       randomNumbers.push(selectedNumber);
     }
@@ -249,8 +272,10 @@ export function AddToCart({
             <div className="max-h-[280px] overflow-y-auto pr-2 my-2 custom-scrollbar">
               <div className="grid grid-cols-5 gap-2 py-2" data-testid="number-grid">
                 {Array.from({ length: competition.totalTickets }, (_, i) => i + 1).map(number => {
-                  // This is a placeholder. In a real implementation, you would fetch taken numbers from the API
-                  const isTaken = [2, 15, 27, 42, 56, 78, 91].includes(number) && !selectedNumbers.includes(number);
+                  // Get taken numbers from API or use fallback
+                  const takenNumbers = takenNumbersData?.takenNumbers || [2, 15, 27, 42, 56, 78, 91];
+                  const isTaken = takenNumbers.includes(number) && !selectedNumbers.includes(number);
+                  
                   return (
                     <div
                       key={number}

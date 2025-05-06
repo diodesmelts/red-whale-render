@@ -385,6 +385,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API endpoint to get taken numbers for a competition
+  app.get("/api/competitions/:id/taken-numbers", async (req, res) => {
+    try {
+      // Validate ID
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid competition ID" });
+      }
+
+      // For now, return placeholder data
+      // In a production environment, this would be fetched from the database
+      const takenNumbers = [2, 15, 27, 42, 56, 78, 91];
+      
+      return res.json({ 
+        competitionId: id,
+        takenNumbers 
+      });
+    } catch (error: any) {
+      console.error(`Failed to fetch taken numbers for competition ${req.params.id}:`, error);
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
   app.get("/api/competitions/:id", async (req, res) => {
     try {
       console.log(`🔍 GET competition request for ID: ${req.params.id}`);
