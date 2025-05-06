@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HeroBannerUpload } from "@/components/admin/site-config/hero-banner-upload";
 import { LogoUpload } from "@/components/admin/site-config/logo-upload";
+import { FooterSettings } from "@/components/admin/site-config/footer-settings";
 import { useQuery } from "@tanstack/react-query";
 import { SiteConfig } from "@shared/schema";
 import { cn, getImageUrl } from "@/lib/utils";
@@ -157,11 +158,11 @@ export default function SiteConfigPage() {
               <CardHeader>
                 <CardTitle>Footer Settings</CardTitle>
                 <CardDescription>
-                  Manage your site footer
+                  Manage your site footer links, social media accounts, and copyright text
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Footer configuration content will be added here</p>
+                <FooterSettings />
               </CardContent>
             </Card>
           </TabsContent>
