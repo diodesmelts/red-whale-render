@@ -16,19 +16,28 @@ console.log('CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? 'Set' 
 console.log('CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not set');
 console.log('CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not set');
 
+// Make sure the cloud_name is lowercase (Cloudinary requirement)
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME ? 
+  process.env.CLOUDINARY_CLOUD_NAME.toLowerCase() : null;
+
 const isCloudinaryConfigured = 
-  process.env.CLOUDINARY_CLOUD_NAME && 
+  cloudName && 
   process.env.CLOUDINARY_API_KEY && 
   process.env.CLOUDINARY_API_SECRET;
 
 if (isCloudinaryConfigured) {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true
-  });
-  console.log('Cloudinary configured for image uploads successfully!');
+  try {
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+      secure: true
+    });
+    console.log('Cloudinary configured for image uploads successfully!');
+  } catch (error) {
+    console.error('Error configuring Cloudinary:', error);
+    console.log('Cloudinary configuration failed, will use local storage for uploads');
+  }
 } else {
   console.log('Cloudinary not configured, using local storage for uploads');
 }
@@ -93,8 +102,15 @@ export const storageService = {
     return new Promise((resolve, reject) => {
       console.log('Starting Cloudinary upload for file:', originalFilename);
       
+      // Log the Cloudinary configuration for debugging
+      console.log('Cloudinary configuration during upload:', {
+        cloud_name: cloudName || 'not set', // Use the lowercase version
+        api_key_present: !!process.env.CLOUDINARY_API_KEY,
+        api_secret_present: !!process.env.CLOUDINARY_API_SECRET
+      });
+      
       const uploadOptions = {
-        public_id: `blue-whale/${uuidv4()}`,
+        public_id: `moby-comps/${uuidv4()}`, // Changed from blue-whale to moby-comps
         folder: 'competitions',
         resource_type: 'auto' as const
       };

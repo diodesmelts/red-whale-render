@@ -29,7 +29,8 @@ export function HeroBannerUpload() {
     onSuccess: async (data) => {
       // After successful upload, update the hero banner site config
       try {
-        const response = await fetch('/api/site-config/heroBanner', {
+        // Use the correct admin endpoint for updating site config
+        const response = await fetch('/api/admin/site-config', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
