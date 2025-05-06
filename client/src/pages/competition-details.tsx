@@ -333,6 +333,22 @@ export default function CompetitionDetails() {
               </div>
             </div>
             
+            {/* Competition Details */}
+            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+              <h3 className="text-sm font-semibold text-[#002147] mb-2">Competition Details</h3>
+              <p className="text-xs text-gray-700 mb-2">
+                {competition.description || 
+                "We are giving you the opportunity to win " + competition.title + " All for just £" + competition.ticketPrice.toFixed(2) + "!"}
+              </p>
+              <div className="text-xs text-gray-700">
+                <span className="font-medium text-[#002147]">Draw Information:</span> 
+                <ul className="list-disc list-inside mt-1 space-y-0.5">
+                  <li>Draw takes place on {new Date(competition.drawDate).toLocaleDateString('en-GB')}</li>
+                  <li>Competition will close sooner if the maximum entries are received</li>
+                </ul>
+              </div>
+            </div>
+            
             {/* Mini How It Works section */}
             <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-100">
               <h3 className="text-sm font-semibold text-[#002147] mb-2 text-center">How it works</h3>
