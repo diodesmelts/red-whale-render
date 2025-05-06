@@ -298,9 +298,9 @@ export function StripeCheckout({
   }
 
   return (
-    <div className="bg-card border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
+    <div className="bg-[#002147] text-white border rounded-lg p-4 sm:p-6 shadow-lg max-w-md mx-auto overflow-y-auto">
       <h2 className="text-xl font-semibold mb-1">Complete your purchase</h2>
-      <p className="text-sm text-muted-foreground mb-4 sm:mb-6">
+      <p className="text-sm text-white/80 mb-4 sm:mb-6">
         Total: £{amount.toFixed(2)} for {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
       </p>
       
@@ -312,7 +312,7 @@ export function StripeCheckout({
         />
       </Elements>
       
-      <div className="mt-4 text-xs text-muted-foreground">
+      <div className="mt-4 text-xs text-white/70">
         <p>Your payment is processed securely through Stripe.</p>
       </div>
     </div>
