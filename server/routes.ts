@@ -427,6 +427,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get active cart items for a competition from all users' localStorage
+  app.post("/api/competitions/:id/active-cart-items", async (req, res) => {
+    console.log('🛒 Requesting active cart items for competition:', req.params.id);
+    
+    // This endpoint can be called by anyone (it's used when users view available numbers)
+    const competitionId = parseInt(req.params.id);
+    if (isNaN(competitionId)) {
+      return res.status(400).json({ message: 'Invalid competition ID' });
+    }
+
+    try {
+      // Get the client-side cart data submitted in the request
+      const { cartItems } = req.body;
+      if (!cartItems || !Array.isArray(cartItems)) {
+        return res.status(400).json({ message: 'Invalid cart data format' });
+      }
+      
+      // Filter only items for this competition
+      const relevantCartItems = cartItems.filter(item => 
+        item.competitionId === competitionId && 
+        item.selectedNumbers && 
+        Array.isArray(item.selectedNumbers)
+      );
+      
+      // Extract all selected numbers
+      const inCartNumbers = [];
+      relevantCartItems.forEach(item => {
+        if (item.selectedNumbers && Array.isArray(item.selectedNumbers)) {
+          inCartNumbers.push(...item.selectedNumbers);
+        }
+      });
+      
+      // Return the unique numbers in cart
+      res.json({
+        inCartNumbers: [...new Set(inCartNumbers)]
+      });
+    } catch (error) {
+      console.error('Error processing cart items:', error);
+      res.status(500).json({ message: 'Error processing cart items' });
+    }
+  });
+
   // Get ticket statistics for a competition (admin only)
   app.get("/api/competitions/:id/ticket-stats", async (req, res) => {
     console.log('📊 Request to get ticket statistics for competition:', req.params.id);

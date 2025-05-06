@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Competition } from "@shared/schema";
@@ -19,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useCart } from "@/hooks/use-cart";
 
 interface TicketStats {
   totalTickets: number;
@@ -39,6 +40,46 @@ interface CompetitionStatsProps {
 
 export function CompetitionStats({ competition }: CompetitionStatsProps) {
   const [showNumberGrid, setShowNumberGrid] = useState(false);
+  const { cartItems } = useCart();
+  const [clientCartNumbers, setClientCartNumbers] = useState<number[]>([]);
+  
+  // Get active cart numbers from the client
+  useEffect(() => {
+    // Get active numbers for this competition from the current user's cart
+    const competitionCartItems = cartItems.filter(item => 
+      item.competitionId === competition.id && 
+      item.selectedNumbers && 
+      Array.isArray(item.selectedNumbers)
+    );
+    
+    const selectedNumbers = competitionCartItems.flatMap(item => 
+      item.selectedNumbers || []
+    );
+    
+    setClientCartNumbers(selectedNumbers);
+    
+    // Get cart data from all users by sending our cart to the server
+    const fetchAllCartData = async () => {
+      try {
+        const res = await apiRequest('POST', `/api/competitions/${competition.id}/active-cart-items`, {
+          cartItems: cartItems
+        });
+        const data = await res.json();
+        if (data && data.inCartNumbers) {
+          setClientCartNumbers(prev => {
+            // Combine with our existing numbers to ensure we include our own cart
+            const combined = [...prev, ...data.inCartNumbers];
+            // Remove duplicates
+            return [...new Set(combined)];
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching active cart numbers:", error);
+      }
+    };
+    
+    fetchAllCartData();
+  }, [competition.id, cartItems]);
   
   // Fetch ticket statistics
   const { data: stats, isLoading, error } = useQuery<TicketStats>({
@@ -75,10 +116,27 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     );
   }
 
+  // Update stats with client-side cart data
+  const enhancedStats = {
+    ...stats,
+    allNumbers: {
+      ...stats.allNumbers,
+      inCart: [...new Set([...stats.allNumbers.inCart, ...clientCartNumbers])]
+    }
+  };
+  
+  // Recalculate inCartTickets count based on actual data
+  const actualInCartCount = enhancedStats.allNumbers.inCart.length;
+  enhancedStats.inCartTickets = actualInCartCount;
+  
+  // Adjust available tickets accordingly
+  enhancedStats.availableTickets = enhancedStats.totalTickets - 
+    enhancedStats.purchasedTickets - actualInCartCount;
+  
   // Calculate percentages for visualization
-  const purchasedPercentage = (stats.purchasedTickets / stats.totalTickets) * 100;
-  const inCartPercentage = (stats.inCartTickets / stats.totalTickets) * 100;
-  const availablePercentage = (stats.availableTickets / stats.totalTickets) * 100;
+  const purchasedPercentage = (enhancedStats.purchasedTickets / enhancedStats.totalTickets) * 100;
+  const inCartPercentage = (enhancedStats.inCartTickets / enhancedStats.totalTickets) * 100;
+  const availablePercentage = (enhancedStats.availableTickets / enhancedStats.totalTickets) * 100;
   
   // Get percent sold for display (using the actual ticketsSold value from the competition)
   const percentSold = stats.soldTicketsCount ? ((stats.soldTicketsCount / stats.totalTickets) * 100).toFixed(1) + '%' : '0%';
@@ -98,25 +156,25 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
             <StatCard 
               icon={<TicketIcon />} 
               title="Total Tickets" 
-              value={stats.totalTickets.toString()}
+              value={enhancedStats.totalTickets.toString()}
               color="bg-gray-100"
             />
             <StatCard 
               icon={<CheckCircle2 />} 
               title="Purchased" 
-              value={stats.purchasedTickets.toString()}
+              value={enhancedStats.purchasedTickets.toString()}
               color="bg-green-100"
             />
             <StatCard 
               icon={<ShoppingCart />} 
               title="In Cart" 
-              value={stats.inCartTickets.toString()}
+              value={enhancedStats.inCartTickets.toString()}
               color="bg-blue-100"
             />
             <StatCard 
               icon={<TicketIcon />} 
               title="Available" 
-              value={stats.availableTickets.toString()}
+              value={enhancedStats.availableTickets.toString()}
               color="bg-amber-100"
             />
           </div>
