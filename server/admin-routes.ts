@@ -467,10 +467,17 @@ adminRouter.get('/competitions/:id/ticket-stats', isAdmin, async (req, res) => {
       }
     }
     
-    // Find active cart numbers (numbers in carts but not purchased)
-    const activeEntries = await db.select()
-      .from(entries)
-      .where(eq(entries.competitionId, numId));
+    // Get in-cart numbers - tickets that are in active carts but not purchased
+    const inCartNumbers = new Set();
+    const pendingEntries = entryList.filter(entry => entry.paymentStatus === 'pending');
+    
+    for (const entry of pendingEntries) {
+      if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+        for (const num of entry.selectedNumbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
     
     // Create a range of all possible ticket numbers
     const totalRange = Array.from({ length: competition[0].totalTickets }, (_, i) => i + 1);
@@ -479,18 +486,59 @@ adminRouter.get('/competitions/:id/ticket-stats', isAdmin, async (req, res) => {
     res.json({
       totalTickets: competition[0].totalTickets,
       purchasedTickets: purchasedNumbers.size,
-      inCartTickets: 0, // Fallback as we'll calculate this client-side for real-time accuracy
-      availableTickets: competition[0].totalTickets - purchasedNumbers.size,
+      inCartTickets: inCartNumbers.size,
+      availableTickets: competition[0].totalTickets - purchasedNumbers.size - inCartNumbers.size,
       soldTicketsCount: purchasedNumbers.size,
       allNumbers: {
         totalRange: totalRange,
         purchased: Array.from(purchasedNumbers),
-        inCart: [] // Fallback as we'll get this client-side
+        inCart: Array.from(inCartNumbers)
       }
     });
   } catch (error: any) {
     console.error('Error fetching competition ticket stats:', error);
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin endpoint to get cart items for a competition
+adminRouter.post('/competitions/:id/cart-items', isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    // Get all pending entries (in cart) for this competition
+    const activeEntries = await db.select()
+      .from(entries)
+      .where(eq(entries.competitionId, numId));
+      
+    // Filter for pending entries
+    const pendingEntries = activeEntries.filter(entry => entry.paymentStatus === 'pending');
+    
+    // Extract all numbers from pending entries
+    const inCartNumbers = new Set();
+    for (const entry of pendingEntries) {
+      if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+        for (const num of entry.selectedNumbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    console.log(`Found ${inCartNumbers.size} in-cart numbers for competition ${numId}`);
+    
+    // Return the cart numbers
+    return res.json({
+      competitionId: numId,
+      inCartNumbers: Array.from(inCartNumbers)
+    });
+  } catch (error: any) {
+    console.error('Error fetching competition cart numbers:', error);
+    return res.status(500).json({ message: error.message });
   }
 });
 
