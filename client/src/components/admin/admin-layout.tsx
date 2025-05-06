@@ -31,8 +31,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside className="w-64 bg-card border-r hidden md:block">
         <div className="p-6">
-          <h2 className="text-xl font-bold flex items-center text-primary">
-            <Shield className="h-5 w-5 mr-2" />
+          <h2 className="text-xl font-bold flex items-center text-foreground">
+            <Shield className="h-5 w-5 mr-2 text-primary" />
             Admin Dashboard
           </h2>
         </div>
