@@ -86,12 +86,21 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     queryKey: ['/api/competitions', competition.id, 'ticket-stats'],
     enabled: !!competition.id,
     queryFn: async () => {
-      const res = await apiRequest(
-        'GET', 
-        `/api/competitions/${competition.id}/ticket-stats`
-      );
-      return res.json();
+      try {
+        const res = await apiRequest(
+          'GET', 
+          `/api/competitions/${competition.id}/ticket-stats`
+        );
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status}`);
+        }
+        return res.json();
+      } catch (err) {
+        console.error(`Error fetching stats for competition ${competition.id}:`, err);
+        throw err;
+      }
     },
+    retry: false, // Don't retry failing requests
   });
 
   if (isLoading) {
