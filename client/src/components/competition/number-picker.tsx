@@ -135,25 +135,27 @@ export function NumberPicker({
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid grid-cols-5 gap-2 py-4" data-testid="number-grid">
-            {availableNumbers.map(number => (
-              <div
-                key={number}
-                data-testid={`number-${number}`}
-                className={`
-                  flex items-center justify-center w-10 h-10 rounded-full cursor-pointer border
-                  ${selectedNumbers.includes(number) 
-                    ? 'bg-[#002147] text-white border-[#002147] shadow-md transform scale-105 transition-all'
-                    : 'bg-white text-gray-800 border-gray-200 hover:border-[#002147] hover:shadow transition-all'}
-                  ${(selectedNumbers.length >= selectedCount && !selectedNumbers.includes(number))
-                    ? 'opacity-50 cursor-not-allowed'
-                    : ''}
-                `}
-                onClick={() => handleNumberToggle(number)}
-              >
-                {number}
-              </div>
-            ))}
+          <div className="max-h-[280px] overflow-y-auto pr-2 my-2 custom-scrollbar">
+            <div className="grid grid-cols-5 gap-2 py-2" data-testid="number-grid">
+              {availableNumbers.map(number => (
+                <div
+                  key={number}
+                  data-testid={`number-${number}`}
+                  className={`
+                    flex items-center justify-center w-10 h-10 rounded-full cursor-pointer border
+                    ${selectedNumbers.includes(number) 
+                      ? 'bg-[#002147] text-white border-[#002147] shadow-md transform scale-105 transition-all'
+                      : 'bg-white text-gray-800 border-gray-200 hover:border-[#002147] hover:shadow transition-all'}
+                    ${(selectedNumbers.length >= selectedCount && !selectedNumbers.includes(number))
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''}
+                  `}
+                  onClick={() => handleNumberToggle(number)}
+                >
+                  {number}
+                </div>
+              ))}
+            </div>
           </div>
           
           <div className="flex flex-col gap-4">
