@@ -326,13 +326,19 @@ export default function EditCompetition() {
                         <FormLabel>Prize Value (£)</FormLabel>
                         <FormControl>
                           <Input 
-                            {...field}
                             type="text" 
                             placeholder="" 
+                            value={field.value}
                             onChange={(e) => {
-                              const val = e.target.value.trim();
-                              const price = val === '' ? 0 : (parseFloat(val) || 0);
-                              field.onChange(price);
+                              // Accept any input - don't filter or format
+                              field.onChange(e.target.value);
+                            }}
+                            onBlur={(e) => {
+                              // Only convert to number on blur if it's a valid number
+                              const val = e.target.value;
+                              if (val && !isNaN(Number(val))) {
+                                field.onChange(Number(val));
+                              }
                             }}
                           />
                         </FormControl>
@@ -356,11 +362,19 @@ export default function EditCompetition() {
                             placeholder="" 
                             value={field.value !== undefined ? (field.value / 100) : ""}
                             onChange={(e) => {
+                              // Store input value directly without conversion
+                              // This allows decimal points as user types
+                              const val = e.target.value;
+                              field.onChange(val);
+                            }}
+                            onBlur={(e) => {
+                              // Convert to pence on blur
                               const val = e.target.value.trim();
-                              if (val === '') {
+                              if (val === '' || isNaN(Number(val))) {
                                 field.onChange(0);
                               } else {
-                                const pounds = parseFloat(val) || 0;
+                                // Convert pounds to pence
+                                const pounds = parseFloat(val);
                                 const pence = Math.round(pounds * 100);
                                 field.onChange(pence);
                               }
