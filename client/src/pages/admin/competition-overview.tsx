@@ -1,108 +1,119 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { CompetitionStats } from "@/components/admin/competition-stats";
-import { Competition } from "@shared/schema";
-import { Loader2, AlertCircle } from "lucide-react";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Loader2 } from "lucide-react";
+import { Competition } from "@shared/schema";
 
 export default function CompetitionOverview() {
-  const [selectedCompetitionId, setSelectedCompetitionId] = useState<string>("");
-
   // Fetch all competitions
-  const {
-    data: competitions,
-    isLoading: isLoadingCompetitions,
-    error: competitionsError,
-  } = useQuery<Competition[]>({
+  const { data: competitions, isLoading } = useQuery<Competition[]>({
     queryKey: ["/api/competitions"],
   });
 
-  // Get selected competition details
-  const selectedCompetition = selectedCompetitionId ? 
-    competitions?.find(c => c.id.toString() === selectedCompetitionId) : 
-    undefined;
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-[40vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (!competitions || competitions.length === 0) {
+    return (
+      <AdminLayout>
+        <Card>
+          <CardHeader>
+            <CardTitle>Competition Overview</CardTitle>
+            <CardDescription>
+              There are no competitions available to display.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </AdminLayout>
+    );
+  }
+
+  // Find active and past competitions
+  const activeCompetitions = competitions.filter(comp => comp.isLive);
+  const pastCompetitions = competitions.filter(comp => !comp.isLive);
+
+  // Default to the first tab (active) if available, otherwise past
+  const defaultTab = activeCompetitions.length > 0 ? "active" : "past";
 
   return (
     <AdminLayout>
-      <div className="container py-6 space-y-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight">Competition Overview</h1>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Competition Overview</h1>
           <p className="text-muted-foreground">
-            View detailed statistics for each competition
+            View detailed statistics for all competitions
           </p>
         </div>
 
-        {isLoadingCompetitions ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : competitionsError ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-8">
-              <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-              <p className="text-muted-foreground text-center">
-                Could not load competitions
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Competition</CardTitle>
-                <CardDescription>
-                  Choose a competition to view detailed statistics
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Select 
-                  value={selectedCompetitionId} 
-                  onValueChange={(value) => setSelectedCompetitionId(value)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a competition" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Available Competitions</SelectLabel>
-                      {competitions?.map((competition) => (
-                        <SelectItem key={competition.id} value={competition.id.toString()}>
-                          {competition.title}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
+        <Tabs defaultValue={defaultTab} className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="active" disabled={activeCompetitions.length === 0}>
+              Active ({activeCompetitions.length})
+            </TabsTrigger>
+            <TabsTrigger value="past" disabled={pastCompetitions.length === 0}>
+              Past ({pastCompetitions.length})
+            </TabsTrigger>
+          </TabsList>
 
-            {selectedCompetition && (
-              <>
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-2xl font-bold tracking-tight">
-                    {selectedCompetition.title}
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Ticket status and statistics
-                  </p>
-                </div>
-                
-                <CompetitionStats competition={selectedCompetition} />
-              </>
+          <TabsContent value="active" className="space-y-4">
+            {activeCompetitions.length === 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Active Competitions</CardTitle>
+                  <CardDescription>
+                    There are currently no active competitions.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {activeCompetitions.map((competition) => (
+                  <CompetitionStats key={competition.id} competition={competition} />
+                ))}
+              </div>
             )}
-          </div>
-        )}
+          </TabsContent>
+
+          <TabsContent value="past" className="space-y-4">
+            {pastCompetitions.length === 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Past Competitions</CardTitle>
+                  <CardDescription>
+                    There are no past competitions to display.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {pastCompetitions.map((competition) => (
+                  <CompetitionStats key={competition.id} competition={competition} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </AdminLayout>
   );
