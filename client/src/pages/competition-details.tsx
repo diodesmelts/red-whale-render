@@ -552,6 +552,7 @@ export default function CompetitionDetails() {
                       buttonVariant="default"
                       withNavigation={true}
                       showNumberPicker={true}
+                      quantity={ticketQuantity}
                     />
                   </div>
                   

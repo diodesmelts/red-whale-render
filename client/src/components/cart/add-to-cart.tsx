@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { useState, useEffect } from "react";
 import { ShoppingCart, Check, Shuffle, AlertCircle } from "lucide-react";
 import { Dice5 } from "lucide-react";
@@ -31,6 +30,7 @@ interface AddToCartProps {
   buttonVariant?: "default" | "outline" | "secondary" | "destructive" | "ghost" | "link";
   withNavigation?: boolean;
   showNumberPicker?: boolean;
+  quantity?: number; // Allow quantity to be passed from parent component
 }
 
 export function AddToCart({ 
@@ -39,8 +39,8 @@ export function AddToCart({
   buttonVariant = "default",
   withNavigation = false,
   showNumberPicker = false,
+  quantity = 1, // Default to 1 if not provided
 }: AddToCartProps) {
-  const [quantity, setQuantity] = useState(1);
   const [isNumberPickerOpen, setIsNumberPickerOpen] = useState(false);
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const { addToCart } = useCart();
@@ -171,50 +171,20 @@ export function AddToCart({
     });
   };
 
-  // Handler for slider change
-  const handleSliderChange = (value: number[]) => {
-    const newQuantity = value[0];
-    setQuantity(newQuantity);
-    
-    // Trim selected numbers if needed
-    if (selectedNumbers.length > newQuantity) {
-      setSelectedNumbers(selectedNumbers.slice(0, newQuantity));
+  // When the quantity prop changes, we may need to trim selected numbers
+  useEffect(() => {
+    if (selectedNumbers.length > quantity) {
+      setSelectedNumbers(selectedNumbers.slice(0, quantity));
     }
-  };
+  }, [quantity, selectedNumbers]);
 
   return (
     <>
-      <div className={`flex ${layout === "column" ? "flex-col gap-4" : "flex-col md:flex-row items-center gap-4"}`}>
-        <div className="flex flex-col gap-2 w-full max-w-xs">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">
-              Number of tickets: <span className="text-[#002147] font-bold">{quantity}</span>
-            </span>
-            <span className="text-sm text-gray-500">
-              (£{(quantity * competition.ticketPrice).toFixed(2)})
-            </span>
-          </div>
-          
-          <Slider 
-            defaultValue={[1]}
-            max={competition.maxTicketsPerUser}
-            min={1}
-            step={1}
-            value={[quantity]}
-            onValueChange={handleSliderChange}
-            className="py-1"
-          />
-          
-          <div className="flex justify-between">
-            <span className="text-xs text-gray-500">1</span>
-            <span className="text-xs text-gray-500">{competition.maxTicketsPerUser}</span>
-          </div>
-        </div>
-        
+      <div className="w-full">
         <Button
           type="button"
           variant={buttonVariant}
-          className="gap-2 w-full md:w-auto"
+          className="gap-2 w-full"
           onClick={handleAddToCart}
         >
           <ShoppingCart className="h-4 w-4" />
