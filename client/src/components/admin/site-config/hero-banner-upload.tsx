@@ -97,7 +97,7 @@ export function HeroBannerUpload() {
     setIsUploading(true);
     
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append('image', selectedFile); // Changed 'file' to 'image' to match server expectation
     
     uploadMutation.mutate(formData);
   };
