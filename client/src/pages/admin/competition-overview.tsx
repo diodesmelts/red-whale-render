@@ -1,9 +1,8 @@
-import React, { useState, Component, ErrorInfo, ReactNode } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { CompetitionStats } from "@/components/admin/competition-stats";
 import { GlobalWinnerLookup } from "@/components/admin/global-winner-lookup";
-import { AlertCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -20,45 +19,10 @@ import {
 import { Loader2 } from "lucide-react";
 import { Competition } from "@shared/schema";
 
-interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback: ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-}
-
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(_: Error): ErrorBoundaryState {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("CompetitionStats error caught:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-
-    return this.props.children;
-  }
-}
-
 export default function CompetitionOverview() {
   // Fetch all competitions
   const { data: competitions, isLoading } = useQuery<Competition[]>({
     queryKey: ["/api/competitions"],
-    onError: (error) => {
-      console.error("Error fetching competitions for overview:", error);
-    }
   });
 
   if (isLoading) {
@@ -128,22 +92,7 @@ export default function CompetitionOverview() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {activeCompetitions.map((competition) => (
-                  <ErrorBoundary 
-                    key={competition.id}
-                    fallback={
-                      <Card className="p-4">
-                        <div className="flex flex-col items-center justify-center p-6 text-center">
-                          <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-                          <h3 className="font-medium">{competition.title}</h3>
-                          <p className="text-muted-foreground text-sm mt-2">
-                            Stats temporarily unavailable
-                          </p>
-                        </div>
-                      </Card>
-                    }
-                  >
-                    <CompetitionStats competition={competition} />
-                  </ErrorBoundary>
+                  <CompetitionStats key={competition.id} competition={competition} />
                 ))}
               </div>
             )}
@@ -162,22 +111,7 @@ export default function CompetitionOverview() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {pastCompetitions.map((competition) => (
-                  <ErrorBoundary 
-                    key={competition.id}
-                    fallback={
-                      <Card className="p-4">
-                        <div className="flex flex-col items-center justify-center p-6 text-center">
-                          <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-                          <h3 className="font-medium">{competition.title}</h3>
-                          <p className="text-muted-foreground text-sm mt-2">
-                            Stats temporarily unavailable
-                          </p>
-                        </div>
-                      </Card>
-                    }
-                  >
-                    <CompetitionStats competition={competition} />
-                  </ErrorBoundary>
+                  <CompetitionStats key={competition.id} competition={competition} />
                 ))}
               </div>
             )}

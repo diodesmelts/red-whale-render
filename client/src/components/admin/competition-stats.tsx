@@ -64,12 +64,6 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
         const res = await apiRequest('POST', `/api/competitions/${competition.id}/active-cart-items`, {
           cartItems: cartItems
         });
-        
-        if (!res.ok) {
-          console.error(`Error fetching active cart numbers for competition ${competition.id}: ${res.status}`);
-          return;
-        }
-        
         const data = await res.json();
         if (data && data.inCartNumbers) {
           setClientCartNumbers(prev => {
@@ -80,7 +74,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
           });
         }
       } catch (error) {
-        console.error(`Error fetching active cart numbers for competition ${competition.id}:`, error);
+        console.error("Error fetching active cart numbers:", error);
       }
     };
     
@@ -92,21 +86,12 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     queryKey: ['/api/competitions', competition.id, 'ticket-stats'],
     enabled: !!competition.id,
     queryFn: async () => {
-      try {
-        const res = await apiRequest(
-          'GET', 
-          `/api/competitions/${competition.id}/ticket-stats`
-        );
-        if (!res.ok) {
-          throw new Error(`API Error: ${res.status}`);
-        }
-        return res.json();
-      } catch (err) {
-        console.error(`Error fetching stats for competition ${competition.id}:`, err);
-        throw err;
-      }
+      const res = await apiRequest(
+        'GET', 
+        `/api/competitions/${competition.id}/ticket-stats`
+      );
+      return res.json();
     },
-    retry: false, // Don't retry failing requests
   });
 
   if (isLoading) {
