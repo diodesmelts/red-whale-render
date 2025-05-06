@@ -29,6 +29,16 @@ export default function SiteConfigPage() {
       return res.json();
     },
   });
+  
+  // Fetch the current payment cards image config
+  const { data: paymentCardsConfig, isLoading: isLoadingPaymentCards } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config", "paymentCardsImage"],
+    queryFn: async () => {
+      const res = await fetch("/api/site-config/paymentCardsImage");
+      if (!res.ok) return null;
+      return res.json();
+    },
+  });
 
   return (
     <AdminLayout>
@@ -39,6 +49,7 @@ export default function SiteConfigPage() {
           <TabsList className="mb-4">
             <TabsTrigger value="hero-banner">Hero Banner</TabsTrigger>
             <TabsTrigger value="logo">Logo</TabsTrigger>
+            <TabsTrigger value="payment-cards">Payment Cards</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
           </TabsList>
           
@@ -147,6 +158,63 @@ export default function SiteConfigPage() {
                   <p className="mt-2 text-sm text-muted-foreground">
                     Last updated: {logoConfig?.updatedAt 
                       ? new Date(logoConfig.updatedAt).toLocaleString() 
+                      : 'Never'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="payment-cards">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Payment Cards Upload Form */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Cards Image</CardTitle>
+                  <CardDescription>
+                    Upload an image showing accepted payment methods for the footer
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PaymentCardsUpload />
+                </CardContent>
+              </Card>
+              
+              {/* Current Payment Cards Image */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Current Payment Cards Image</CardTitle>
+                  <CardDescription>
+                    Preview of the currently active payment methods image
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isLoadingPaymentCards ? (
+                    <div className="h-24 bg-muted animate-pulse rounded-md"></div>
+                  ) : paymentCardsConfig?.value ? (
+                    <div className="bg-[#002147] p-4 rounded-md">
+                      <div className="relative overflow-hidden rounded-md flex justify-center items-center">
+                        <img 
+                          src={getImageUrl(paymentCardsConfig.value)}
+                          alt="Current payment cards image" 
+                          className="h-16 w-auto object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src = "/uploads/payment-cards.png";
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-[#002147] h-24 rounded-md flex items-center justify-center text-white">
+                      <div className="flex items-center">
+                        <span className="text-sm">Default payment cards image</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Last updated: {paymentCardsConfig?.updatedAt 
+                      ? new Date(paymentCardsConfig.updatedAt).toLocaleString() 
                       : 'Never'}
                   </p>
                 </CardContent>
