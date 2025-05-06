@@ -432,4 +432,85 @@ adminRouter.post('/fix-image-urls', isAdmin, async (req, res) => {
   }
 });
 
+// Admin endpoint to lookup ticket owner by competition ID and ticket number
+adminRouter.get('/competitions/:competitionId/ticket/:ticketNumber', isAdmin, async (req, res) => {
+  try {
+    console.log('🔍 TICKET OWNER LOOKUP request received:', {
+      competitionId: req.params.competitionId,
+      ticketNumber: req.params.ticketNumber,
+      userId: req.user?.id,
+      userIsAdmin: req.user?.isAdmin
+    });
+
+    const competitionId = parseInt(req.params.competitionId);
+    const ticketNumber = parseInt(req.params.ticketNumber);
+    
+    if (isNaN(competitionId) || isNaN(ticketNumber)) {
+      return res.status(400).json({ message: 'Invalid competition ID or ticket number' });
+    }
+    
+    console.log(`📌 Looking up owner for ticket #${ticketNumber} in competition #${competitionId}`);
+    
+    // First, verify the competition exists
+    const competition = await db.select()
+      .from(competitions)
+      .where(eq(competitions.id, competitionId))
+      .limit(1);
+      
+    if (!competition.length) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Find the entry that contains this ticket number
+    const allEntries = await db.select()
+      .from(entries)
+      .where(eq(entries.competitionId, competitionId));
+    
+    // Filter entries to find one with the matching ticket number
+    let ticketEntry = null;
+    
+    for (const entry of allEntries) {
+      if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers) && 
+          entry.selectedNumbers.includes(ticketNumber)) {
+        ticketEntry = entry;
+        break;
+      }
+    }
+    
+    if (!ticketEntry) {
+      return res.status(404).json({ 
+        message: 'Ticket not found or not yet purchased' 
+      });
+    }
+    
+    // Get user details
+    const user = await db.select()
+      .from(users)
+      .where(eq(users.id, ticketEntry.userId))
+      .limit(1);
+      
+    if (!user.length) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Don't send password to client
+    const { password, ...userWithoutPassword } = user[0];
+    
+    // Construct the response
+    const ticketOwner = {
+      ticketNumber,
+      userId: ticketEntry.userId,
+      userDetails: userWithoutPassword,
+      purchaseDate: ticketEntry.createdAt
+    };
+    
+    console.log(`✅ Found owner for ticket #${ticketNumber}: User ID #${ticketEntry.userId}`);
+    
+    res.json(ticketOwner);
+  } catch (error: any) {
+    console.error('❌ Error looking up ticket owner:', error);
+    res.status(500).json({ message: 'Failed to lookup ticket owner' });
+  }
+});
+
 export default adminRouter;
