@@ -1,0 +1,180 @@
+jhbx9
+CORS request from origin: https://www.mobycomps.co.uk
+jhbx9
+Origin https://www.mobycomps.co.uk is allowed by CORS
+jhbx9
+🔍 Request to POST /api/competitions/7/active-cart-items {
+jhbx9
+  hasSession: false,
+jhbx9
+  sessionID: 'no-session-id',
+jhbx9
+  hasSessionData: false
+jhbx9
+}
+jhbx9
+CORS request from origin: https://www.mobycomps.co.uk
+jhbx9
+Origin https://www.mobycomps.co.uk is allowed by CORS
+jhbx9
+🔍 Request to POST /api/competitions/5/active-cart-items {
+hgpnn
+CORS request from origin: https://www.mobycomps.co.uk
+jhbx9
+  hasSession: false,
+jhbx9
+  sessionID: 'no-session-id',
+jhbx9
+  hasSessionData: false
+jhbx9
+}
+hgpnn
+Origin https://www.mobycomps.co.uk is allowed by CORS
+hgpnn
+🔍 Request to POST /api/competitions/6/active-cart-items {
+hgpnn
+  hasSession: false,
+hgpnn
+  sessionID: 'no-session-id',
+hgpnn
+  hasSessionData: false
+hgpnn
+}
+hgpnn
+CORS request from origin: undefined
+hgpnn
+Allowing request with no origin
+hgpnn
+🔍 Request to GET /api/competitions/6/ticket-stats {
+hgpnn
+  hasSession: false,
+hgpnn
+  sessionID: 'no-session-id',
+hgpnn
+  hasSessionData: false
+hgpnn
+}
+jhbx9
+CORS request from origin: undefined
+jhbx9
+Allowing request with no origin
+jhbx9
+🔍 Request to GET /api/competitions/4/ticket-stats {
+jhbx9
+  hasSession: false,
+jhbx9
+  sessionID: 'no-session-id',
+jhbx9
+  hasSessionData: false
+jhbx9
+}
+hgpnn
+CORS request from origin: undefined
+hgpnn
+Allowing request with no origin
+hgpnn
+🔍 Request to GET /api/competitions/5/ticket-stats {
+hgpnn
+  hasSession: false,
+hgpnn
+  sessionID: 'no-session-id',
+hgpnn
+  hasSessionData: false
+hgpnn
+}
+hgpnn
+CORS request from origin: undefined
+hgpnn
+Allowing request with no origin
+hgpnn
+🔍 Request to GET /favicon.ico {
+hgpnn
+  hasSession: false,
+hgpnn
+  sessionID: 'no-session-id',
+hgpnn
+  hasSessionData: false
+hgpnn
+}
+hgpnn
+CORS request from origin: https://www.mobycomps.co.uk
+hgpnn
+Origin https://www.mobycomps.co.uk is allowed by CORS
+hgpnn
+🔍 Request to POST /api/competitions/4/active-cart-items {
+hgpnn
+  hasSession: false,
+hgpnn
+  sessionID: 'no-session-id',
+hgpnn
+  hasSessionData: false
+hgpnn
+}
+jhbx9
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+jhbx9
+Using customized select query for user
+hgpnn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+hgpnn
+Using customized select query for user
+jhbx9
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+jhbx9
+Using customized select query for user
+hgpnn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+hgpnn
+Using customized select query for user
+jhbx9
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+jhbx9
+Using customized select query for user
+hgpnn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+hgpnn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+jhbx9
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+jhbx9
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+hgpnn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+hgpnn
+Using customized select query for user
+hgpnn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+hgpnn
+Using customized select query for user
+hgpnn
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+hgpnn
+Using customized select query for user
+jhbx9
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+hgpnn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+hgpnn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+hgpnn
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }
+jhbx9
+CORS request from origin: undefined
+jhbx9
+Allowing request with no origin
+jhbx9
+🔍 Request to GET /api/competitions/7/ticket-stats {
+jhbx9
+  hasSession: false,
+jhbx9
+  sessionID: 'no-session-id',
+jhbx9
+  hasSessionData: false
+jhbx9
+}
+jhbx9
+Database columns check: { isBannedExists: true, stripeCustomerIdExists: true }
+jhbx9
+Using customized select query for user
+jhbx9
+✅ User deserialized successfully: { id: 1, username: 'admin', isAdmin: true, stripeCustomerId: 'null' }

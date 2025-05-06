@@ -25,19 +25,41 @@ export default function CompetitionOverview() {
     queryKey: ["/api/admin/competitions"],
     queryFn: async () => {
       console.log("🔍 Fetching competitions from admin endpoint");
-      const response = await fetch("/api/admin/competitions", {
-        credentials: 'include' // Ensure cookies are sent with the request
-      });
-      if (!response.ok) {
-        console.error(`Failed to fetch competitions from admin endpoint: ${response.status}`);
-        throw new Error(`Failed to fetch competitions: ${response.status}`);
+      
+      try {
+        // First try admin endpoint
+        const adminResponse = await fetch("/api/admin/competitions", {
+          credentials: 'include', // Ensure cookies are sent with the request
+          headers: { 'Cache-Control': 'no-cache' } // Avoid stale cached responses
+        });
+        
+        if (adminResponse.ok) {
+          const data = await adminResponse.json();
+          console.log(`✅ Received ${data?.length || 0} competitions from admin endpoint`);
+          return data;
+        }
+        
+        console.warn(`Admin endpoint failed with ${adminResponse.status}, trying regular endpoint`);
+        
+        // Fallback to regular endpoint
+        const regularResponse = await fetch("/api/competitions", {
+          credentials: 'include'
+        });
+        
+        if (!regularResponse.ok) {
+          throw new Error(`Failed to fetch competitions: ${regularResponse.status}`);
+        }
+        
+        const fallbackData = await regularResponse.json();
+        console.log(`✅ Received ${fallbackData?.length || 0} competitions from regular endpoint`);
+        return fallbackData;
+      } catch (error) {
+        console.error("Error fetching competitions:", error);
+        throw error;
       }
-      const data = await response.json();
-      console.log(`✅ Received ${data?.length || 0} competitions from admin endpoint`);
-      return data;
     },
     staleTime: 30 * 1000, // 30 seconds cache - shorter for admin panel to see updates faster
-    retry: 1, // Only retry once to avoid excessive requests if there's an auth issue
+    retry: 2, // Allow 2 retries for more resilience 
   });
 
   if (isLoading) {

@@ -89,9 +89,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
   // Debug flag to help with troubleshooting
   const DEBUG = true;
   
-  // Fetch ticket statistics with admin credentials
+  // Fetch ticket statistics with proper production/development handling
   const { data: stats, isLoading, error } = useQuery<TicketStats>({
-    queryKey: ['/api/admin/competitions', competition?.id, 'ticket-stats'],
+    queryKey: ['/api/competitions', competition?.id, 'ticket-stats'],
     // Only enable the query if competition ID is valid
     enabled: !!competition && !!competition.id,
     queryFn: async () => {
@@ -103,43 +103,51 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
       
       if (DEBUG) console.log("🔍 Fetching ticket stats for competition ID:", competition.id);
       try {
-        // First try admin endpoint for more detailed stats
-        const res = await fetch(
-          `/api/admin/competitions/${competition.id}/ticket-stats`, {
-            credentials: 'include' // Essential for admin authentication
-          }
-        );
+        // Unified approach - try the admin endpoint first, then regular endpoint as fallback
+        // Using proper fetch with credentials
+        const adminEndpoint = `/api/admin/competitions/${competition.id}/ticket-stats`;
+        const regularEndpoint = `/api/competitions/${competition.id}/ticket-stats`;
         
-        // If admin endpoint fails, fall back to regular endpoint
-        if (!res.ok) {
-          if (DEBUG) console.warn(`Admin ticket stats API failed with ${res.status}, falling back to regular endpoint`);
+        if (DEBUG) console.log(`🔍 Trying admin endpoint: ${adminEndpoint}`);
+        
+        try {
+          const adminRes = await fetch(adminEndpoint, {
+            credentials: 'include', // Essential for admin authentication
+            headers: { 'Cache-Control': 'no-cache' } // Avoid stale responses
+          });
           
-          const fallbackRes = await apiRequest(
-            'GET', 
-            `/api/competitions/${competition.id}/ticket-stats`,
-            null,
-            { credentials: 'include' } // Still include credentials for regular endpoint
-          );
-          
-          if (!fallbackRes.ok) {
-            if (DEBUG) console.error("💥 Fallback ticket stats API error:", fallbackRes.status, fallbackRes.statusText);
-            throw new Error(`API Error: ${fallbackRes.status} ${fallbackRes.statusText}`);
+          if (adminRes.ok) {
+            const data = await adminRes.json();
+            if (DEBUG) console.log("✅ Admin ticket stats data received:", data);
+            return data;
           }
           
-          const fallbackData = await fallbackRes.json();
-          if (DEBUG) console.log("✅ Fallback ticket stats data received:", fallbackData);
-          return fallbackData;
+          if (DEBUG) console.warn(`Admin endpoint failed with ${adminRes.status}, trying regular endpoint`);
+        } catch (adminErr) {
+          if (DEBUG) console.warn("Admin endpoint error:", adminErr);
+          // Continue to fallback
         }
         
-        const data = await res.json();
-        if (DEBUG) console.log("✅ Admin ticket stats data received:", data);
-        return data;
+        // Try regular endpoint as fallback
+        if (DEBUG) console.log(`🔍 Trying regular endpoint: ${regularEndpoint}`);
+        const regularRes = await fetch(regularEndpoint, {
+          credentials: 'include'
+        });
+        
+        if (!regularRes.ok) {
+          throw new Error(`API Error: ${regularRes.status} ${regularRes.statusText}`);
+        }
+        
+        const fallbackData = await regularRes.json();
+        if (DEBUG) console.log("✅ Regular endpoint stats data received:", fallbackData);
+        return fallbackData;
       } catch (err) {
         if (DEBUG) console.error("💥 Error fetching ticket stats:", err);
         throw err;
       }
     },
     staleTime: 30 * 1000, // 30 seconds cache - shorter for admin panel to see updates faster
+    retry: 2 // Allow a couple of retries
   });
 
   if (isLoading) {
