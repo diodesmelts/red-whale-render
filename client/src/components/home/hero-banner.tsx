@@ -200,9 +200,11 @@ export function HeroBanner() {
                 Enter now <Ticket className="h-5 w-5 ml-1" />
               </Button>
             </Link>
-            <div className="mt-3 flex items-center text-white/80 text-sm">
-              <CreditCard className="h-4 w-4 mr-2 text-primary" />
-              Secure payments with Mastercard and Visa
+            <div className="mt-3 flex items-center">
+              <div className="bg-black/30 text-white px-3 py-1.5 rounded flex items-center text-sm">
+                <CreditCard className="h-4 w-4 mr-2 text-primary" />
+                Secure payments with Mastercard and Visa
+              </div>
             </div>
           </div>
         </div>
