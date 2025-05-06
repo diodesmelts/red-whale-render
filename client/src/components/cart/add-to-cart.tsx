@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { ShoppingCart, Plus, Minus, Check } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Check, Shuffle, AlertCircle } from "lucide-react";
+import { Dice5 } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Competition } from "@shared/schema";
 import { useLocation } from "wouter";
@@ -197,33 +199,143 @@ export function AddToCart({
           </DialogTrigger>
           <DialogContent className="sm:max-w-md" data-testid="number-picker-dialog">
             <DialogHeader>
-              <DialogTitle>Select Your Numbers</DialogTitle>
+              <DialogTitle className="text-[#002147] flex items-center gap-2">
+                <Dice5 className="h-5 w-5" />
+                Select Your Lucky Numbers
+              </DialogTitle>
               <DialogDescription>
-                Choose {quantity} unique number{quantity !== 1 ? 's' : ''} for your ticket{quantity !== 1 ? 's' : ''}.
+                Choose {quantity} unique number{quantity !== 1 ? 's' : ''} from 1 to {competition.totalTickets} for your ticket{quantity !== 1 ? 's' : ''}.
               </DialogDescription>
             </DialogHeader>
             
-            <div className="py-4">
-              <NumberPicker
-                maxNumber={competition.totalTickets}
-                selectedCount={quantity}
-                initialSelectedNumbers={selectedNumbers}
-                onChange={setSelectedNumbers}
-                competitionId={competition.id}
-              />
+            <div className="max-h-[280px] overflow-y-auto pr-2 my-2 custom-scrollbar">
+              <div className="grid grid-cols-5 gap-2 py-2" data-testid="number-grid">
+                {Array.from({ length: competition.totalTickets }, (_, i) => i + 1).map(number => {
+                  const isTaken = false; // TODO: Implement taken number check
+                  return (
+                    <div
+                      key={number}
+                      data-testid={`number-${number}`}
+                      className={`
+                        flex items-center justify-center w-10 h-10 rounded-full border relative
+                        ${selectedNumbers.includes(number) 
+                          ? 'bg-[#002147] text-white border-[#002147] shadow-md transform scale-105 transition-all'
+                          : isTaken 
+                            ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed opacity-70' 
+                            : 'bg-white text-gray-800 border-gray-200 hover:border-[#002147] hover:shadow transition-all cursor-pointer'}
+                        ${(selectedNumbers.length >= quantity && !selectedNumbers.includes(number) && !isTaken)
+                          ? 'opacity-50 cursor-not-allowed'
+                          : ''}
+                      `}
+                      onClick={() => {
+                        if (isTaken) return;
+                        
+                        if (selectedNumbers.includes(number)) {
+                          setSelectedNumbers(prev => prev.filter(n => n !== number));
+                        } else if (selectedNumbers.length < quantity) {
+                          setSelectedNumbers(prev => [...prev, number]);
+                        }
+                      }}
+                      title={isTaken ? "This number is already taken" : ""}
+                    >
+                      {isTaken ? (
+                        <>
+                          {number}
+                          <Lock className="absolute top-0 right-0 h-3 w-3 text-gray-400 -mt-1 -mr-1" />
+                        </>
+                      ) : (
+                        number
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             
-            <DialogFooter>
-              <Button 
-                onClick={handleNumberPickerSave} 
-                disabled={selectedNumbers.length !== quantity}
-                className="bg-[#002147] hover:bg-[#002147]/90 flex items-center gap-2"
-                data-testid="save-numbers-btn"
-              >
-                <Check className="h-4 w-4" />
-                Save & Add to Cart
-              </Button>
-            </DialogFooter>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 bg-[#bbd665]/10 border-[#bbd665] text-[#002147] hover:bg-[#bbd665]/20"
+                  onClick={() => {
+                    // Generate random non-repeating numbers
+                    const randomNumbers: number[] = [];
+                    const availablePool = Array.from({ length: competition.totalTickets }, (_, i) => i + 1);
+                    
+                    for (let i = 0; i < quantity; i++) {
+                      if (availablePool.length === 0) break;
+                      
+                      // Pick a random index from the remaining pool
+                      const randomIndex = Math.floor(Math.random() * availablePool.length);
+                      // Get the number at that index
+                      const selectedNumber = availablePool[randomIndex];
+                      // Remove the number from the pool to avoid duplicates
+                      availablePool.splice(randomIndex, 1);
+                      // Add the number to our selection
+                      randomNumbers.push(selectedNumber);
+                    }
+                    
+                    const sortedNumbers = randomNumbers.sort((a, b) => a - b);
+                    setSelectedNumbers(sortedNumbers);
+                  }}
+                  data-testid="lucky-dip-btn"
+                >
+                  <Shuffle className="h-4 w-4" /> Lucky Dip
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedNumbers([])}
+                  className="border-gray-200 text-gray-700 hover:bg-gray-100"
+                  data-testid="clear-numbers-btn"
+                >
+                  Clear All
+                </Button>
+              </div>
+              
+              {selectedNumbers.length > 0 && (
+                <div className="bg-[#002147]/5 p-2 rounded-md">
+                  <div className="text-xs font-medium text-[#002147] mb-1">Your selection:</div>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedNumbers.map(number => (
+                      <span 
+                        key={number}
+                        className="inline-flex items-center justify-center bg-[#002147] text-white text-xs rounded-full h-6 w-6 shadow-sm"
+                      >
+                        {number}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {selectedNumbers.length !== quantity && (
+                <div className="text-xs text-amber-500 flex items-center gap-1 bg-amber-50 p-2 rounded border border-amber-100">
+                  <AlertCircle className="h-3 w-3" />
+                  Please select exactly {quantity} number{quantity !== 1 ? 's' : ''} to continue
+                </div>
+              )}
+            
+              <DialogFooter className="flex justify-between sm:justify-between gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsNumberPickerOpen(false)}
+                  className="border-gray-300"
+                >
+                  Cancel
+                </Button>
+                
+                <Button 
+                  onClick={handleNumberPickerSave} 
+                  disabled={selectedNumbers.length !== quantity}
+                  className="bg-[#002147] hover:bg-[#002147]/90 flex items-center gap-2"
+                  data-testid="save-numbers-btn"
+                >
+                  <Check className="h-4 w-4" />
+                  Save & Add to Cart
+                </Button>
+              </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       )}
