@@ -94,6 +94,7 @@ export default function HomePage() {
                 !activeCategory ? "bg-[#002147] hover:bg-[#002147]/90 text-white" : "text-[#002147] border-[#002147]/30"
               )}
             >
+              <span className="w-2.5 h-2.5 inline-block bg-[#bbd665] rounded-full mr-2"></span>
               <Filter className="h-4 w-4 mr-1" /> All Prizes
             </Button>
             
@@ -105,6 +106,7 @@ export default function HomePage() {
                 activeCategory === COMPETITION_CATEGORIES.CASH ? "bg-green-500 hover:bg-green-600 text-white" : "text-[#002147] border-[#002147]/30"
               )}
             >
+              <span className="w-2.5 h-2.5 inline-block bg-green-400 rounded-full mr-2"></span>
               <i className="fas fa-pound-sign mr-1"></i> Cash Prizes
             </Button>
             
@@ -116,6 +118,7 @@ export default function HomePage() {
                 activeCategory === COMPETITION_CATEGORIES.FAMILY ? "bg-yellow-500 hover:bg-yellow-600 text-white" : "text-[#002147] border-[#002147]/30"
               )}
             >
+              <span className="w-2.5 h-2.5 inline-block bg-yellow-400 rounded-full mr-2"></span>
               <i className="fas fa-users mr-1"></i> Family
             </Button>
             
@@ -127,6 +130,7 @@ export default function HomePage() {
                 activeCategory === COMPETITION_CATEGORIES.HOUSEHOLD ? "bg-pink-500 hover:bg-pink-600 text-white" : "text-[#002147] border-[#002147]/30"
               )}
             >
+              <span className="w-2.5 h-2.5 inline-block bg-pink-400 rounded-full mr-2"></span>
               <i className="fas fa-blender mr-1"></i> Household
             </Button>
             
@@ -138,6 +142,7 @@ export default function HomePage() {
                 activeCategory === COMPETITION_CATEGORIES.ELECTRONICS ? "bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white" : "text-[#002147] border-[#002147]/30"
               )}
             >
+              <span className="w-2.5 h-2.5 inline-block bg-primary rounded-full mr-2"></span>
               <i className="fas fa-laptop mr-1"></i> Electronics
             </Button>
             
@@ -149,6 +154,7 @@ export default function HomePage() {
                 activeCategory === COMPETITION_CATEGORIES.TRAVEL ? "bg-purple-500 hover:bg-purple-600 text-white" : "text-[#002147] border-[#002147]/30"
               )}
             >
+              <span className="w-2.5 h-2.5 inline-block bg-purple-500 rounded-full mr-2"></span>
               <i className="fas fa-plane mr-1"></i> Travel
             </Button>
             
@@ -160,6 +166,7 @@ export default function HomePage() {
                 activeCategory === COMPETITION_CATEGORIES.BEAUTY ? "bg-rose-500 hover:bg-rose-600 text-white" : "text-[#002147] border-[#002147]/30"
               )}
             >
+              <span className="w-2.5 h-2.5 inline-block bg-rose-400 rounded-full mr-2"></span>
               <i className="fas fa-spa mr-1"></i> Beauty
             </Button>
           </div>
