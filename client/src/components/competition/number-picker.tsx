@@ -56,7 +56,8 @@ export function NumberPicker({
       // Use a POST for active cart items (needed to sync with other users' carts)
       // First make a request to fetch active cart items with an empty cart
       try {
-        const cartResponse = await fetch(`/api/competitions/${competitionId}/active-cart-items`, {
+        // Using the updated endpoint path that's more explicit
+        const cartResponse = await fetch(`/api/competitions/cart-items/${competitionId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

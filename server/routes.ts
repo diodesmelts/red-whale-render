@@ -437,7 +437,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get active cart items for a competition from all users' localStorage
-  app.post("/api/competitions/:id/active-cart-items", async (req, res) => {
+  // Using more explicit path to avoid path conflicts in production
+  app.post("/api/competitions/cart-items/:id", async (req, res) => {
     console.log('🛒 Requesting active cart items for competition:', req.params.id);
     
     // This endpoint can be called by anyone (it's used when users view available numbers)
@@ -526,7 +527,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get ticket statistics for a competition (admin only)
-  app.get("/api/competitions/:id/ticket-stats", async (req, res) => {
+  // Using more explicit path to avoid path conflicts in production
+  app.get("/api/competitions/ticket-stats/:id", async (req, res) => {
     console.log('📊 Request to get ticket statistics for competition:', req.params.id);
     
     // Admin only endpoint

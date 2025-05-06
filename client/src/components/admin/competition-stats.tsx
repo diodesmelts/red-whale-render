@@ -66,7 +66,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     // Get cart data from all users by sending our cart to the server
     const fetchAllCartData = async () => {
       try {
-        const res = await apiRequest('POST', `/api/competitions/${competition.id}/active-cart-items`, {
+        const res = await apiRequest('POST', `/api/competitions/cart-items/${competition.id}`, {
           cartItems: cartItems
         });
         const data = await res.json();
@@ -106,7 +106,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
         // Unified approach - try the admin endpoint first, then regular endpoint as fallback
         // Using proper fetch with credentials
         const adminEndpoint = `/api/admin/competitions/${competition.id}/ticket-stats`;
-        const regularEndpoint = `/api/competitions/${competition.id}/ticket-stats`;
+        const regularEndpoint = `/api/competitions/ticket-stats/${competition.id}`;
         
         if (DEBUG) console.log(`🔍 Trying admin endpoint: ${adminEndpoint}`);
         
