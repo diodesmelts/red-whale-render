@@ -86,6 +86,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     fetchAllCartData();
   }, [competition, competition.id, cartItems]);
   
+  // Debug flag to help with troubleshooting
+  const DEBUG = true;
+  
   // Fetch ticket statistics
   const { data: stats, isLoading, error } = useQuery<TicketStats>({
     queryKey: ['/api/competitions', competition?.id, 'ticket-stats'],
@@ -94,14 +97,29 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     queryFn: async () => {
       // Double-check competition ID exists to prevent API calls with undefined
       if (!competition || !competition.id) {
+        if (DEBUG) console.log("🛑 Query aborted: Competition ID is invalid:", competition?.id);
         throw new Error("No valid competition ID available");
       }
       
-      const res = await apiRequest(
-        'GET', 
-        `/api/competitions/${competition.id}/ticket-stats`
-      );
-      return res.json();
+      if (DEBUG) console.log("🔍 Fetching ticket stats for competition ID:", competition.id);
+      try {
+        const res = await apiRequest(
+          'GET', 
+          `/api/competitions/${competition.id}/ticket-stats`
+        );
+        
+        if (!res.ok) {
+          if (DEBUG) console.error("💥 Ticket stats API error:", res.status, res.statusText);
+          throw new Error(`API Error: ${res.status} ${res.statusText}`);
+        }
+        
+        const data = await res.json();
+        if (DEBUG) console.log("✅ Ticket stats data received:", data);
+        return data;
+      } catch (err) {
+        if (DEBUG) console.error("💥 Error fetching ticket stats:", err);
+        throw err;
+      }
     },
   });
 
