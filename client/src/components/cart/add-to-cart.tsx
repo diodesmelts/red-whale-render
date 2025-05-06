@@ -209,6 +209,7 @@ export function AddToCart({
                 selectedCount={quantity}
                 initialSelectedNumbers={selectedNumbers}
                 onChange={setSelectedNumbers}
+                competitionId={competition.id}
               />
             </div>
             

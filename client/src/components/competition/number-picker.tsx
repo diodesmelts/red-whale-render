@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertCircle, Shuffle, Dice5 } from "lucide-react";
+import { AlertCircle, Shuffle, Dice5, Lock } from "lucide-react";
 import { 
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface NumberPickerProps {
   maxNumber: number;
@@ -20,6 +21,7 @@ interface NumberPickerProps {
   initialSelectedNumbers?: number[];
   onChange: (selectedNumbers: number[]) => void;
   disabled?: boolean;
+  competitionId?: number;
 }
 
 export function NumberPicker({
@@ -28,9 +30,11 @@ export function NumberPicker({
   initialSelectedNumbers = [],
   onChange,
   disabled = false,
+  competitionId,
 }: NumberPickerProps) {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>(initialSelectedNumbers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [takenNumbers, setTakenNumbers] = useState<number[]>([]);
   const { toast } = useToast();
   
   // Ensure initialSelectedNumbers is reflected in state
@@ -38,10 +42,38 @@ export function NumberPicker({
     setSelectedNumbers(initialSelectedNumbers);
   }, [initialSelectedNumbers]);
 
+  // Fetch taken numbers when the dialog opens
+  useEffect(() => {
+    if (isDialogOpen && competitionId) {
+      fetchTakenNumbers();
+    }
+  }, [isDialogOpen, competitionId]);
+
+  const fetchTakenNumbers = async () => {
+    try {
+      // This is a placeholder. You would need to implement this API endpoint
+      // to return numbers that are already taken by other users
+      const response = await apiRequest("GET", `/api/competitions/${competitionId}/taken-numbers`);
+      const data = await response.json();
+      setTakenNumbers(data.takenNumbers || []);
+    } catch (error) {
+      console.error("Failed to fetch taken numbers:", error);
+      // For now, we'll use a placeholder set of taken numbers for demonstration
+      setTakenNumbers([2, 15, 27, 42, 56, 78, 91]);
+    }
+  };
+
   // Generate an array of numbers from 1 to maxNumber
   const availableNumbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
   
+  const isNumberTaken = (number: number) => {
+    return takenNumbers.includes(number) && !initialSelectedNumbers.includes(number);
+  };
+  
   const handleNumberToggle = (number: number) => {
+    // Don't allow selecting numbers that are taken by others
+    if (isNumberTaken(number)) return;
+    
     if (selectedNumbers.includes(number)) {
       // Remove number if already selected
       setSelectedNumbers(prev => prev.filter(n => n !== number));
@@ -54,7 +86,19 @@ export function NumberPicker({
   const handleLuckyDip = () => {
     // Generate random non-repeating numbers
     const randomNumbers: number[] = [];
-    const availablePool = Array.from({ length: maxNumber }, (_, i) => i + 1);
+    // Filter out numbers that are already taken
+    const availablePool = Array.from({ length: maxNumber }, (_, i) => i + 1)
+      .filter(num => !isNumberTaken(num));
+    
+    // Handle case where there aren't enough numbers available
+    if (availablePool.length < selectedCount) {
+      toast({
+        title: "Not enough numbers available",
+        description: `Only ${availablePool.length} numbers are available. Please try again or select manually.`,
+        variant: "destructive",
+      });
+      return;
+    }
     
     for (let i = 0; i < selectedCount; i++) {
       if (availablePool.length === 0) break;
@@ -137,24 +181,37 @@ export function NumberPicker({
           
           <div className="max-h-[280px] overflow-y-auto pr-2 my-2 custom-scrollbar">
             <div className="grid grid-cols-5 gap-2 py-2" data-testid="number-grid">
-              {availableNumbers.map(number => (
-                <div
-                  key={number}
-                  data-testid={`number-${number}`}
-                  className={`
-                    flex items-center justify-center w-10 h-10 rounded-full cursor-pointer border
-                    ${selectedNumbers.includes(number) 
-                      ? 'bg-[#002147] text-white border-[#002147] shadow-md transform scale-105 transition-all'
-                      : 'bg-white text-gray-800 border-gray-200 hover:border-[#002147] hover:shadow transition-all'}
-                    ${(selectedNumbers.length >= selectedCount && !selectedNumbers.includes(number))
-                      ? 'opacity-50 cursor-not-allowed'
-                      : ''}
-                  `}
-                  onClick={() => handleNumberToggle(number)}
-                >
-                  {number}
-                </div>
-              ))}
+              {availableNumbers.map(number => {
+                const isTaken = isNumberTaken(number);
+                return (
+                  <div
+                    key={number}
+                    data-testid={`number-${number}`}
+                    className={`
+                      flex items-center justify-center w-10 h-10 rounded-full border relative
+                      ${selectedNumbers.includes(number) 
+                        ? 'bg-[#002147] text-white border-[#002147] shadow-md transform scale-105 transition-all'
+                        : isTaken 
+                          ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed opacity-70' 
+                          : 'bg-white text-gray-800 border-gray-200 hover:border-[#002147] hover:shadow transition-all cursor-pointer'}
+                      ${(selectedNumbers.length >= selectedCount && !selectedNumbers.includes(number) && !isTaken)
+                        ? 'opacity-50 cursor-not-allowed'
+                        : ''}
+                    `}
+                    onClick={() => handleNumberToggle(number)}
+                    title={isTaken ? "This number is already taken" : ""}
+                  >
+                    {isTaken ? (
+                      <>
+                        {number}
+                        <Lock className="absolute top-0 right-0 h-3 w-3 text-gray-400 -mt-1 -mr-1" />
+                      </>
+                    ) : (
+                      number
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
           
