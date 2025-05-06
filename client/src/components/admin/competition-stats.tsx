@@ -144,74 +144,96 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>{competition.title}</CardTitle>
-          <CardDescription>
-            Ticket status overview for this competition - {percentSold} sold
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg font-bold text-primary">{competition.title}</CardTitle>
+          <CardDescription className="flex items-center gap-1 text-sm">
+            <span>Status: </span>
+            <span className="font-medium text-primary-foreground bg-primary/90 px-2 rounded-full text-xs">
+              {percentSold} sold
+            </span>
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <StatCard 
-              icon={<TicketIcon />} 
-              title="Total Tickets" 
-              value={enhancedStats.totalTickets.toString()}
-              color="bg-gray-100"
-            />
-            <StatCard 
-              icon={<CheckCircle2 />} 
-              title="Purchased" 
-              value={enhancedStats.purchasedTickets.toString()}
-              color="bg-green-100"
-            />
-            <StatCard 
-              icon={<ShoppingCart />} 
-              title="In Cart" 
-              value={enhancedStats.inCartTickets.toString()}
-              color="bg-blue-100"
-            />
-            <StatCard 
-              icon={<TicketIcon />} 
-              title="Available" 
-              value={enhancedStats.availableTickets.toString()}
-              color="bg-amber-100"
-            />
+        <CardContent className="space-y-6 pt-4">
+          {/* Stats Cards - Simplified and cleaner */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
+              <div className="flex items-center gap-2 mb-1">
+                <TicketIcon className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Total</span>
+              </div>
+              <span className="text-xl font-bold text-foreground">{enhancedStats.totalTickets}</span>
+            </div>
+            
+            <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
+              <div className="flex items-center gap-2 mb-1">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <span className="text-xs font-medium text-muted-foreground">Purchased</span>
+              </div>
+              <span className="text-xl font-bold text-green-600">{enhancedStats.purchasedTickets}</span>
+            </div>
+            
+            <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
+              <div className="flex items-center gap-2 mb-1">
+                <ShoppingCart className="h-4 w-4 text-blue-600" />
+                <span className="text-xs font-medium text-muted-foreground">In Cart</span>
+              </div>
+              <span className="text-xl font-bold text-blue-600">{enhancedStats.inCartTickets}</span>
+            </div>
+            
+            <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
+              <div className="flex items-center gap-2 mb-1">
+                <TicketIcon className="h-4 w-4 text-amber-600" />
+                <span className="text-xs font-medium text-muted-foreground">Available</span>
+              </div>
+              <span className="text-xl font-bold text-amber-600">{enhancedStats.availableTickets}</span>
+            </div>
           </div>
 
-          {/* Progress Bars */}
-          <div className="space-y-3 mt-6">
-            <h3 className="text-sm font-medium">Ticket Distribution</h3>
-            <div className="space-y-2">
+          {/* Progress Bars - Cleaner and more compact */}
+          <div className="space-y-3 border rounded-lg p-3">
+            <h3 className="text-xs font-medium text-muted-foreground mb-3">Ticket Distribution</h3>
+            
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span>Purchased</span>
-                <span>{purchasedPercentage.toFixed(1)}%</span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
+                  <span>Purchased</span>
+                </span>
+                <span className="font-medium">{purchasedPercentage.toFixed(1)}%</span>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-muted w-full rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-green-500 transition-all" 
                   style={{ width: `${purchasedPercentage}%` }}
                 />
               </div>
             </div>
-            <div className="space-y-2">
+            
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span>In Cart (Reserved)</span>
-                <span>{inCartPercentage.toFixed(1)}%</span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
+                  <span>In Cart</span>
+                </span>
+                <span className="font-medium">{inCartPercentage.toFixed(1)}%</span>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-muted w-full rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-blue-500 transition-all" 
                   style={{ width: `${inCartPercentage}%` }}
                 />
               </div>
             </div>
-            <div className="space-y-2">
+            
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span>Available</span>
-                <span>{availablePercentage.toFixed(1)}%</span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-amber-500 rounded-full inline-block"></span>
+                  <span>Available</span>
+                </span>
+                <span className="font-medium">{availablePercentage.toFixed(1)}%</span>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-muted w-full rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-amber-500 transition-all" 
                   style={{ width: `${availablePercentage}%` }}
@@ -220,11 +242,12 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
             </div>
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="pt-0">
           <Button 
             variant="outline" 
             onClick={() => setShowNumberGrid(!showNumberGrid)}
-            className="w-full"
+            className="w-full text-sm"
+            size="sm"
           >
             {showNumberGrid ? "Hide" : "Show"} Ticket Number Grid
           </Button>
