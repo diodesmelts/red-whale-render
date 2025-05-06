@@ -5,16 +5,23 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { SiteConfig } from "@shared/schema";
 import { getImageUrl } from "@/lib/utils";
+import CachedImage from "@/components/ui/cached-image";
 
 export function Footer() {
-  // Fetch payment cards image URL from site config
+  // Fetch payment cards image URL from site config with reduced refresh rate
   const { data: paymentCardsConfig } = useQuery<SiteConfig>({
     queryKey: ["/api/site-config", "paymentCardsImage"],
     queryFn: async () => {
-      const res = await fetch("/api/site-config/paymentCardsImage");
+      const res = await fetch("/api/site-config/paymentCardsImage", {
+        credentials: 'include'
+      });
       if (!res.ok) return null;
       return res.json();
     },
+    // Add longer stale time to reduce unnecessary refetching
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000,   // 10 minutes
+    refetchOnWindowFocus: false,
   });
   return (
     <footer className="bg-[#002147] text-white pt-12 pb-8">
@@ -123,13 +130,11 @@ export function Footer() {
               </Button>
             </div>
             <div className="mt-6">
-              <img 
+              <CachedImage 
                 src={paymentCardsConfig?.value ? getImageUrl(paymentCardsConfig.value) : "/uploads/payment-cards.png"} 
                 alt="Payment methods: Mastercard and Visa" 
                 className="h-8"
-                onError={(e) => {
-                  e.currentTarget.src = "/uploads/payment-cards.png";
-                }}
+                fallbackSrc="/uploads/payment-cards.png"
               />
             </div>
           </div>
