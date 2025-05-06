@@ -58,7 +58,7 @@ export default function HomePage() {
       <HeroBanner />
       
       {/* Secure Payments Banner */}
-      <div className="bg-[#002147]/10 py-1 flex justify-center border-b border-[#002147]/20">
+      <div className="bg-[#bbd665]/30 py-1 flex justify-center border-b border-[#bbd665]/50">
         <div className="bg-[#002147] text-white px-4 py-1.5 rounded-full flex items-center text-sm mx-auto my-2 shadow-sm font-medium">
           <CreditCard className="h-4 w-4 mr-2 text-[#bbd665]" />
           Secure payments with Mastercard and Visa
