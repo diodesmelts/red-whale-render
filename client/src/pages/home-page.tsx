@@ -1,14 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { CompetitionCard } from "@/components/competition/competition-card";
 import { Competition } from "@shared/schema";
-import { ChevronRight, Search, Ticket, Clock } from "lucide-react";
+import { ChevronRight, Search, Ticket, Clock, Filter } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { HeroBanner } from "@/components/home/hero-banner";
 import { CountdownTimer } from "@/components/countdown-timer";
+import { COMPETITION_CATEGORIES } from "@/lib/constants";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
+  const [activeCategory, setActiveCategory] = useState<string | undefined>(undefined);
+  const [filteredCompetitions, setFilteredCompetitions] = useState<Competition[]>([]);
+  
   const { data: featuredCompetitions, isLoading } = useQuery<Competition[]>({
     queryKey: ["/api/competitions", { featured: true }],
     queryFn: async () => {
@@ -26,6 +32,25 @@ export default function HomePage() {
       return res.json();
     }
   });
+  
+  // Filter competitions based on the selected category
+  useEffect(() => {
+    if (!featuredCompetitions) return;
+    
+    if (!activeCategory) {
+      setFilteredCompetitions(featuredCompetitions);
+    } else {
+      const filtered = featuredCompetitions.filter(
+        competition => competition.category.toLowerCase() === activeCategory.toLowerCase()
+      );
+      setFilteredCompetitions(filtered);
+    }
+  }, [featuredCompetitions, activeCategory]);
+  
+  // Handle category filter change
+  const handleCategoryChange = (category?: string) => {
+    setActiveCategory(category === activeCategory ? undefined : category);
+  };
 
   return (
     <div>
@@ -59,6 +84,86 @@ export default function HomePage() {
             </div>
           </div>
           
+          {/* Category Filter Buttons */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            <Button 
+              variant={!activeCategory ? "default" : "outline"} 
+              onClick={() => handleCategoryChange(undefined)}
+              className={cn(
+                "flex items-center",
+                !activeCategory ? "bg-[#002147] hover:bg-[#002147]/90 text-white" : "text-[#002147] border-[#002147]/30"
+              )}
+            >
+              <Filter className="h-4 w-4 mr-1" /> All Prizes
+            </Button>
+            
+            <Button 
+              variant={activeCategory === COMPETITION_CATEGORIES.CASH ? "default" : "outline"} 
+              onClick={() => handleCategoryChange(COMPETITION_CATEGORIES.CASH)}
+              className={cn(
+                "flex items-center",
+                activeCategory === COMPETITION_CATEGORIES.CASH ? "bg-green-500 hover:bg-green-600 text-white" : "text-[#002147] border-[#002147]/30"
+              )}
+            >
+              <i className="fas fa-pound-sign mr-1"></i> Cash Prizes
+            </Button>
+            
+            <Button 
+              variant={activeCategory === COMPETITION_CATEGORIES.FAMILY ? "default" : "outline"} 
+              onClick={() => handleCategoryChange(COMPETITION_CATEGORIES.FAMILY)}
+              className={cn(
+                "flex items-center",
+                activeCategory === COMPETITION_CATEGORIES.FAMILY ? "bg-yellow-500 hover:bg-yellow-600 text-white" : "text-[#002147] border-[#002147]/30"
+              )}
+            >
+              <i className="fas fa-users mr-1"></i> Family
+            </Button>
+            
+            <Button 
+              variant={activeCategory === COMPETITION_CATEGORIES.HOUSEHOLD ? "default" : "outline"} 
+              onClick={() => handleCategoryChange(COMPETITION_CATEGORIES.HOUSEHOLD)}
+              className={cn(
+                "flex items-center",
+                activeCategory === COMPETITION_CATEGORIES.HOUSEHOLD ? "bg-pink-500 hover:bg-pink-600 text-white" : "text-[#002147] border-[#002147]/30"
+              )}
+            >
+              <i className="fas fa-blender mr-1"></i> Household
+            </Button>
+            
+            <Button 
+              variant={activeCategory === COMPETITION_CATEGORIES.ELECTRONICS ? "default" : "outline"} 
+              onClick={() => handleCategoryChange(COMPETITION_CATEGORIES.ELECTRONICS)}
+              className={cn(
+                "flex items-center",
+                activeCategory === COMPETITION_CATEGORIES.ELECTRONICS ? "bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white" : "text-[#002147] border-[#002147]/30"
+              )}
+            >
+              <i className="fas fa-laptop mr-1"></i> Electronics
+            </Button>
+            
+            <Button 
+              variant={activeCategory === COMPETITION_CATEGORIES.TRAVEL ? "default" : "outline"} 
+              onClick={() => handleCategoryChange(COMPETITION_CATEGORIES.TRAVEL)}
+              className={cn(
+                "flex items-center",
+                activeCategory === COMPETITION_CATEGORIES.TRAVEL ? "bg-purple-500 hover:bg-purple-600 text-white" : "text-[#002147] border-[#002147]/30"
+              )}
+            >
+              <i className="fas fa-plane mr-1"></i> Travel
+            </Button>
+            
+            <Button 
+              variant={activeCategory === COMPETITION_CATEGORIES.BEAUTY ? "default" : "outline"} 
+              onClick={() => handleCategoryChange(COMPETITION_CATEGORIES.BEAUTY)}
+              className={cn(
+                "flex items-center",
+                activeCategory === COMPETITION_CATEGORIES.BEAUTY ? "bg-rose-500 hover:bg-rose-600 text-white" : "text-[#002147] border-[#002147]/30"
+              )}
+            >
+              <i className="fas fa-spa mr-1"></i> Beauty
+            </Button>
+          </div>
+          
           {isLoading ? (
             <div className="flex flex-col justify-center items-center py-32">
               <Loader2 className="h-12 w-12 animate-spin text-[#bbd665] mb-4" />
@@ -79,9 +184,23 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
+          ) : filteredCompetitions.length === 0 && activeCategory ? (
+            <div className="flex flex-col justify-center items-center py-20 px-4 border-2 border-dashed border-[#bbd665]/30 bg-[#002147]/5 rounded-xl">
+              <div className="w-20 h-20 bg-[#bbd665]/20 rounded-full flex items-center justify-center mb-6">
+                <i className="fas fa-filter text-[#002147]/60 text-3xl"></i>
+              </div>
+              <h3 className="text-2xl font-bold text-[#002147] mb-3">No {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Competitions</h3>
+              <p className="text-[#002147]/70 max-w-md text-center mb-6">
+                We don't have any active competitions in this category at the moment. Please check back soon or try another category.
+              </p>
+              <Button variant="outline" onClick={() => handleCategoryChange(undefined)} 
+                className="border-[#bbd665] border-2 text-[#002147] hover:bg-[#bbd665]/20 hover:text-[#002147]">
+                <Filter className="mr-2 h-4 w-4" /> Show All Categories
+              </Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 mb-16 px-4">
-              {featuredCompetitions?.map(competition => (
+              {filteredCompetitions.map(competition => (
                 <CompetitionCard key={competition.id} competition={competition} />
               ))}
             </div>
