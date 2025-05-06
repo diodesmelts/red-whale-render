@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Competition } from "@shared/schema";
-import { Loader2, Lock, AlertCircle, TicketIcon, ShoppingCart, CheckCircle2, Trophy } from "lucide-react";
-import { WinnerLookup } from "./winner-lookup";
+import { Loader2, Lock, AlertCircle, TicketIcon, ShoppingCart, CheckCircle2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -124,23 +123,6 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
               </p>
               <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
                 Statistics for this competition will be available soon.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg text-foreground">Winner Lookup</CardTitle>
-            <CardDescription>
-              Lookup winner information for this competition
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex flex-col items-center justify-center py-6">
-              <AlertCircle className="h-8 w-8 text-amber-500 mb-3" />
-              <p className="text-muted-foreground text-center text-sm">
-                Winner lookup temporarily unavailable
               </p>
             </div>
           </CardContent>
@@ -286,9 +268,6 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
           </Button>
         </CardFooter>
       </Card>
-
-      {/* Winner Lookup UI */}
-      <WinnerLookup competition={competition} />
 
       {showNumberGrid && (
         <Card>
