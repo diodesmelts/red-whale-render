@@ -443,14 +443,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // This endpoint can be called by anyone (it's used when users view available numbers)
     const competitionId = parseInt(req.params.id);
     if (isNaN(competitionId)) {
-      return res.status(400).json({ message: 'Invalid competition ID' });
+      console.log(`⚠️ Invalid competition ID for active cart items: ${req.params.id}`);
+      return res.status(400).json({ 
+        message: 'Invalid competition ID',
+        inCartNumbers: [] // Always provide valid response format
+      });
     }
 
     try {
+      // Check if competition exists
+      const competition = await dataStorage.getCompetition(competitionId);
+      if (!competition) {
+        console.log(`⚠️ Competition not found for active cart items: ${competitionId}`);
+        return res.status(404).json({ 
+          message: 'Competition not found',
+          inCartNumbers: [] // Always provide valid response format
+        });
+      }
+      
       // Get the client-side cart data submitted in the request
       const { cartItems } = req.body;
       if (!cartItems || !Array.isArray(cartItems)) {
-        return res.status(400).json({ message: 'Invalid cart data format' });
+        return res.status(400).json({ 
+          message: 'Invalid cart data format',
+          inCartNumbers: [] // Always provide valid response format
+        });
       }
       
       // Filter only items for this competition
@@ -473,8 +490,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         inCartNumbers: [...new Set(inCartNumbers)]
       });
     } catch (error) {
-      console.error('Error processing cart items:', error);
-      res.status(500).json({ message: 'Error processing cart items' });
+      console.error(`❌ Error processing cart items for competition ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: 'Error processing cart items',
+        inCartNumbers: [] // Always provide valid response format
+      });
     }
   });
 
@@ -484,18 +504,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Admin only endpoint
     if (!req.isAuthenticated() || !req.user.isAdmin) {
-      return res.status(403).json({ message: 'Forbidden - Admin access required' });
+      return res.status(403).json({ 
+        message: 'Forbidden - Admin access required',
+        // Add default values for essential properties to prevent UI errors
+        totalTickets: 0,
+        purchasedTickets: 0,
+        inCartTickets: 0,
+        availableTickets: 0,
+        soldTicketsCount: 0,
+        allNumbers: {
+          totalRange: [],
+          purchased: [],
+          inCart: []
+        }
+      });
     }
     
     const competitionId = parseInt(req.params.id);
     if (isNaN(competitionId)) {
-      return res.status(400).json({ message: 'Invalid competition ID' });
+      console.log(`⚠️ Invalid competition ID for ticket stats: ${req.params.id}`);
+      return res.status(400).json({ 
+        message: 'Invalid competition ID',
+        // Add default values for essential properties to prevent UI errors
+        totalTickets: 0,
+        purchasedTickets: 0,
+        inCartTickets: 0,
+        availableTickets: 0,
+        soldTicketsCount: 0,
+        allNumbers: {
+          totalRange: [],
+          purchased: [],
+          inCart: []
+        }
+      });
     }
 
     try {
       const competition = await dataStorage.getCompetition(competitionId);
       if (!competition) {
-        return res.status(404).json({ message: 'Competition not found' });
+        console.log(`⚠️ Competition not found for ticket stats: ${competitionId}`);
+        return res.status(404).json({ 
+          message: 'Competition not found',
+          // Add default values for essential properties to prevent UI errors
+          totalTickets: 0,
+          purchasedTickets: 0,
+          inCartTickets: 0,
+          availableTickets: 0,
+          soldTicketsCount: 0,
+          allNumbers: {
+            totalRange: [],
+            purchased: [],
+            inCart: []
+          }
+        });
       }
       
       // Get all entries for this competition
@@ -584,8 +645,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     } catch (error: any) {
-      console.error('Error fetching ticket statistics:', error);
-      res.status(500).json({ message: error.message || 'Error calculating ticket statistics' });
+      console.error(`❌ Error fetching ticket statistics for competition ${req.params.id}:`, error);
+      res.status(500).json({ 
+        message: error.message || 'Error calculating ticket statistics',
+        // Add default values for essential properties to prevent UI errors
+        totalTickets: 0,
+        purchasedTickets: 0,
+        inCartTickets: 0,
+        availableTickets: 0,
+        soldTicketsCount: 0,
+        allNumbers: {
+          totalRange: [],
+          purchased: [],
+          inCart: []
+        }
+      });
     }
   });
 
