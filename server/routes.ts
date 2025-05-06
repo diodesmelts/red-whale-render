@@ -21,6 +21,7 @@ const stripe = process.env.STRIPE_SECRET_KEY
 
 // Import storage service for file uploads
 import { storageService } from './storage-service';
+import { runAutomaticMigrations } from './db-migrations';
 
 // Configure multer for memory storage (files temporarily held in memory)
 const multerStorage = multer.memoryStorage();
@@ -57,6 +58,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Add debug log for auth routes
   console.log("🔍 Registering API routes...");
+  
+  // Run automatic database migrations to ensure required columns exist
+  try {
+    await runAutomaticMigrations();
+    console.log("✅ Automatic database migrations completed");
+  } catch (error) {
+    console.error("❌ Error running automatic database migrations:", error);
+  }
   
   // Seed the admin user in the database (if it doesn't exist)
   if (dataStorage instanceof Object && typeof (dataStorage as any).seedAdminUser === 'function') {
