@@ -51,16 +51,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               
               return (
                 <li key={item.href}>
-                  <Link href={item.href}>
-                    <a
-                      className={cn(
-                        "flex items-center px-3 py-2 rounded-md group hover:bg-primary/10 transition-all",
-                        isActive ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-muted-foreground"
-                      )}
-                    >
-                      <Icon className={cn("h-5 w-5 mr-3", isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary")} />
-                      {item.label}
-                    </a>
+                  <Link 
+                    href={item.href}
+                    className={cn(
+                      "flex items-center px-3 py-2 rounded-md group hover:bg-primary/10 transition-all",
+                      isActive ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-muted-foreground"
+                    )}
+                  >
+                    <Icon className={cn("h-5 w-5 mr-3", isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary")} />
+                    {item.label}
                   </Link>
                 </li>
               );
