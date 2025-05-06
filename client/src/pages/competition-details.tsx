@@ -321,13 +321,60 @@ export default function CompetitionDetails() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Left column: Image */}
-          <div className="bg-white rounded-lg p-3 shadow-md border border-gray-100">
-            <div className="aspect-square relative bg-white rounded-lg overflow-hidden">
-              <img 
-                className="w-full h-full object-contain" 
-                src={competition.imageUrl || "https://placehold.co/600x600/1a1f2b/FFFFFF/png?text=No+Image"} 
-                alt={competition.title}
-              />
+          <div className="flex flex-col gap-3">
+            {/* Image container */}
+            <div className="bg-white rounded-lg p-3 shadow-md border border-gray-100">
+              <div className="aspect-square relative bg-white rounded-lg overflow-hidden">
+                <img 
+                  className="w-full h-full object-contain" 
+                  src={competition.imageUrl || "https://placehold.co/600x600/1a1f2b/FFFFFF/png?text=No+Image"} 
+                  alt={competition.title}
+                />
+              </div>
+            </div>
+            
+            {/* Mini How It Works section */}
+            <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-100">
+              <h3 className="text-sm font-semibold text-[#002147] mb-2 text-center">How it works</h3>
+              <p className="text-xs text-gray-600 text-center mb-3">Instantly find out if you are a lucky winner!</p>
+              
+              <div className="grid grid-cols-3 gap-2">
+                <div className="text-center">
+                  <div className="w-6 h-6 bg-[#bbd665]/20 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <span className="text-[#002147] font-medium text-xs">1</span>
+                  </div>
+                  <div className="text-[#002147]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </div>
+                  <p className="text-xs font-medium mt-1">Buy tickets</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-6 h-6 bg-[#bbd665]/20 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <span className="text-[#002147] font-medium text-xs">2</span>
+                  </div>
+                  <div className="text-[#002147]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <p className="text-xs font-medium mt-1">Reveal result</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-6 h-6 bg-[#bbd665]/20 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <span className="text-[#002147] font-medium text-xs">3</span>
+                  </div>
+                  <div className="text-[#002147]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                  </div>
+                  <p className="text-xs font-medium mt-1">Claim prize</p>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -510,49 +557,7 @@ export default function CompetitionDetails() {
           </div>
         </div>
         
-        {/* How it works section */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-center mb-3">How it works</h2>
-          <p className="text-center text-gray-600 mb-5 text-sm">Instantly find out if you are a lucky winner!</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="border border-gray-200 rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-              <div className="bg-[#bbd665]/20 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-[#002147] font-semibold text-sm">1</span>
-              </div>
-              <div className="mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-[#002147]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-sm mb-1 text-[#002147]">Buy your tickets</h3>
-            </div>
-            
-            <div className="border border-gray-200 rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-              <div className="bg-[#bbd665]/20 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-[#002147] font-semibold text-sm">2</span>
-              </div>
-              <div className="mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-[#002147]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-sm mb-1 text-[#002147]">Reveal if you've won</h3>
-            </div>
-            
-            <div className="border border-gray-200 rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow">
-              <div className="bg-[#bbd665]/20 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-[#002147] font-semibold text-sm">3</span>
-              </div>
-              <div className="mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-[#002147]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-sm mb-1 text-[#002147]">Claim your prize</h3>
-            </div>
-          </div>
-        </div>
+
       
         {/* Details Tabs */}
         <div className="border-t border-gray-200 pt-4">
