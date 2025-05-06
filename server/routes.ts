@@ -523,8 +523,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       👉 Request Body: ${JSON.stringify(req.body || {})}
       `);
       
-      // Simply return empty array to avoid 404 errors
-      return res.json({ inCartNumbers: [] });
+      // Get actual cart items for this competition
+      try {
+        const entries = await dataStorage.getEntriesByCompetition(competitionId);
+        
+        // Extract numbers in cart (pending entries)
+        const inCartNumbers = [];
+        
+        entries.forEach(entry => {
+          if (entry.selectedNumbers && entry.paymentStatus === 'pending') {
+            try {
+              // Handle both array and JSON string formats
+              let numbers;
+              if (typeof entry.selectedNumbers === 'string') {
+                numbers = JSON.parse(entry.selectedNumbers);
+              } else if (Array.isArray(entry.selectedNumbers)) {
+                numbers = entry.selectedNumbers;
+              }
+              
+              if (Array.isArray(numbers)) {
+                inCartNumbers.push(...numbers);
+              }
+            } catch (e) {
+              console.error('Error parsing selected numbers:', e);
+            }
+          }
+        });
+        
+        // Return the unique numbers in cart
+        console.log(`📊 Legacy endpoint returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId}`);
+        return res.json({ inCartNumbers: Array.from(new Set(inCartNumbers)) });
+      } 
+      catch (err) {
+        console.error(`Error retrieving in-cart numbers: ${err}`);
+        // Simply return empty array to avoid 404 errors as a fallback
+        return res.json({ inCartNumbers: [] });
+      }
     } catch (error) {
       console.error(`Error in legacy endpoint handler: `, error);
       // Always return success to avoid breaking the frontend
@@ -557,9 +591,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ====================================
       `);
 
-      // For maximum compatibility, just return an empty array for production resilience
-      console.log('🔄 PRODUCTION CRITICAL PATH: Returning empty array response for maximum compatibility');
-      return res.json({ inCartNumbers: [] });
+      // Get actual cart items for this competition
+      try {
+        const entries = await dataStorage.getEntriesByCompetition(competitionId);
+        
+        // Extract numbers in cart (pending entries)
+        const inCartNumbers = [];
+        
+        entries.forEach(entry => {
+          if (entry.selectedNumbers && entry.paymentStatus === 'pending') {
+            try {
+              // Handle both array and JSON string formats
+              let numbers;
+              if (typeof entry.selectedNumbers === 'string') {
+                numbers = JSON.parse(entry.selectedNumbers);
+              } else if (Array.isArray(entry.selectedNumbers)) {
+                numbers = entry.selectedNumbers;
+              }
+              
+              if (Array.isArray(numbers)) {
+                inCartNumbers.push(...numbers);
+              }
+            } catch (e) {
+              console.error('Error parsing selected numbers:', e);
+            }
+          }
+        });
+        
+        // Return the unique numbers in cart
+        console.log(`📊 Catch-all handler returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId}`);
+        return res.json({ inCartNumbers: Array.from(new Set(inCartNumbers)) });
+      } 
+      catch (err) {
+        console.error(`Error retrieving in-cart numbers in catch-all handler: ${err}`);
+        // Return an empty array for production resilience
+        console.log('🔄 PRODUCTION CRITICAL PATH: Returning empty array response for maximum compatibility');
+        return res.json({ inCartNumbers: [] });
+      }
     } catch (error) {
       console.error('❌ CRITICAL PRODUCTION ERROR in legacy endpoint handler:', error);
       // Always return a valid response in production, never an error
