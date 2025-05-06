@@ -233,13 +233,13 @@ export default function HomePage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto text-[#002147]">
-              HOW TO <span className="text-[#002147] relative">PLAY
-                <span className="absolute -top-1 -right-4 text-[#002147] text-lg">✨</span>
+            <h2 className="text-4xl font-extrabold mb-3 tracking-tight mx-auto text-white">
+              HOW TO <span className="text-white relative">PLAY
+                <span className="absolute -top-1 -right-4 text-white text-lg">✨</span>
               </span>
             </h2>
-            <p className="text-[#002147]/80 max-w-2xl mx-auto mb-6 text-lg">
-              Just <span className="text-[#002147] font-medium">three simple steps</span> to start winning amazing prizes!
+            <p className="text-white/90 max-w-2xl mx-auto mb-6 text-lg">
+              Just <span className="text-white font-medium">three simple steps</span> to start winning amazing prizes!
             </p>
           </div>
           
@@ -254,8 +254,8 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-[#002147] mb-3">Get Your Tickets</h3>
-                <p className="text-[#002147]/80">Browse our amazing competitions and secure your tickets to win. The more tickets, the better your chances!</p>
+                <h3 className="text-2xl font-bold text-white mb-3">Get Your Tickets</h3>
+                <p className="text-white/80">Browse our amazing competitions and secure your tickets to win. The more tickets, the better your chances!</p>
               </div>
             </div>
             
@@ -269,8 +269,8 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-[#002147] mb-3">Watch Live Draws</h3>
-                <p className="text-[#002147]/80">All winners are selected randomly during our exciting live streamed draws. Get ready for the thrill!</p>
+                <h3 className="text-2xl font-bold text-white mb-3">Watch Live Draws</h3>
+                <p className="text-white/80">All winners are selected randomly during our exciting live streamed draws. Get ready for the thrill!</p>
               </div>
             </div>
             
@@ -284,8 +284,8 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-[#002147] mb-3">Win & Celebrate!</h3>
-                <p className="text-[#002147]/80">Get notified when you win and celebrate your new prize! We'll deliver it straight to your door.</p>
+                <h3 className="text-2xl font-bold text-white mb-3">Win & Celebrate!</h3>
+                <p className="text-white/80">Get notified when you win and celebrate your new prize! We'll deliver it straight to your door.</p>
               </div>
             </div>
           </div>
