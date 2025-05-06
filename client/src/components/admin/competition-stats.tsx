@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { useState } from "react";
 import { Competition } from "@shared/schema";
 import { Loader2, Lock, AlertCircle, TicketIcon, ShoppingCart, CheckCircle2 } from "lucide-react";
 import {
@@ -11,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -19,206 +16,149 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useCart } from "@/hooks/use-cart";
 
-interface TicketStats {
-  totalTickets: number;
-  purchasedTickets: number;
-  inCartTickets: number;
-  availableTickets: number;
-  soldTicketsCount: number;
-  allNumbers: {
-    totalRange: number[];
-    purchased: number[];
-    inCart: number[];
-  }
-}
-
-interface CompetitionStatsProps {
-  competition: Competition;
-}
-
-export function CompetitionStats({ competition }: CompetitionStatsProps) {
+// Minimal standalone component that doesn't rely on React Query or other dependencies
+export function CompetitionStats({ competition }: { competition: Competition }) {
   const [showNumberGrid, setShowNumberGrid] = useState(false);
-  const { cartItems } = useCart();
-  const [clientCartNumbers, setClientCartNumbers] = useState<number[]>([]);
-  
-  // Debug flag to help with troubleshooting
-  const DEBUG = true;
-  
-  // Get cart numbers for this competition
-  useEffect(() => {
-    // Ensure we have a valid competition ID
-    if (!competition?.id) return;
-    
-    // Extract ticket numbers from client-side cart for this competition
-    const ticketNumbers = cartItems
-      .filter(item => item.competitionId === competition.id)
-      .flatMap(item => item.selectedNumbers || []);
-    
-    // Update state with client-side cart numbers
-    setClientCartNumbers(ticketNumbers);
-    
-    // Fetch server-side cart data
-    const fetchServerCartData = async () => {
-      if (DEBUG) console.log(`📦 Fetching cart data for competition ID: ${competition.id}`);
-      
-      try {
-        // Use the standard fetch API to ensure consistency across environments
-        const response = await fetch(`/api/admin/competitions/${competition.id}/cart-items`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({ cartItems }),
-        });
-        
-        // Handle response
-        if (response.ok) {
-          const data = await response.json();
-          if (DEBUG) console.log(`✅ Received cart data:`, data);
-          
-          if (data && Array.isArray(data.inCartNumbers)) {
-            // Combine with local cart numbers and remove duplicates
-            const allNumbers = [...new Set([...ticketNumbers, ...data.inCartNumbers])];
-            setClientCartNumbers(allNumbers);
-          }
-        } else {
-          console.error(`⚠️ Cart data fetch failed: ${response.status} ${response.statusText}`);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching cart data:", error);
-      }
-    };
-    
-    fetchServerCartData();
-  }, [competition?.id, cartItems]);
-  
-  // Fetch ticket statistics from admin endpoint
-  const { data: stats, isLoading, error } = useQuery<TicketStats>({
-    queryKey: ['/api/admin/competitions', competition?.id, 'ticket-stats'],
-    enabled: !!competition?.id,
-    queryFn: async () => {
-      // Verify competition ID again for safety
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [inCartNumbers, setInCartNumbers] = useState<number[]>([]);
+
+  // Use plain React effects for fetching data - more reliable across environments
+  useState(() => {
+    async function fetchData() {
       if (!competition?.id) {
-        throw new Error("Invalid competition ID");
+        setHasError(true);
+        setIsLoading(false);
+        return;
       }
-      
-      if (DEBUG) console.log(`🔍 Fetching ticket stats for competition ID: ${competition.id}`);
-      
+
       try {
-        // Use the admin endpoint with proper credentials
-        const endpoint = `/api/admin/competitions/${competition.id}/ticket-stats`;
-        
-        const response = await fetch(endpoint, {
+        // First get the ticket stats
+        const statsResponse = await fetch(`/api/admin/competitions/${competition.id}/ticket-stats`, {
           credentials: 'include',
           headers: { 'Cache-Control': 'no-cache' }
         });
         
-        if (!response.ok) {
-          throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        if (!statsResponse.ok) {
+          throw new Error(`Stats API Error: ${statsResponse.status}`);
         }
         
-        const data = await response.json();
-        if (DEBUG) console.log("✅ Ticket stats data received:", data);
-        return data;
+        const statsData = await statsResponse.json();
+        setStats(statsData);
+        
+        // Then get in-cart numbers
+        try {
+          const cartResponse = await fetch(`/api/admin/competitions/${competition.id}/cart-items`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({})
+          });
+          
+          if (cartResponse.ok) {
+            const cartData = await cartResponse.json();
+            if (cartData && Array.isArray(cartData.inCartNumbers)) {
+              setInCartNumbers(cartData.inCartNumbers);
+            }
+          }
+        } catch (cartError) {
+          console.error("Non-fatal cart data error:", cartError);
+          // We don't fail the whole component for cart errors
+        }
+        
+        setIsLoading(false);
       } catch (error) {
-        console.error("❌ Error fetching ticket stats:", error);
-        throw error;
+        console.error("Error loading competition stats:", error);
+        setHasError(true);
+        setIsLoading(false);
       }
-    },
-    staleTime: 30 * 1000,
-    retry: 1
+    }
+    
+    fetchData();
   });
 
+  // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-48">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <Card>
+        <CardContent className="flex items-center justify-center h-48">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
     );
   }
 
-  // Handle error or missing data
-  if (error || !stats) {
-    // Also handle the case where competition might be undefined or incomplete
-    if (!competition || !competition.id) {
-      return (
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold text-foreground">Competition Data Unavailable</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="flex flex-col items-center justify-center py-6">
-                <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-                <p className="text-muted-foreground text-center font-medium">
-                  Competition data could not be loaded
-                </p>
-                <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
-                  Please check the competition ID and try again.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
-    
+  // Error handling - competition missing or data fetch error
+  if (hasError || !stats) {
     return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-bold text-foreground">{competition.title}</CardTitle>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-foreground">
+            {competition ? competition.title : 'Competition Data Unavailable'}
+          </CardTitle>
+          {competition && (
             <CardDescription className="flex items-center gap-1 text-sm">
               <span>Status: </span>
               <span className="font-medium bg-amber-100 text-amber-700 px-2 rounded-full text-xs">
-                {competition.ticketsSold !== null ? `${((competition.ticketsSold / competition.totalTickets) * 100).toFixed(1)}% sold` : '0% sold'}
+                {competition.status || 'Unknown'}
               </span>
             </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="flex flex-col items-center justify-center py-6">
-              <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-              <p className="text-muted-foreground text-center font-medium">
-                Stats temporarily unavailable
-              </p>
-              <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
-                Statistics for this competition will be available soon.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          )}
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="flex flex-col items-center justify-center py-6">
+            <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
+            <p className="text-muted-foreground text-center font-medium">
+              Stats data unavailable
+            </p>
+            <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
+              The competition statistics cannot be displayed at this time.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
-
-  // Update stats with client-side cart data
-  const enhancedStats = {
-    ...stats,
-    allNumbers: {
-      ...stats.allNumbers,
-      inCart: [...new Set([...stats.allNumbers.inCart, ...clientCartNumbers])]
-    }
+  
+  // Fallback values for missing data
+  const totalTickets = competition.totalTickets || 0;
+  const purchasedTickets = stats.purchasedTickets || 0;
+  const inCartTicketsCount = inCartNumbers.length || 0;
+  const availableTickets = totalTickets - purchasedTickets - inCartTicketsCount;
+  
+  // Calculate percentages for visualization (with safety checks)
+  const safeCalculatePercentage = (value: number) => {
+    if (!totalTickets || totalTickets <= 0) return 0;
+    return (value / totalTickets) * 100;
   };
   
-  // Recalculate inCartTickets count based on actual data
-  const actualInCartCount = enhancedStats.allNumbers.inCart.length;
-  enhancedStats.inCartTickets = actualInCartCount;
+  const purchasedPercentage = safeCalculatePercentage(purchasedTickets);
+  const inCartPercentage = safeCalculatePercentage(inCartTicketsCount);
+  const availablePercentage = safeCalculatePercentage(availableTickets);
   
-  // Adjust available tickets accordingly
-  enhancedStats.availableTickets = enhancedStats.totalTickets - 
-    enhancedStats.purchasedTickets - actualInCartCount;
+  // Sale status percentage with fallback
+  const percentSold = totalTickets ? ((purchasedTickets / totalTickets) * 100).toFixed(1) + '%' : '0%';
   
-  // Calculate percentages for visualization
-  const purchasedPercentage = (enhancedStats.purchasedTickets / enhancedStats.totalTickets) * 100;
-  const inCartPercentage = (enhancedStats.inCartTickets / enhancedStats.totalTickets) * 100;
-  const availablePercentage = (enhancedStats.availableTickets / enhancedStats.totalTickets) * 100;
+  // Basic range generation for the number grid
+  const generateRange = (start: number, end: number) => {
+    const result = [];
+    for (let i = start; i <= end; i++) {
+      result.push(i);
+    }
+    return result;
+  };
   
-  // Get percent sold for display (using the actual ticketsSold value from the competition)
-  const percentSold = stats.soldTicketsCount ? ((stats.soldTicketsCount / stats.totalTickets) * 100).toFixed(1) + '%' : '0%';
-
+  // Ensure we have all number arrays with fallbacks
+  const allNumbers = {
+    totalRange: stats.allNumbers?.totalRange || generateRange(1, totalTickets),
+    purchased: stats.allNumbers?.purchased || [],
+    inCart: inCartNumbers
+  };
+  
   return (
     <div className="space-y-6">
       <Card>
@@ -232,14 +172,14 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-4">
-          {/* Stats Cards - Simplified and cleaner */}
+          {/* Stats Cards Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
               <div className="flex items-center gap-2 mb-1">
                 <TicketIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-xs font-medium text-muted-foreground">Total</span>
               </div>
-              <span className="text-xl font-bold text-foreground">{enhancedStats.totalTickets}</span>
+              <span className="text-xl font-bold text-foreground">{totalTickets}</span>
             </div>
             
             <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
@@ -247,7 +187,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <span className="text-xs font-medium text-muted-foreground">Purchased</span>
               </div>
-              <span className="text-xl font-bold text-green-600">{enhancedStats.purchasedTickets}</span>
+              <span className="text-xl font-bold text-green-600">{purchasedTickets}</span>
             </div>
             
             <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
@@ -255,7 +195,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
                 <ShoppingCart className="h-4 w-4 text-blue-600" />
                 <span className="text-xs font-medium text-muted-foreground">In Cart</span>
               </div>
-              <span className="text-xl font-bold text-blue-600">{enhancedStats.inCartTickets}</span>
+              <span className="text-xl font-bold text-blue-600">{inCartTicketsCount}</span>
             </div>
             
             <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
@@ -263,11 +203,11 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
                 <TicketIcon className="h-4 w-4 text-amber-600" />
                 <span className="text-xs font-medium text-muted-foreground">Available</span>
               </div>
-              <span className="text-xl font-bold text-amber-600">{enhancedStats.availableTickets}</span>
+              <span className="text-xl font-bold text-amber-600">{availableTickets}</span>
             </div>
           </div>
 
-          {/* Progress Bars - Cleaner and more compact */}
+          {/* Progress Bars */}
           <div className="space-y-3 border rounded-lg p-3">
             <h3 className="text-xs font-medium text-muted-foreground mb-3">Ticket Distribution</h3>
             
@@ -342,10 +282,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <div className="grid grid-cols-10 gap-2 md:grid-cols-20">
-              {enhancedStats.allNumbers.totalRange.map((number) => {
-                const isPurchased = enhancedStats.allNumbers.purchased.includes(number);
-                const isInCart = enhancedStats.allNumbers.inCart.includes(number) || 
-                                clientCartNumbers.includes(number);
+              {allNumbers.totalRange.slice(0, 500).map((number) => {
+                const isPurchased = allNumbers.purchased.includes(number);
+                const isInCart = allNumbers.inCart.includes(number);
                 
                 return (
                   <TooltipProvider key={number}>
@@ -371,22 +310,15 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
                   </TooltipProvider>
                 );
               })}
+              {allNumbers.totalRange.length > 500 && (
+                <div className="col-span-full text-center text-sm text-muted-foreground py-2">
+                  Showing first 500 tickets of {allNumbers.totalRange.length} total
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
       )}
-    </div>
-  );
-}
-
-function StatCard({ icon, title, value, color }: { icon: React.ReactNode; title: string; value: string; color: string }) {
-  return (
-    <div className={`flex items-center p-4 rounded-lg ${color}`}>
-      <div className="mr-4 text-gray-700">{icon}</div>
-      <div>
-        <p className="text-sm font-medium text-gray-700">{title}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-      </div>
     </div>
   );
 }
