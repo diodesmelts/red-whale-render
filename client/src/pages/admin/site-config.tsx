@@ -5,6 +5,7 @@ import { HeroBannerUpload } from "@/components/admin/site-config/hero-banner-upl
 import { LogoUpload } from "@/components/admin/site-config/logo-upload";
 import { FooterSettings } from "@/components/admin/site-config/footer-settings";
 import { PaymentCardsUpload } from "@/components/admin/site-config/payment-cards-upload";
+import { PaymentCardsPreview } from "@/components/admin/site-config/payment-cards-preview";
 import { useQuery } from "@tanstack/react-query";
 import { SiteConfig } from "@shared/schema";
 import { cn, getImageUrl } from "@/lib/utils";
@@ -189,28 +190,12 @@ export default function SiteConfigPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {isLoadingPaymentCards ? (
-                    <div className="h-24 bg-muted animate-pulse rounded-md"></div>
-                  ) : paymentCardsConfig?.value ? (
-                    <div className="bg-[#002147] p-4 rounded-md">
-                      <div className="relative overflow-hidden rounded-md flex justify-center items-center">
-                        <img 
-                          src={getImageUrl(paymentCardsConfig.value)}
-                          alt="Current payment cards image" 
-                          className="h-16 w-auto object-contain"
-                          onError={(e) => {
-                            e.currentTarget.src = "/uploads/payment-cards.png";
-                          }}
-                        />
-                      </div>
+                  {/* Use our optimized payment cards preview component with caching */}
+                  <div className="bg-[#002147] p-4 rounded-md">
+                    <div className="relative overflow-hidden rounded-md flex justify-center items-center">
+                      <PaymentCardsPreview />
                     </div>
-                  ) : (
-                    <div className="bg-[#002147] h-24 rounded-md flex items-center justify-center text-white">
-                      <div className="flex items-center">
-                        <span className="text-sm">Default payment cards image</span>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                   
                   <p className="mt-2 text-sm text-muted-foreground">
                     Last updated: {paymentCardsConfig?.updatedAt 

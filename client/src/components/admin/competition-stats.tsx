@@ -105,7 +105,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
       try {
         const res = await apiRequest(
           'GET', 
-          `/api/competitions/${competition.id}/ticket-stats`
+          `/api/competitions/${competition.id}/ticket-stats`,
+          null,
+          { credentials: 'include' } // Add credentials to ensure auth session is sent
         );
         
         if (!res.ok) {
