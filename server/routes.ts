@@ -484,10 +484,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      // Count unique numbers
-      const purchasedCount = new Set(purchasedNumbers).size;
+      // Count unique numbers from entries with selectedNumbers
+      const selectedNumbersPurchasedCount = new Set(purchasedNumbers).size;
       const inCartCount = new Set(inCartNumbers).size;
+      
+      // Get total purchased count from the competition's ticketsSold field
+      // If ticketsSold is greater than our counted purchased numbers, use that instead
+      const ticketsSoldCount = competition.ticketsSold || 0;
+      const purchasedCount = Math.max(selectedNumbersPurchasedCount, ticketsSoldCount);
+      
+      // Calculate available tickets based on the higher purchased count
       const availableCount = totalTickets - purchasedCount - inCartCount;
+      
+      // For the ticket grid, we need to ensure we have enough "purchased" numbers
+      // If ticketsSold is greater than our selectedNumbersPurchased, we need to generate more
+      let displayedPurchasedNumbers = [...new Set(purchasedNumbers)];
+      
+      // If we have fewer purchased numbers than tickets sold, generate some additional ones
+      // (this is just for display purposes since we don't know which specific numbers were selected)
+      if (ticketsSoldCount > selectedNumbersPurchasedCount) {
+        // Generate a sequence of numbers from 1 to totalTickets
+        const allNumbers = Array.from({ length: totalTickets }, (_, i) => i + 1);
+        
+        // Remove numbers that are already marked as purchased or in cart
+        const availableForDisplay = allNumbers.filter(
+          num => !displayedPurchasedNumbers.includes(num) && !inCartNumbers.includes(num)
+        );
+        
+        // Select additional numbers to match the ticketsSold count
+        const additionalNeeded = ticketsSoldCount - selectedNumbersPurchasedCount;
+        const additionalNumbers = availableForDisplay.slice(0, additionalNeeded);
+        
+        // Add these to our displayed purchased numbers
+        displayedPurchasedNumbers = [...displayedPurchasedNumbers, ...additionalNumbers];
+      }
       
       // Return the statistics
       res.json({
@@ -495,10 +525,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         purchasedTickets: purchasedCount,
         inCartTickets: inCartCount,
         availableTickets: availableCount,
-        soldTicketsCount, // The official count from the competition record
+        soldTicketsCount: ticketsSoldCount, // The official count from the competition record
         allNumbers: {
           totalRange: Array.from({ length: totalTickets }, (_, i) => i + 1),
-          purchased: [...new Set(purchasedNumbers)],
+          purchased: displayedPurchasedNumbers,
           inCart: [...new Set(inCartNumbers)]
         }
       });

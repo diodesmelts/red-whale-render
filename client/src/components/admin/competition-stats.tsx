@@ -79,6 +79,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
   const purchasedPercentage = (stats.purchasedTickets / stats.totalTickets) * 100;
   const inCartPercentage = (stats.inCartTickets / stats.totalTickets) * 100;
   const availablePercentage = (stats.availableTickets / stats.totalTickets) * 100;
+  
+  // Get percent sold for display (using the actual ticketsSold value from the competition)
+  const percentSold = stats.soldTicketsCount ? ((stats.soldTicketsCount / stats.totalTickets) * 100).toFixed(1) + '%' : '0%';
 
   return (
     <div className="space-y-6">
@@ -86,7 +89,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
         <CardHeader>
           <CardTitle>{competition.title}</CardTitle>
           <CardDescription>
-            Ticket status overview for this competition
+            Ticket status overview for this competition - {percentSold} sold
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
