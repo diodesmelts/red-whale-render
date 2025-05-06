@@ -29,7 +29,7 @@ RUN npm install
 COPY --from=builder /app/dist ./dist
 
 # Copy server files
-COPY server-docker.cjs production-direct-fix.cjs render-endpoint-fixes.cjs active-cart-items-fix.cjs render-integration.cjs ./
+COPY server-docker.cjs production-direct-fix.cjs render-endpoint-fixes.cjs active-cart-items-fix.cjs render-db-query-fix.cjs render-integration.cjs ./
 
 # Apply all fixes to the server file using the integrated script
 RUN node render-integration.cjs

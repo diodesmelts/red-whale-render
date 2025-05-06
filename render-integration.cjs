@@ -15,7 +15,8 @@ console.log('🚀 Starting Render integration process...');
 const fixScripts = [
   'production-direct-fix.cjs',
   'render-endpoint-fixes.cjs',
-  'active-cart-items-fix.cjs'
+  'active-cart-items-fix.cjs',
+  'render-db-query-fix.cjs'
 ];
 
 try {
