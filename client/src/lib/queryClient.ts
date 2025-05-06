@@ -121,14 +121,29 @@ export async function apiRequest(
     const isProduction = import.meta.env.MODE === 'production';
     const hostname = window.location.hostname;
     const isRender = hostname.includes('onrender.com');
+    const isMobyComps = hostname.includes('mobycomps.co.uk');
     
     // Log environment detection for debugging
     console.log(`🌐 URL processing environment:`, {
       url,
       isProduction,
       hostname,
-      isRender
+      isRender,
+      isMobyComps,
+      referer: document.referrer,
+      pathName: window.location.pathname,
+      fullOrigin: window.location.origin,
+      protocol: window.location.protocol
     });
+    
+    // PRODUCTION DEBUG: Additional logging specifically for MobyComps domain
+    if (isMobyComps) {
+      console.log(`🔍 MOBYCOMPS REQUEST DEBUGGING: ${method} ${url}`);
+      console.log(`📌 Request data:`, data || {});
+      
+      // Log exactly where this is being called from (stack trace)
+      console.log(`📚 Call stack:`, new Error().stack);
+    }
     
     if (url.startsWith('http')) {
       apiUrl = url;

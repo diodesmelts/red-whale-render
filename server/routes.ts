@@ -56,6 +56,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: Auth setup is now handled in index.ts or api-only.ts before calling this
   // Don't set up auth again here to avoid duplicate routes
   
+  // Enhanced debug logging middleware for ALL requests
+  app.use((req, res, next) => {
+    // Create detailed environment info for all requests
+    const requestInfo = {
+      url: req.url,
+      originalUrl: req.originalUrl, 
+      method: req.method,
+      path: req.path,
+      baseUrl: req.baseUrl,
+      hostname: req.hostname,
+      ip: req.ip,
+      protocol: req.protocol,
+      secure: req.secure,
+      headers: {
+        host: req.headers.host,
+        origin: req.headers.origin,
+        referer: req.headers.referer,
+        'user-agent': req.headers['user-agent'],
+        'content-type': req.headers['content-type']
+      },
+      cookies: req.headers.cookie ? 'Present' : 'Not present',
+      timestamp: new Date().toISOString(),
+    };
+    
+    // Special handling for critical API paths that have been causing issues
+    if (req.originalUrl.includes('/competitions/') && 
+        (req.originalUrl.includes('cart-items') || req.originalUrl.includes('ticket-stats'))) {
+      console.log('🔍🔍 CRITICAL PATH DEBUGGING INFO:', JSON.stringify(requestInfo, null, 2));
+      
+      // Handle legacy endpoints by attempting to detect if they're using the old pattern
+      // Example: /api/competitions/5/cart-items -> /api/competitions/cart-items/5
+      if (req.path.match(/\/competitions\/\d+\/(cart-items|ticket-stats)/)) {
+        // This is likely an old-pattern URL
+        console.log('⚠️ LEGACY ENDPOINT PATTERN DETECTED - Redirecting to new format');
+        
+        // Extract competition ID and endpoint type
+        const match = req.path.match(/\/competitions\/(\d+)\/([^\/]+)/);
+        if (match) {
+          const [, competitionId, endpointType] = match;
+          const newPath = `/api/competitions/${endpointType}/${competitionId}`;
+          
+          console.log(`🔄 Transforming path from ${req.path} to ${newPath}`);
+          
+          // Modify the request to use the new path pattern
+          req.url = newPath;
+        }
+      }
+    }
+    
+    // Standard debug logging for all requests
+    console.log(`🔄 API Request: ${req.method} ${req.originalUrl}`);
+    
+    next();
+  });
+  
   // Add debug log for auth routes
   console.log("🔍 Registering API routes...");
   
@@ -434,6 +489,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error(`Failed to fetch taken numbers for competition ${req.params.id}:`, error);
       return res.status(500).json({ message: error.message || "Failed to fetch taken numbers" });
     }
+  });
+  
+  // LEGACY ENDPOINT - Compatibility layer for old client code
+  // This catches all requests using the old format: /api/competitions/:id/active-cart-items
+  // and redirects them to the new format: /api/competitions/cart-items/:id
+  app.post("/api/competitions/:id/active-cart-items", (req, res) => {
+    const competitionId = req.params.id;
+    console.log(`⚠️ LEGACY ENDPOINT DETECTED: /api/competitions/${competitionId}/active-cart-items`);
+    console.log('🔄 Forwarding to new endpoint format...');
+    
+    // Forward the request to our new endpoint
+    req.url = `/api/competitions/cart-items/${competitionId}`;
+    app._router.handle(req, res);
+  });
+  
+  // LEGACY ENDPOINT - Compatibility layer for old client code
+  // This catches all requests using the old format: /api/competitions/:id/ticket-stats
+  // and redirects them to the new format: /api/competitions/ticket-stats/:id
+  app.get("/api/competitions/:id/ticket-stats", (req, res) => {
+    const competitionId = req.params.id;
+    console.log(`⚠️ LEGACY ENDPOINT DETECTED: /api/competitions/${competitionId}/ticket-stats`);
+    console.log('🔄 Forwarding to new endpoint format...');
+    
+    // Forward the request to our new endpoint
+    req.url = `/api/competitions/ticket-stats/${competitionId}`;
+    app._router.handle(req, res);
+  });
+  
+  // LEGACY ENDPOINT - Compatibility layer for old client code
+  // Also add handlers for admin endpoints
+  app.get("/api/admin/competitions/:id/ticket-stats", (req, res, next) => {
+    // Keep the same URL but log it for debugging
+    console.log(`⚠️ ADMIN ENDPOINT ACCESS: /api/admin/competitions/${req.params.id}/ticket-stats`);
+    next();
   });
   
   // Get active cart items for a competition from all users' localStorage
