@@ -201,7 +201,6 @@ const checkDbConnection = async () => {
         draw_date TIMESTAMP NOT NULL,
         is_live BOOLEAN NOT NULL DEFAULT TRUE,
         is_featured BOOLEAN NOT NULL DEFAULT FALSE,
-        push_to_hero_banner BOOLEAN NOT NULL DEFAULT FALSE,
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
       
