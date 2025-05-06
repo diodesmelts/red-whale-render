@@ -34,6 +34,7 @@ import AboutUs from "@/pages/about-us";
 import AdminDashboard from "@/pages/admin/index";
 import CompetitionsManagement from "@/pages/admin/competitions";
 import CompetitionOverview from "@/pages/admin/competition-overview";
+import UnifiedCompetitionsManager from "@/pages/admin/unified-competitions";
 import UsersManagement from "@/pages/admin/users";
 import AdminSettings from "@/pages/admin/settings";
 import SiteConfigPage from "@/pages/admin/site-config";
@@ -84,6 +85,7 @@ function Router() {
               <ProtectedRoute path="/admin" component={AdminDashboard} adminRequired={true} />
               <ProtectedRoute path="/admin/competitions" component={CompetitionsManagement} adminRequired={true} />
               <ProtectedRoute path="/admin/competition-overview" component={CompetitionOverview} adminRequired={true} />
+              <ProtectedRoute path="/admin/unified-competitions" component={UnifiedCompetitionsManager} adminRequired={true} />
               <ProtectedRoute path="/admin/create-competition" component={() => <CreateCompetition />} adminRequired={true} />
               <ProtectedRoute path="/admin/edit-competition/:id" component={EditCompetition} adminRequired={true} />
               <ProtectedRoute path="/admin/users" component={UsersManagement} adminRequired={true} />
