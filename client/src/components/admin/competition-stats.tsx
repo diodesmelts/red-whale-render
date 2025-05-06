@@ -145,7 +145,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-bold text-primary">{competition.title}</CardTitle>
+          <CardTitle className="text-lg font-bold text-foreground">{competition.title}</CardTitle>
           <CardDescription className="flex items-center gap-1 text-sm">
             <span>Status: </span>
             <span className="font-medium text-primary-foreground bg-primary/90 px-2 rounded-full text-xs">
@@ -257,7 +257,7 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
       {showNumberGrid && (
         <Card>
           <CardHeader>
-            <CardTitle>{competition.title} - Ticket Numbers</CardTitle>
+            <CardTitle className="text-lg font-bold text-foreground">{competition.title} - Ticket Numbers</CardTitle>
             <CardDescription>
               View the status of individual ticket numbers
             </CardDescription>
