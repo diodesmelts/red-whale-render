@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Home, Package, Users, Shield, Image, Terminal, TicketIcon } from "lucide-react";
+import { Home, Package, Users, Shield, Image, TicketIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 
@@ -17,9 +17,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   if (!user || !user.isAdmin) {
     return <Redirect to="/" />;
   }
-
-  // Check if we're in development mode
-  const isDev = process.env.NODE_ENV !== 'production';
   
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: Home },
@@ -27,8 +24,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/competitions-overview", label: "Ticket Stats", icon: TicketIcon },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/site-config", label: "Site Configuration", icon: Image },
-    // Only show dev tools in development environment
-    ...(isDev ? [{ href: "/admin/dev-tools", label: "Dev Tools", icon: Terminal }] : []),
   ];
 
   return (
