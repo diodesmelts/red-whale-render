@@ -112,7 +112,7 @@ export function Footer() {
             </div>
             <div className="mt-6">
               <img 
-                src="/images/payment-cards.png" 
+                src="/uploads/payment-cards.png" 
                 alt="Payment methods: Mastercard and Visa" 
                 className="h-8"
               />
