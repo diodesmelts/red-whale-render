@@ -317,7 +317,7 @@ export function AddToCart({
                 <Button 
                   onClick={handleNumberPickerSave} 
                   disabled={selectedNumbers.length !== quantity}
-                  className="bg-[#002147] hover:bg-[#002147]/90 flex items-center gap-2"
+                  className="bg-[#002147] hover:bg-[#002147]/90 flex items-center gap-2 text-white"
                   data-testid="save-numbers-btn"
                 >
                   <Check className="h-4 w-4" />
