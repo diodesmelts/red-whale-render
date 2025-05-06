@@ -482,14 +482,14 @@ export default function CompetitionDetails() {
                     <div className="flex items-start mb-2">
                       <AlertCircle className="h-4 w-4 text-[#002147] mr-2 mt-0.5" />
                       <div>
-                        <h4 className="text-sm font-medium text-[#002147]">Security Check</h4>
+                        <h4 className="text-sm font-medium text-[#002147]">Question</h4>
                         <p className="text-xs text-gray-500 mt-0.5">Please answer the following question correctly to continue</p>
                       </div>
                     </div>
                     
                     <div className="mb-3">
                       <label className="block text-sm font-medium mb-1">
-                        Question
+                        What is 4 + 8?
                       </label>
                       <Select
                         value={competencyAnswer}
@@ -511,7 +511,7 @@ export default function CompetitionDetails() {
                   {/* Number Selection and Add to Cart */}
                   <div 
                     className={competencyAnswer !== "12" ? "opacity-50 pointer-events-none" : ""}
-                    title={competencyAnswer !== "12" ? "Please correctly answer the security question to continue" : ""}
+                    title={competencyAnswer !== "12" ? "Please correctly answer the question to continue" : ""}
                   >
                     {/* Select Numbers Button */}
                     <div className="mb-3">
@@ -542,7 +542,7 @@ export default function CompetitionDetails() {
                   {competencyAnswer !== "12" && (
                     <div className="mt-2 text-xs text-destructive flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
-                      Please correctly answer the security question to continue
+                      Please correctly answer the question to continue
                     </div>
                   )}
                   
