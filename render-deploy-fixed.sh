@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Simple deployment script for Render.com with production fixes
-# This script pushes the server-docker-fixed.cjs to the main branch
+# This script pushes the direct production fixes to the main branch
 # and triggers a deployment through Render's automated GitHub integration
 
 set -e
 
 echo "💡 Starting Render deployment preparation..."
 
-# Ensure the fixed server file exists
-if [ ! -f "server-docker-fixed.cjs" ]; then
-  echo "❌ Error: server-docker-fixed.cjs not found!"
+# Ensure the direct fix file exists
+if [ ! -f "production-direct-fix.cjs" ]; then
+  echo "❌ Error: production-direct-fix.cjs not found!"
   exit 1
 fi
 
@@ -22,11 +22,11 @@ fi
 
 # Add all files to Git
 echo "📦 Adding production fixes to Git..."
-git add server-docker-fixed.cjs Dockerfile
+git add production-direct-fix.cjs Dockerfile 
 
 # Commit changes (if any)
 if ! git diff --cached --quiet; then
-  git commit -m "Add production fixes for stable deployment"
+  git commit -m "Add direct production fixes for stable deployment"
 fi
 
 # Push to GitHub
