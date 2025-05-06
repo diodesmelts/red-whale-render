@@ -44,6 +44,13 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
   const { data: stats, isLoading, error } = useQuery<TicketStats>({
     queryKey: ['/api/competitions', competition.id, 'ticket-stats'],
     enabled: !!competition.id,
+    queryFn: async () => {
+      const res = await apiRequest(
+        'GET', 
+        `/api/competitions/${competition.id}/ticket-stats`
+      );
+      return res.json();
+    },
   });
 
   if (isLoading) {

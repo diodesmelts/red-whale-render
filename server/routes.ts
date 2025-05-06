@@ -451,7 +451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const entries = await dataStorage.getEntriesByCompetition(competitionId);
       
       // Calculate ticket statistics
-      const totalTickets = competition.maxTickets;
+      const totalTickets = competition.totalTickets;
       const soldTicketsCount = competition.ticketsSold || 0;
       
       // Extract purchased numbers (confirmed entries)
@@ -462,10 +462,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       entries.forEach(entry => {
         if (entry.selectedNumbers) {
           try {
-            const numbers = JSON.parse(entry.selectedNumbers);
-            if (entry.status === 'completed') {
+            // Handle both array and JSON string formats
+            let numbers;
+            if (typeof entry.selectedNumbers === 'string') {
+              numbers = JSON.parse(entry.selectedNumbers);
+            } else if (Array.isArray(entry.selectedNumbers)) {
+              numbers = entry.selectedNumbers;
+            } else {
+              numbers = [];
+              console.warn('Unexpected selectedNumbers format:', entry.selectedNumbers);
+            }
+            
+            if (entry.paymentStatus === 'completed') {
               purchasedNumbers.push(...numbers);
-            } else if (entry.status === 'cart') {
+            } else if (entry.paymentStatus === 'pending') {
               inCartNumbers.push(...numbers);
             }
           } catch (e) {
