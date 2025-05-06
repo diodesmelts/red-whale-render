@@ -123,11 +123,11 @@ export function Navbar() {
             </div>
             <div className="hidden md:block">
               <div className="ml-4 flex items-center md:ml-6 pr-2 sm:pr-4">
+                <div className="flex items-center mr-6">
+                  <CartIcon variant="ghost" size="icon" showTooltip={true} />
+                </div>
                 {user ? (
                   <>
-                    <div className="flex items-center mr-6">
-                      <CartIcon variant="ghost" size="icon" showTooltip={true} />
-                    </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="secondary" className="flex items-center h-9 py-1 px-3 bg-primary/30 hover:bg-primary/50 shadow-[0_0_8px_rgba(67,32,124,0.5)] border border-primary/40 transition-all hover:shadow-[0_0_12px_rgba(67,32,124,0.7)]">
@@ -271,6 +271,14 @@ export function Navbar() {
                         location === "/faqs" ? "text-primary" : "text-foreground"
                       )}>
                       <i className="fas fa-info-circle mr-2"></i> FAQs
+                    </Link>
+                    <Link href="/cart" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className={cn(
+                        "flex items-center text-lg font-medium",
+                        location === "/cart" ? "text-primary" : "text-foreground"
+                      )}>
+                      <i className="fas fa-shopping-bag mr-2"></i> My Cart
                     </Link>
                     {user ? (
                       <>

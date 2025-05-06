@@ -21,11 +21,7 @@ export default function CartPage() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-  // If the user isn't logged in, redirect to auth page
-  if (!user) {
-    navigate('/auth');
-    return null;
-  }
+  // We'll now allow non-logged in users to view the cart, but will prompt for login at checkout
 
   const createPaymentIntentMutation = useMutation({
     mutationFn: async () => {
@@ -173,6 +169,21 @@ export default function CartPage() {
         description: "Please add items to your cart before checking out",
         variant: "destructive",
       });
+      return;
+    }
+    
+    // Check if user is logged in before proceeding to checkout
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please login or create an account to complete your purchase",
+      });
+      
+      // Save current page to return after authentication
+      localStorage.setItem('returnToAfterAuth', '/cart');
+      
+      // Redirect to authentication page
+      navigate('/auth');
       return;
     }
     
