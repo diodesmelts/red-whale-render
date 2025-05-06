@@ -432,6 +432,68 @@ adminRouter.post('/fix-image-urls', isAdmin, async (req, res) => {
   }
 });
 
+// Admin endpoint to get detailed ticket statistics for a competition
+adminRouter.get('/competitions/:id/ticket-stats', isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    // First verify the competition exists
+    const competition = await db.select()
+      .from(competitions)
+      .where(eq(competitions.id, numId))
+      .limit(1);
+      
+    if (!competition.length) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Get all entries for this competition to calculate stats
+    const entryList = await db.select()
+      .from(entries)
+      .where(eq(entries.competitionId, numId));
+    
+    // Calculate purchased tickets
+    const purchasedNumbers = new Set();
+    for (const entry of entryList) {
+      if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+        for (const num of entry.selectedNumbers) {
+          purchasedNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Find active cart numbers (numbers in carts but not purchased)
+    const activeEntries = await db.select()
+      .from(entries)
+      .where(eq(entries.competitionId, numId));
+    
+    // Create a range of all possible ticket numbers
+    const totalRange = Array.from({ length: competition[0].totalTickets }, (_, i) => i + 1);
+    
+    // Return comprehensive stats
+    res.json({
+      totalTickets: competition[0].totalTickets,
+      purchasedTickets: purchasedNumbers.size,
+      inCartTickets: 0, // Fallback as we'll calculate this client-side for real-time accuracy
+      availableTickets: competition[0].totalTickets - purchasedNumbers.size,
+      soldTicketsCount: purchasedNumbers.size,
+      allNumbers: {
+        totalRange: totalRange,
+        purchased: Array.from(purchasedNumbers),
+        inCart: [] // Fallback as we'll get this client-side
+      }
+    });
+  } catch (error: any) {
+    console.error('Error fetching competition ticket stats:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Admin endpoint to lookup ticket owner by competition ID and ticket number
 adminRouter.get('/competitions/:competitionId/ticket/:ticketNumber', isAdmin, async (req, res) => {
   try {

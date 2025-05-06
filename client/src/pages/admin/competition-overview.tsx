@@ -20,9 +20,24 @@ import { Loader2 } from "lucide-react";
 import { Competition } from "@shared/schema";
 
 export default function CompetitionOverview() {
-  // Fetch all competitions
+  // Fetch all competitions with admin endpoint and proper authentication
   const { data: competitions, isLoading } = useQuery<Competition[]>({
-    queryKey: ["/api/competitions"],
+    queryKey: ["/api/admin/competitions"],
+    queryFn: async () => {
+      console.log("🔍 Fetching competitions from admin endpoint");
+      const response = await fetch("/api/admin/competitions", {
+        credentials: 'include' // Ensure cookies are sent with the request
+      });
+      if (!response.ok) {
+        console.error(`Failed to fetch competitions from admin endpoint: ${response.status}`);
+        throw new Error(`Failed to fetch competitions: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(`✅ Received ${data?.length || 0} competitions from admin endpoint`);
+      return data;
+    },
+    staleTime: 30 * 1000, // 30 seconds cache - shorter for admin panel to see updates faster
+    retry: 1, // Only retry once to avoid excessive requests if there's an auth issue
   });
 
   if (isLoading) {

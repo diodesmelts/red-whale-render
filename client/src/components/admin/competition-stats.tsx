@@ -89,9 +89,9 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
   // Debug flag to help with troubleshooting
   const DEBUG = true;
   
-  // Fetch ticket statistics
+  // Fetch ticket statistics with admin credentials
   const { data: stats, isLoading, error } = useQuery<TicketStats>({
-    queryKey: ['/api/competitions', competition?.id, 'ticket-stats'],
+    queryKey: ['/api/admin/competitions', competition?.id, 'ticket-stats'],
     // Only enable the query if competition ID is valid
     enabled: !!competition && !!competition.id,
     queryFn: async () => {
@@ -103,26 +103,43 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
       
       if (DEBUG) console.log("🔍 Fetching ticket stats for competition ID:", competition.id);
       try {
-        const res = await apiRequest(
-          'GET', 
-          `/api/competitions/${competition.id}/ticket-stats`,
-          null,
-          { credentials: 'include' } // Add credentials to ensure auth session is sent
+        // First try admin endpoint for more detailed stats
+        const res = await fetch(
+          `/api/admin/competitions/${competition.id}/ticket-stats`, {
+            credentials: 'include' // Essential for admin authentication
+          }
         );
         
+        // If admin endpoint fails, fall back to regular endpoint
         if (!res.ok) {
-          if (DEBUG) console.error("💥 Ticket stats API error:", res.status, res.statusText);
-          throw new Error(`API Error: ${res.status} ${res.statusText}`);
+          if (DEBUG) console.warn(`Admin ticket stats API failed with ${res.status}, falling back to regular endpoint`);
+          
+          const fallbackRes = await apiRequest(
+            'GET', 
+            `/api/competitions/${competition.id}/ticket-stats`,
+            null,
+            { credentials: 'include' } // Still include credentials for regular endpoint
+          );
+          
+          if (!fallbackRes.ok) {
+            if (DEBUG) console.error("💥 Fallback ticket stats API error:", fallbackRes.status, fallbackRes.statusText);
+            throw new Error(`API Error: ${fallbackRes.status} ${fallbackRes.statusText}`);
+          }
+          
+          const fallbackData = await fallbackRes.json();
+          if (DEBUG) console.log("✅ Fallback ticket stats data received:", fallbackData);
+          return fallbackData;
         }
         
         const data = await res.json();
-        if (DEBUG) console.log("✅ Ticket stats data received:", data);
+        if (DEBUG) console.log("✅ Admin ticket stats data received:", data);
         return data;
       } catch (err) {
         if (DEBUG) console.error("💥 Error fetching ticket stats:", err);
         throw err;
       }
     },
+    staleTime: 30 * 1000, // 30 seconds cache - shorter for admin panel to see updates faster
   });
 
   if (isLoading) {
