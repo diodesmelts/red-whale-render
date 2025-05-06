@@ -241,9 +241,10 @@ export function CompetitionStats({ competition }: CompetitionStatsProps) {
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <div className="grid grid-cols-10 gap-2 md:grid-cols-20">
-              {stats.allNumbers.totalRange.map((number) => {
-                const isPurchased = stats.allNumbers.purchased.includes(number);
-                const isInCart = stats.allNumbers.inCart.includes(number);
+              {enhancedStats.allNumbers.totalRange.map((number) => {
+                const isPurchased = enhancedStats.allNumbers.purchased.includes(number);
+                const isInCart = enhancedStats.allNumbers.inCart.includes(number) || 
+                                clientCartNumbers.includes(number);
                 
                 return (
                   <TooltipProvider key={number}>
