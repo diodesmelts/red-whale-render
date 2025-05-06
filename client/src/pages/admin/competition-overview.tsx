@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { CompetitionStats } from "@/components/admin/competition-stats";
+import { GlobalWinnerLookup } from "@/components/admin/global-winner-lookup";
 import {
   Card,
   CardContent,
@@ -65,6 +66,8 @@ export default function CompetitionOverview() {
             View detailed statistics for all competitions
           </p>
         </div>
+
+        <GlobalWinnerLookup />
 
         <Tabs defaultValue={defaultTab} className="space-y-4">
           <TabsList>
