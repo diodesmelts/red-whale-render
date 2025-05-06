@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState, useCallback } from "react";
 import { Competition } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,6 +11,8 @@ export type CartItem = {
   selectedNumbers: number[];
   maxTicketsPerUser: number;
   totalTickets: number;
+  addedAt: number; // Timestamp when the item was added to cart
+  expiresAt: number; // Timestamp when the reservation expires
 };
 
 type CartContextType = {
@@ -24,6 +26,8 @@ type CartContextType = {
 };
 
 const CART_STORAGE_KEY = "bluewhale-cart";
+// 30 minutes in milliseconds
+const RESERVATION_TIME = 30 * 60 * 1000;
 
 export const CartContext = createContext<CartContextType | null>(null);
 
@@ -31,17 +35,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount and remove expired items
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem(CART_STORAGE_KEY);
       if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+        
+        // Filter out expired items
+        const now = Date.now();
+        const validItems = parsedCart.filter(item => {
+          // Keep items that don't have an expiration yet (for backwards compatibility)
+          // or items that haven't expired yet
+          return !item.expiresAt || item.expiresAt > now;
+        });
+        
+        // If we filtered out items, show a notification
+        if (validItems.length < parsedCart.length) {
+          toast({
+            title: "Some items in your cart have expired",
+            description: "Items are reserved for 30 minutes before they become available to others.",
+            variant: "destructive",
+          });
+        }
+        
+        setCartItems(validItems);
       }
     } catch (error) {
       console.error("Failed to load cart from localStorage:", error);
     }
-  }, []);
+  }, [toast]);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -51,6 +74,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
       console.error("Failed to save cart to localStorage:", error);
     }
   }, [cartItems]);
+  
+  // Periodically check for expired items (every 30 seconds)
+  useEffect(() => {
+    const checkExpiredItems = () => {
+      const now = Date.now();
+      setCartItems(prevItems => {
+        // Check if any items are expired
+        const validItems = prevItems.filter(item => {
+          return !item.expiresAt || item.expiresAt > now;
+        });
+        
+        // If we have removed items, return the new array, otherwise return the same array
+        // to avoid unnecessary re-renders
+        if (validItems.length < prevItems.length) {
+          toast({
+            title: "Some items in your cart have expired",
+            description: "Items are reserved for 30 minutes before they become available to others.",
+            variant: "destructive",
+          });
+          return validItems;
+        }
+        
+        return prevItems;
+      });
+    };
+    
+    // Check every 30 seconds
+    const interval = setInterval(checkExpiredItems, 30 * 1000);
+    
+    // Clean up interval when component unmounts
+    return () => clearInterval(interval);
+  }, [toast]);
 
   // Calculate cart total and count
   const cartCount = cartItems.reduce((total, item) => total + item.ticketCount, 0);
@@ -110,6 +165,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         description: `${quantity} ticket${quantity !== 1 ? 's' : ''} for ${competition.title} added to your cart.`,
       });
 
+      const now = Date.now();
       return [
         ...prevItems,
         {
@@ -121,6 +177,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           selectedNumbers: selectedNumbers.slice(0, quantity),
           maxTicketsPerUser: competition.maxTicketsPerUser,
           totalTickets: competition.totalTickets,
+          addedAt: now,
+          expiresAt: now + RESERVATION_TIME,
         },
       ];
     });
@@ -157,7 +215,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       return prevItems.map((item) =>
         item.competitionId === competitionId
-          ? { ...item, ticketCount: newQuantity, selectedNumbers: updatedNumbers }
+          ? { 
+              ...item, 
+              ticketCount: newQuantity, 
+              selectedNumbers: updatedNumbers,
+              // Keep the original timestamps when updating
+              addedAt: item.addedAt || Date.now(),
+              expiresAt: item.expiresAt || (Date.now() + RESERVATION_TIME)
+            }
           : item
       );
     });
