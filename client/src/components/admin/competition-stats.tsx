@@ -62,17 +62,23 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
       try {
         console.log(`🎟️ Fetching ticket stats for competition ${competition.id}`);
         
-        // Check if we're in production (Render) environment
-        const isProduction = window.location.hostname.includes('render.com') || 
-                           window.location.hostname.includes('onrender.com') ||
-                           window.location.hostname.includes('bluewhalecompetitions.co.uk') ||
-                           window.location.hostname.includes('mobycomps.co.uk');
+        // Check if we're in production (Render) environment - critical for proper API path detection
+        const isRender = window.location.hostname.includes('render.com') || 
+                         window.location.hostname.includes('onrender.com');
+        const isProduction = isRender || 
+                             window.location.hostname.includes('bluewhalecompetitions.co.uk') || 
+                             window.location.hostname.includes('mobycomps.co.uk');
         
         // Add extra debugging for auth issues
         const isAuthenticated = document.cookie.includes('bw.sid');
+        
+        // Add troubleshooting console message specifically for Render
+        if (isRender) {
+          console.log('🔴 Running on Render! This component needs special handling for API paths.');
+        }
                            
-        // Determine the correct API base URL - no need for a different base in production
-        // We just need to use the same paths consistently
+        // On Render, we need to make sure the API paths match exactly what server-docker.cjs expects
+        // The frontend and backend are served from the same domain on Render, so we don't need a base URL
         const apiBase = '';
         
         console.log(`🔑 Auth status: Cookie exists? ${isAuthenticated ? 'Yes' : 'No'}, Is production? ${isProduction ? 'Yes' : 'No'}`);
@@ -108,6 +114,30 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         
         // Then get in-cart numbers
         try {
+          // Before making the cart request, make a quick test to verify auth is working
+          // Especially important on Render to diagnose issues
+          if (isRender) {
+            try {
+              const testAuthUrl = `${apiBase}/api/user`;
+              console.log(`🔑 Testing auth status with: ${testAuthUrl}`);
+              
+              const authResponse = await fetch(testAuthUrl, {
+                credentials: 'include',
+                headers: { 'Cache-Control': 'no-cache' }
+              });
+              
+              if (authResponse.ok) {
+                const authData = await authResponse.json();
+                console.log('🔑 Auth test successful:', authData);
+                // Don't do anything with the data, just checking it works
+              } else {
+                console.error(`🔑 Auth test failed: ${authResponse.status} ${authResponse.statusText}`);
+              }
+            } catch (authError) {
+              console.error("🔑 Auth test error:", authError);
+            }
+          }
+        
           // Use the same environment detection logic for cart items API
           const cartUrl = `${apiBase}/api/admin/competitions/${competition.id}/cart-items`;
           console.log(`Making cart API request to: ${cartUrl}`);
@@ -201,12 +231,13 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
               <li>- Competition ID: {competition?.id || 'Not available'}</li>
               <li>- Host: {window.location.hostname}</li>
               <li>- Path: {window.location.pathname}</li>
+              <li>- Is Render: {window.location.hostname.includes('render.com') || window.location.hostname.includes('onrender.com') ? 'Yes' : 'No'}</li>
               <li>- Auth Cookie Present: {document.cookie.includes('bw.sid') ? 'Yes' : 'No'}</li>
               <li>- Error Status: {hasError ? 'Error fetching data' : 'No data returned'}</li>
             </ul>
             <p className="mt-3 text-xs">
-              If this issue persists, check that the ticket-stats and cart-items API endpoints 
-              are properly implemented in both server.ts and server-docker.cjs files.
+              <strong>Render-specific solution:</strong> Make sure server-docker.cjs has the admin API endpoints 
+              properly registered with the isAdmin middleware. Check lines 1899 and 1973 in that file.
             </p>
           </div>
         </CardContent>
