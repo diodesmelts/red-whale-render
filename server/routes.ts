@@ -261,12 +261,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(entries)
         .where(eq(entries.competitionId, numId));
       
-      // Calculate purchased tickets
+      console.log(`📊 Found ${entryList.length} entries for competition ${numId}`);
+      
+      // Calculate purchased tickets (completed payment status)
       const purchasedNumbers = new Set();
-      for (const entry of entryList) {
+      const purchasedEntries = entryList.filter(entry => entry.paymentStatus === 'completed');
+      console.log(`📊 Found ${purchasedEntries.length} completed entries`);
+      
+      for (const entry of purchasedEntries) {
         if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
           for (const num of entry.selectedNumbers) {
             purchasedNumbers.add(Number(num));
+          }
+        }
+      }
+      
+      // Calculate in-cart tickets (pending payment status)
+      const inCartNumbers = new Set();
+      const pendingEntries = entryList.filter(entry => entry.paymentStatus === 'pending');
+      console.log(`📊 Found ${pendingEntries.length} pending entries`);
+      
+      for (const entry of pendingEntries) {
+        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+          for (const num of entry.selectedNumbers) {
+            inCartNumbers.add(Number(num));
           }
         }
       }
@@ -277,21 +295,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         (_, i) => i + 1
       );
       
-      const purchasedTickets = purchasedNumbers.size;
+      // If tickets_sold is set in the competition but we have no purchased numbers, 
+      // we use the tickets_sold value and generate random numbers to match
+      const purchasedCount = purchasedNumbers.size;
+      const inCartCount = inCartNumbers.size;
+      const ticketsSold = competition[0].ticketsSold || 0;
+      
+      // Use the greater of our calculated purchases or the competition's ticketsSold value
+      const finalPurchasedTickets = Math.max(purchasedCount, ticketsSold);
+      
+      // If we need to generate additional purchased numbers to match ticketsSold
+      if (ticketsSold > purchasedCount) {
+        console.log(`📊 Generating additional ${ticketsSold - purchasedCount} purchased numbers to match ticketsSold`);
+        
+        // Find available numbers that aren't in purchasedNumbers or inCartNumbers
+        const allTakenNumbers = new Set([...purchasedNumbers, ...inCartNumbers]);
+        const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
+        
+        // Add enough random available numbers to match tickets_sold
+        const additionalNeeded = ticketsSold - purchasedCount;
+        const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
+        
+        for (const num of additionalNumbers) {
+          purchasedNumbers.add(num);
+        }
+      }
+      
       const totalTickets = competition[0].totalTickets;
-      const availableTickets = totalTickets - purchasedTickets;
+      const availableTickets = totalTickets - finalPurchasedTickets - inCartCount;
+      
+      console.log(`📊 Stats summary for competition ${numId}:`, {
+        totalTickets,
+        purchasedTickets: finalPurchasedTickets,
+        inCartTickets: inCartCount,
+        availableTickets,
+        purchasedNumbersCount: purchasedNumbers.size,
+        inCartNumbersCount: inCartNumbers.size
+      });
       
       // Return stats
       res.json({
         totalTickets,
-        purchasedTickets,
-        inCartTickets: 0, // We can't calculate this properly without session info
+        purchasedTickets: finalPurchasedTickets,
+        inCartTickets: inCartCount,
         availableTickets,
-        soldTicketsCount: purchasedTickets,
+        soldTicketsCount: finalPurchasedTickets,
         allNumbers: {
           totalRange,
           purchased: Array.from(purchasedNumbers),
-          inCart: [] // Empty cart numbers
+          inCart: Array.from(inCartNumbers)
         }
       });
     } catch (error: any) {
@@ -348,12 +400,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(entries)
         .where(eq(entries.competitionId, numId));
       
-      // Calculate purchased tickets
+      console.log(`📊 [MOBYCOMPS] Found ${entryList.length} entries for competition ${numId}`);
+      
+      // Calculate purchased tickets (completed payment status)
       const purchasedNumbers = new Set();
-      for (const entry of entryList) {
+      const purchasedEntries = entryList.filter(entry => entry.paymentStatus === 'completed');
+      console.log(`📊 [MOBYCOMPS] Found ${purchasedEntries.length} completed entries`);
+      
+      for (const entry of purchasedEntries) {
         if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
           for (const num of entry.selectedNumbers) {
             purchasedNumbers.add(Number(num));
+          }
+        }
+      }
+      
+      // Calculate in-cart tickets (pending payment status)
+      const inCartNumbers = new Set();
+      const pendingEntries = entryList.filter(entry => entry.paymentStatus === 'pending');
+      console.log(`📊 [MOBYCOMPS] Found ${pendingEntries.length} pending entries`);
+      
+      for (const entry of pendingEntries) {
+        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+          for (const num of entry.selectedNumbers) {
+            inCartNumbers.add(Number(num));
           }
         }
       }
@@ -364,21 +434,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         (_, i) => i + 1
       );
       
-      const purchasedTickets = purchasedNumbers.size;
+      // If tickets_sold is set in the competition but we have no purchased numbers, 
+      // we use the tickets_sold value and generate random numbers to match
+      const purchasedCount = purchasedNumbers.size;
+      const inCartCount = inCartNumbers.size;
+      const ticketsSold = competition[0].ticketsSold || 0;
+      
+      // Use the greater of our calculated purchases or the competition's ticketsSold value
+      const finalPurchasedTickets = Math.max(purchasedCount, ticketsSold);
+      
+      // If we need to generate additional purchased numbers to match ticketsSold
+      if (ticketsSold > purchasedCount) {
+        console.log(`📊 [MOBYCOMPS] Generating additional ${ticketsSold - purchasedCount} purchased numbers to match ticketsSold`);
+        
+        // Find available numbers that aren't in purchasedNumbers or inCartNumbers
+        const allTakenNumbers = new Set([...purchasedNumbers, ...inCartNumbers]);
+        const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
+        
+        // Add enough random available numbers to match tickets_sold
+        const additionalNeeded = ticketsSold - purchasedCount;
+        const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
+        
+        for (const num of additionalNumbers) {
+          purchasedNumbers.add(num);
+        }
+      }
+      
       const totalTickets = competition[0].totalTickets;
-      const availableTickets = totalTickets - purchasedTickets;
+      const availableTickets = totalTickets - finalPurchasedTickets - inCartCount;
+      
+      console.log(`📊 [MOBYCOMPS] Stats summary for competition ${numId}:`, {
+        totalTickets,
+        purchasedTickets: finalPurchasedTickets,
+        inCartTickets: inCartCount,
+        availableTickets,
+        purchasedNumbersCount: purchasedNumbers.size,
+        inCartNumbersCount: inCartNumbers.size
+      });
       
       // Return stats
       res.json({
         totalTickets,
-        purchasedTickets,
-        inCartTickets: 0, // We can't accurately calculate this without cart data
+        purchasedTickets: finalPurchasedTickets,
+        inCartTickets: inCartCount,
         availableTickets,
-        soldTicketsCount: purchasedTickets,
+        soldTicketsCount: finalPurchasedTickets,
         allNumbers: {
           totalRange,
           purchased: Array.from(purchasedNumbers),
-          inCart: [] // Empty cart numbers
+          inCart: Array.from(inCartNumbers)
         }
       });
     } catch (error: any) {
