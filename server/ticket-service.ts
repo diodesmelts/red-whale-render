@@ -38,6 +38,15 @@ export class TicketService {
       
       console.log(`🎫 TicketService: Found ${entryList.length} entries for competition ${competitionId}`);
       
+      // SPECIAL: Show entries for debugging
+      console.log(`🔍 All entries for competition ${competitionId}:`, 
+        entryList.map(entry => ({
+          id: entry.id,
+          paymentStatus: entry.paymentStatus,
+          selectedNumbers: entry.selectedNumbers
+        }))
+      );
+      
       // Process purchased tickets (completed payment status)
       const purchasedNumbers = new Set<number>();
       const purchasedEntries = entryList.filter(entry => entry.paymentStatus === 'completed');
@@ -65,7 +74,27 @@ export class TicketService {
       // Get the ticketsSold count from competition
       const ticketsSold = competition[0].ticketsSold || 0;
       
+      // CRITICAL: List locked numbers for debugging - this is what's causing the issue!
+      const purchasedArray = Array.from(purchasedNumbers);
+      const inCartArray = Array.from(inCartNumbers);
+      console.log(`🔍 TICKET CHECK: competition ${competitionId}`, {
+        id: competition[0].id,
+        title: competition[0].title,
+        ticketsSold: competition[0].ticketsSold,
+        purchasedNumbers: purchasedArray,
+        inCartNumbers: inCartArray 
+      });
+      
+      // EXTREMELY IMPORTANT: For numbers 2, 15, and 27 specifically
+      if (purchasedArray.includes(2) || purchasedArray.includes(15) || purchasedArray.includes(27)) {
+        console.log(`⚠️ FOUND PROBLEMATIC NUMBERS in purchased: ${purchasedArray.filter(n => [2, 15, 27].includes(n))}`);
+      }
+      if (inCartArray.includes(2) || inCartArray.includes(15) || inCartArray.includes(27)) {
+        console.log(`⚠️ FOUND PROBLEMATIC NUMBERS in cart: ${inCartArray.filter(n => [2, 15, 27].includes(n))}`);
+      }
+      
       // Only generate additional tickets if ticketsSold is explicitly set to a positive number
+      // AND if we actually need to add more tickets
       if (competition[0].ticketsSold !== null && ticketsSold > purchasedNumbers.size) {
         console.log(`🎫 TicketService: Generating additional ${ticketsSold - purchasedNumbers.size} purchased numbers to match ticketsSold`);
         
@@ -73,19 +102,27 @@ export class TicketService {
         const totalRange = Array.from({ length: competition[0].totalTickets }, (_, i) => i + 1);
         
         // Find available numbers that aren't in purchasedNumbers or inCartNumbers
-        const allTakenNumbers = new Set([...purchasedNumbers, ...inCartNumbers]);
+        // Convert Sets to Arrays before combining to fix TypeScript iteration error
+        const allTakenNumbers = new Set([...Array.from(purchasedNumbers), ...Array.from(inCartNumbers)]);
         const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
         
         // Add enough random available numbers to match tickets_sold
         const additionalNeeded = ticketsSold - purchasedNumbers.size;
         const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
         
+        console.log(`📊 Adding these specific numbers: ${additionalNumbers.join(', ')}`);
+        
         for (const num of additionalNumbers) {
           purchasedNumbers.add(num);
         }
-      } else if (competition[0].ticketsSold === null && ticketsSold > 0) {
-        // Log this case for debugging - shouldn't happen but might help diagnose issues
-        console.log(`⚠️ TicketService: ticketsSold is ${ticketsSold} but competition.ticketsSold is null - not generating additional tickets`);
+      } else {
+        console.log(`🎫 No additional numbers needed for competition ${competitionId} - current purchased: ${purchasedArray.length}, ticketsSold: ${ticketsSold}`);
+        
+        // SPECIAL DEBUG: For competition with the issue, clear any fake tickets that might be stuck
+        if (competition[0].ticketsSold === null || competition[0].ticketsSold === 0) {
+          console.log(`🧹 Competition ${competitionId} has no tickets sold, ensuring clean state`);
+          // Don't do anything to the purchased numbers if we don't have any tickets sold
+        }
       }
       
       // Return all taken numbers 

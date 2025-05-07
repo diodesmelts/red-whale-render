@@ -782,8 +782,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid competition ID" });
       }
 
-      console.log(`⚠️ TAKEN NUMBERS REQUEST: Competition ID ${id} - using TICKET SERVICE for perfect synchronization with admin view`);
+      console.log(`🎯 TAKEN NUMBERS REQUEST: Competition ID ${id} - using TICKET SERVICE for perfect synchronization with admin view`);
 
+      // First, get the competition details to verify ticketsSold status
+      const competition = await db.select()
+        .from(competitions)
+        .where(eq(competitions.id, id))
+        .limit(1);
+        
+      if (!competition.length) {
+        return res.status(404).json({ message: "Competition not found" });
+      }
+      
+      console.log(`🎯 Competition details for debugging - ID ${id}:`, {
+        id: competition[0].id,
+        title: competition[0].title,
+        ticketsSold: competition[0].ticketsSold,
+        ticketsSoldIsNull: competition[0].ticketsSold === null,
+        totalTickets: competition[0].totalTickets
+      });
+      
       // CRITICAL: Use the shared ticket service to ensure perfect consistency
       try {
         // Import the ticket service
@@ -795,8 +813,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Combine purchased and in-cart numbers for the API response
         const allTakenNumbers = [...takenNumbers.purchased, ...takenNumbers.inCart];
         
+        // For debugging, show the exact list for this competition
+        console.log(`🎯 Numbers marked as purchased:`, takenNumbers.purchased);
+        console.log(`🎯 Numbers marked as in cart:`, takenNumbers.inCart);
+        
         console.log(`📊 TAKEN-NUMBERS: Returning ${allTakenNumbers.length} taken numbers via ticket service:`, {
-          purchased: takenNumbers.purchased.length,
+          purchased: takenNumbers.purchased.length, 
           inCart: takenNumbers.inCart.length,
           isFromTicketService: true
         });
