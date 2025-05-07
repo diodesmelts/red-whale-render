@@ -711,10 +711,40 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createCompetition(competitionData: InsertCompetition): Promise<Competition> {
+    // Ensure drawDate is a proper Date object
+    let processedData = { ...competitionData };
+    
+    // Validate and process drawDate
+    if (processedData.drawDate) {
+      try {
+        // If it's a string or timestamp, convert to Date
+        if (typeof processedData.drawDate === 'string' || typeof processedData.drawDate === 'number') {
+          processedData.drawDate = new Date(processedData.drawDate);
+          console.log('📅 Converted drawDate from string/number to Date object');
+        }
+        
+        // Verify the Date is valid
+        if (!(processedData.drawDate instanceof Date) || isNaN(processedData.drawDate.getTime())) {
+          console.warn('⚠️ Invalid drawDate provided, using current date as fallback');
+          processedData.drawDate = new Date(); // Fallback to current date
+        } else {
+          // Valid date, show ISO string format for debugging
+          console.log(`📅 Valid drawDate: ${processedData.drawDate.toISOString()}`);
+        }
+      } catch (error) {
+        console.error('❌ Error processing drawDate:', error);
+        processedData.drawDate = new Date(); // Fallback to current date
+      }
+    } else {
+      // No drawDate provided, use current date
+      console.warn('⚠️ No drawDate provided, using current date');
+      processedData.drawDate = new Date();
+    }
+    
     const [competition] = await db
       .insert(competitions)
       .values({
-        ...competitionData,
+        ...processedData,
         ticketsSold: 0
       })
       .returning();
@@ -733,19 +763,27 @@ export class DatabaseStorage implements IStorage {
         if (typeof drawDateVal === 'string') {
           // If it's a string, convert to Date
           dataToUpdate.drawDate = new Date(drawDateVal);
+          console.log('📅 UPDATE: Converted drawDate from string to Date object');
+        } else if (typeof drawDateVal === 'number') {
+          // If it's a timestamp, convert to Date
+          dataToUpdate.drawDate = new Date(drawDateVal);
+          console.log('📅 UPDATE: Converted drawDate from timestamp to Date object');
         } else if (!(drawDateVal instanceof Date)) {
-          // If it's neither a string nor a Date, use current date as fallback
-          console.warn('Invalid drawDate format, using current date instead');
+          // If it's neither a string, number nor a Date, use current date as fallback
+          console.warn('⚠️ UPDATE: Invalid drawDate format, using current date instead');
           dataToUpdate.drawDate = new Date();
         }
         
         // Validate that we have a proper Date object now
         if (!(dataToUpdate.drawDate instanceof Date) || isNaN(dataToUpdate.drawDate.getTime())) {
-          console.warn('Invalid date after conversion, using current date instead');
+          console.warn('⚠️ UPDATE: Invalid date after conversion, using current date instead');
           dataToUpdate.drawDate = new Date();
+        } else {
+          // Valid date, show ISO string format for debugging
+          console.log(`📅 UPDATE: Valid drawDate: ${dataToUpdate.drawDate.toISOString()}`);
         }
       } catch (error) {
-        console.error('Error processing drawDate:', error);
+        console.error('❌ UPDATE: Error processing drawDate:', error);
         // Remove problematic drawDate from update if it can't be processed
         delete dataToUpdate.drawDate;
       }
