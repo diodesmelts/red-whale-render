@@ -996,8 +996,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Extract all selected numbers - defensive approach
-      const inCartNumbers = [];
+      // Extract client cart numbers directly from the request
+      const clientCartNumbers = [];
       
       // Process the cart data with maximum resilience
       if (Array.isArray(cartData)) {
@@ -1026,16 +1026,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             // Add the numbers to our collection
-            inCartNumbers.push(...numbers);
+            clientCartNumbers.push(...numbers);
           }
         });
       }
       
-      // Return the unique numbers in cart (always return a valid response)
-      console.log(`📊 Returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId}`);
-      res.json({
-        inCartNumbers: Array.from(new Set(inCartNumbers))
-      });
+      // CRITICAL: Use the ticket service to get the definitive in-cart numbers
+      try {
+        // Import and use ticket service
+        const { TicketService } = await import('./ticket-service');
+        const takenNumbers = await TicketService.getTakenNumbers(competitionId);
+        
+        // Combine server in-cart numbers with client cart numbers
+        const allInCartNumbers = [
+          ...takenNumbers.inCart,  // Numbers from the database that are in carts
+          ...clientCartNumbers     // Numbers from the client's cart in this request
+        ];
+        
+        // Remove duplicates using Set
+        const uniqueCartNumbers = Array.from(new Set(allInCartNumbers));
+        console.log(`🛒 Returning ${uniqueCartNumbers.length} unique in-cart numbers via TicketService (${takenNumbers.inCart.length} from DB, ${clientCartNumbers.length} from request)`);
+        
+        return res.json({
+          inCartNumbers: uniqueCartNumbers
+        });
+      } catch (error) {
+        console.error('❌ Error using TicketService:', error);
+        
+        // Fall back to just returning client cart numbers for production resilience
+        console.log('⚠️ Falling back to client-only cart numbers');
+        return res.json({
+          inCartNumbers: Array.from(new Set(clientCartNumbers))
+        });
+      }
     } catch (error) {
       console.error('❌ Error processing cart items:', error);
       // Return an empty array for production resilience rather than an error
@@ -1064,89 +1087,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Competition not found' });
       }
       
-      // Get all entries for this competition
-      const entries = await dataStorage.getEntriesByCompetition(competitionId);
+      // CRITICAL: Use the shared ticket service to ensure perfect consistency
+      const { TicketService } = await import('./ticket-service');
+      const takenNumbers = await TicketService.getTakenNumbers(competitionId);
       
-      // Calculate ticket statistics
+      // Calculate ticket statistics using the service data
       const totalTickets = competition.totalTickets;
-      const soldTicketsCount = competition.ticketsSold || 0;
-      
-      // Extract purchased numbers (confirmed entries)
-      const purchasedNumbers = [];
-      // Extract numbers in cart (pending entries)
-      const inCartNumbers = [];
-      
-      entries.forEach(entry => {
-        if (entry.selectedNumbers) {
-          try {
-            // Handle both array and JSON string formats
-            let numbers;
-            if (typeof entry.selectedNumbers === 'string') {
-              numbers = JSON.parse(entry.selectedNumbers);
-            } else if (Array.isArray(entry.selectedNumbers)) {
-              numbers = entry.selectedNumbers;
-            } else {
-              numbers = [];
-              console.warn('Unexpected selectedNumbers format:', entry.selectedNumbers);
-            }
-            
-            if (entry.paymentStatus === 'completed') {
-              purchasedNumbers.push(...numbers);
-            } else if (entry.paymentStatus === 'pending') {
-              inCartNumbers.push(...numbers);
-            }
-          } catch (e) {
-            console.error('Error parsing selected numbers:', e);
-          }
-        }
-      });
-      
-      // Count unique numbers from entries with selectedNumbers
-      const selectedNumbersPurchasedCount = new Set(purchasedNumbers).size;
-      const inCartCount = new Set(inCartNumbers).size;
-      
-      // Get total purchased count from the competition's ticketsSold field
-      // If ticketsSold is greater than our counted purchased numbers, use that instead
-      const ticketsSoldCount = competition.ticketsSold || 0;
-      const purchasedCount = Math.max(selectedNumbersPurchasedCount, ticketsSoldCount);
-      
-      // Calculate available tickets based on the higher purchased count
+      const purchasedCount = takenNumbers.purchased.length;
+      const inCartCount = takenNumbers.inCart.length;
       const availableCount = totalTickets - purchasedCount - inCartCount;
       
-      // For the ticket grid, we need to ensure we have enough "purchased" numbers
-      // If ticketsSold is greater than our selectedNumbersPurchased, we need to generate more
-      let displayedPurchasedNumbers = [...new Set(purchasedNumbers)];
+      // Create total range for the grid
+      const totalRange = Array.from({ length: totalTickets }, (_, i) => i + 1);
       
-      // If we have fewer purchased numbers than tickets sold, generate some additional ones
-      // (this is just for display purposes since we don't know which specific numbers were selected)
-      if (ticketsSoldCount > selectedNumbersPurchasedCount) {
-        // Generate a sequence of numbers from 1 to totalTickets
-        const allNumbers = Array.from({ length: totalTickets }, (_, i) => i + 1);
-        
-        // Remove numbers that are already marked as purchased or in cart
-        const availableForDisplay = allNumbers.filter(
-          num => !displayedPurchasedNumbers.includes(num) && !inCartNumbers.includes(num)
-        );
-        
-        // Select additional numbers to match the ticketsSold count
-        const additionalNeeded = ticketsSoldCount - selectedNumbersPurchasedCount;
-        const additionalNumbers = availableForDisplay.slice(0, additionalNeeded);
-        
-        // Add these to our displayed purchased numbers
-        displayedPurchasedNumbers = [...displayedPurchasedNumbers, ...additionalNumbers];
-      }
+      // Log detailed stats for monitoring
+      console.log(`📊 Ticket stats (from TicketService) for competition ${competitionId}:`, {
+        totalTickets,
+        purchasedTickets: purchasedCount,
+        inCartTickets: inCartCount,
+        availableTickets: availableCount,
+        source: 'ticket-service'
+      });
       
-      // Return the statistics
+      // Return the statistics using the centralized ticket service data
       res.json({
         totalTickets,
         purchasedTickets: purchasedCount,
         inCartTickets: inCartCount,
         availableTickets: availableCount,
-        soldTicketsCount: ticketsSoldCount, // The official count from the competition record
+        soldTicketsCount: purchasedCount, // Match the purchased count from the service
         allNumbers: {
-          totalRange: Array.from({ length: totalTickets }, (_, i) => i + 1),
-          purchased: displayedPurchasedNumbers,
-          inCart: [...new Set(inCartNumbers)]
+          totalRange,
+          purchased: takenNumbers.purchased,
+          inCart: takenNumbers.inCart
         }
       });
     } catch (error: any) {
