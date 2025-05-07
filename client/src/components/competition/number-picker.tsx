@@ -46,7 +46,49 @@ export function NumberPicker({
   useEffect(() => {
     if (isDialogOpen && competitionId) {
       console.log(`🚀 NumberPicker dialog opened for competition ${competitionId} - fetching taken numbers`);
-      fetchTakenNumbers();
+      
+      // CRITICAL: We now fetch directly from the admin endpoint to ensure 100% consistency
+      // This ensures that we're using the same exact data source as the admin view
+      const fetchAdminStats = async () => {
+        try {
+          console.log(`🚀 Fetching direct from admin-stats endpoint for competition ${competitionId}`);
+          const adminResponse = await fetch(`/api/competitions/${competitionId}/admin-stats`);
+          
+          if (adminResponse.ok) {
+            const adminData = await adminResponse.json();
+            console.log(`✅ Admin data received:`, {
+              purchasedCount: adminData.purchasedTickets,
+              availableCount: adminData.availableTickets,
+              inCartCount: adminData.inCartTickets,
+              purchasedArray: adminData.allNumbers?.purchased?.length
+            });
+            
+            // Use the admin data directly instead of the taken-numbers endpoint
+            if (adminData.allNumbers && Array.isArray(adminData.allNumbers.purchased)) {
+              console.log(`📊 Setting ${adminData.allNumbers.purchased.length} purchased numbers and ${adminData.allNumbers.inCart.length} in-cart numbers as taken`);
+              
+              // Combine all unavailable numbers - both purchased and in cart
+              const allUnavailable = [
+                ...adminData.allNumbers.purchased,
+                ...adminData.allNumbers.inCart
+              ];
+              
+              // Set them as taken numbers
+              setTakenNumbers(allUnavailable);
+              return;
+            }
+          } else {
+            console.warn(`❌ Failed to get admin stats, status: ${adminResponse.status}`);
+          }
+        } catch (error) {
+          console.error(`❌ Error fetching admin stats: ${error}`);
+        }
+        
+        // Fallback to the usual fetchTakenNumbers if admin endpoint failed
+        fetchTakenNumbers();
+      };
+      
+      fetchAdminStats();
     }
   }, [isDialogOpen, competitionId]);
 
