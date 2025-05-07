@@ -5,11 +5,12 @@ import { storage as dataStorage } from "./storage";
 import { setupAuth } from "./auth";
 import Stripe from "stripe";
 import { z } from "zod";
-import { insertEntrySchema } from "@shared/schema";
+import { insertEntrySchema, competitions, entries } from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { pool } from "./db"; // Import the pool for direct SQL queries
+import { pool, db } from "./db"; // Import both pool and db for SQL and ORM queries
+import { eq } from "drizzle-orm";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Missing Stripe secret key. Payment functionality will not work.');
@@ -145,6 +146,268 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await (dataStorage as any).seedAdminUser();
     console.log("👤 Admin user seeding completed");
   }
+  
+  // Special non-authenticated ticket stats endpoint for public access
+  app.get('/api/competitions/:id/public-stats', async (req, res) => {
+    try {
+      console.log('📊 PUBLIC STATS ENDPOINT: Processing request for competition', req.params.id);
+      const { id } = req.params;
+      const numId = parseInt(id);
+      
+      if (isNaN(numId)) {
+        return res.status(400).json({ message: 'Invalid competition ID format' });
+      }
+      
+      // First verify the competition exists
+      const competition = await db.select()
+        .from(competitions)
+        .where(eq(competitions.id, numId))
+        .limit(1);
+        
+      if (!competition.length) {
+        return res.status(404).json({ message: 'Competition not found' });
+      }
+      
+      // Get all entries for this competition to calculate stats
+      const entryList = await db.select()
+        .from(entries)
+        .where(eq(entries.competitionId, numId));
+      
+      // Calculate purchased tickets
+      const purchasedNumbers = new Set();
+      for (const entry of entryList) {
+        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+          for (const num of entry.selectedNumbers) {
+            purchasedNumbers.add(Number(num));
+          }
+        }
+      }
+      
+      // Calculate total range of numbers
+      const totalRange = Array.from(
+        { length: competition[0].totalTickets }, 
+        (_, i) => i + 1
+      );
+      
+      const purchasedTickets = purchasedNumbers.size;
+      const totalTickets = competition[0].totalTickets;
+      const availableTickets = totalTickets - purchasedTickets;
+      
+      // Return stats
+      res.json({
+        totalTickets,
+        purchasedTickets,
+        inCartTickets: 0, // We can't accurately calculate this without cart data
+        availableTickets,
+        soldTicketsCount: purchasedTickets,
+        allNumbers: {
+          totalRange,
+          purchased: Array.from(purchasedNumbers),
+          inCart: [] // Empty cart numbers
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching public ticket stats:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Special non-authenticated cart items endpoint for public access
+  app.post('/api/competitions/:id/public-cart', async (req, res) => {
+    try {
+      console.log('🛒 PUBLIC CART ENDPOINT: Processing request for competition', req.params.id);
+      const { id } = req.params;
+      const numId = parseInt(id);
+      
+      if (isNaN(numId)) {
+        return res.status(400).json({ message: 'Invalid competition ID format' });
+      }
+      
+      // Return empty cart - since this is a non-authenticated endpoint
+      // For now, we just return an empty cart to give the client the right data structure
+      res.json({
+        competitionId: numId,
+        inCartNumbers: []
+      });
+    } catch (error: any) {
+      console.error('Error processing public cart request:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Special non-authenticated admin stats endpoint for API compatibility
+  app.get('/api/competitions/:id/admin-stats', async (req, res) => {
+    try {
+      console.log('📊 ADMIN STATS ENDPOINT: Processing request for competition', req.params.id);
+      const { id } = req.params;
+      const numId = parseInt(id);
+      
+      if (isNaN(numId)) {
+        return res.status(400).json({ message: 'Invalid competition ID format' });
+      }
+      
+      // First verify the competition exists
+      const competition = await db.select()
+        .from(competitions)
+        .where(eq(competitions.id, numId))
+        .limit(1);
+        
+      if (!competition.length) {
+        return res.status(404).json({ message: 'Competition not found' });
+      }
+      
+      // Get all entries for this competition to calculate stats
+      const entryList = await db.select()
+        .from(entries)
+        .where(eq(entries.competitionId, numId));
+      
+      // Calculate purchased tickets
+      const purchasedNumbers = new Set();
+      for (const entry of entryList) {
+        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+          for (const num of entry.selectedNumbers) {
+            purchasedNumbers.add(Number(num));
+          }
+        }
+      }
+      
+      // Calculate total range of numbers
+      const totalRange = Array.from(
+        { length: competition[0].totalTickets }, 
+        (_, i) => i + 1
+      );
+      
+      const purchasedTickets = purchasedNumbers.size;
+      const totalTickets = competition[0].totalTickets;
+      const availableTickets = totalTickets - purchasedTickets;
+      
+      // Return stats
+      res.json({
+        totalTickets,
+        purchasedTickets,
+        inCartTickets: 0, // We can't calculate this properly without session info
+        availableTickets,
+        soldTicketsCount: purchasedTickets,
+        allNumbers: {
+          totalRange,
+          purchased: Array.from(purchasedNumbers),
+          inCart: [] // Empty cart numbers
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching admin ticket stats:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Special non-authenticated admin cart endpoint for API compatibility
+  app.post('/api/competitions/:id/admin-cart', async (req, res) => {
+    try {
+      console.log('🛒 ADMIN CART ENDPOINT: Processing request for competition', req.params.id);
+      const { id } = req.params;
+      const numId = parseInt(id);
+      
+      if (isNaN(numId)) {
+        return res.status(400).json({ message: 'Invalid competition ID format' });
+      }
+      
+      // Return empty cart - since this is a non-authenticated endpoint
+      res.json({
+        competitionId: numId,
+        inCartNumbers: []
+      });
+    } catch (error: any) {
+      console.error('Error processing admin cart request:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Special mobycomps.co.uk specific endpoints
+  app.get('/mobycomps-api/stats/:id', async (req, res) => {
+    try {
+      console.log('📊 MOBYCOMPS SPECIFIC STATS ENDPOINT: Processing request for competition', req.params.id);
+      const { id } = req.params;
+      const numId = parseInt(id);
+      
+      if (isNaN(numId)) {
+        return res.status(400).json({ message: 'Invalid competition ID format' });
+      }
+      
+      // First verify the competition exists
+      const competition = await db.select()
+        .from(competitions)
+        .where(eq(competitions.id, numId))
+        .limit(1);
+        
+      if (!competition.length) {
+        return res.status(404).json({ message: 'Competition not found' });
+      }
+      
+      // Get all entries for this competition to calculate stats
+      const entryList = await db.select()
+        .from(entries)
+        .where(eq(entries.competitionId, numId));
+      
+      // Calculate purchased tickets
+      const purchasedNumbers = new Set();
+      for (const entry of entryList) {
+        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+          for (const num of entry.selectedNumbers) {
+            purchasedNumbers.add(Number(num));
+          }
+        }
+      }
+      
+      // Calculate total range of numbers
+      const totalRange = Array.from(
+        { length: competition[0].totalTickets }, 
+        (_, i) => i + 1
+      );
+      
+      const purchasedTickets = purchasedNumbers.size;
+      const totalTickets = competition[0].totalTickets;
+      const availableTickets = totalTickets - purchasedTickets;
+      
+      // Return stats
+      res.json({
+        totalTickets,
+        purchasedTickets,
+        inCartTickets: 0, // We can't accurately calculate this without cart data
+        availableTickets,
+        soldTicketsCount: purchasedTickets,
+        allNumbers: {
+          totalRange,
+          purchased: Array.from(purchasedNumbers),
+          inCart: [] // Empty cart numbers
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching mobycomps ticket stats:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Special mobycomps.co.uk specific cart endpoint
+  app.post('/mobycomps-api/cart/:id', async (req, res) => {
+    try {
+      console.log('🛒 MOBYCOMPS SPECIFIC CART ENDPOINT: Processing request for competition', req.params.id);
+      const { id } = req.params;
+      const numId = parseInt(id);
+      
+      if (isNaN(numId)) {
+        return res.status(400).json({ message: 'Invalid competition ID format' });
+      }
+      
+      // Return empty cart - since this is a non-authenticated endpoint
+      res.json({
+        competitionId: numId,
+        inCartNumbers: []
+      });
+    } catch (error: any) {
+      console.error('Error processing mobycomps cart request:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
   
   // Enhanced health check with diagnostics - safe implementation
   app.get('/api/health', (req, res) => {
