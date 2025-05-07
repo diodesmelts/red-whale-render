@@ -2195,15 +2195,19 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
     
     console.log(`🎟️ Fetching ticket stats for competition ${numId}`);
     
-    // Verify competition exists
+    // Verify competition exists and get ticket information
     const competition = await pool.query(
-      'SELECT id, total_tickets FROM competitions WHERE id = $1 LIMIT 1',
+      'SELECT id, total_tickets, tickets_sold FROM competitions WHERE id = $1 LIMIT 1',
       [numId]
     );
     
     if (competition.rows.length === 0) {
       return res.status(404).json({ message: 'Competition not found' });
     }
+    
+    const compData = competition.rows[0];
+    const totalTickets = compData.total_tickets;
+    const ticketsSold = compData.tickets_sold || 0; // Use actual tickets_sold from database
     
     // Get all entries for this competition
     const entryList = await pool.query(
@@ -2214,6 +2218,9 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
     // Get purchased numbers - tickets that have been successfully purchased
     const purchasedNumbers = new Set();
     const purchasedEntries = entryList.rows.filter(entry => entry.payment_status === 'completed');
+    
+    // Count completed entries even if they don't have selected numbers
+    let completedEntriesCount = purchasedEntries.length;
     
     for (const entry of purchasedEntries) {
       if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
@@ -2227,6 +2234,9 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
     const inCartNumbers = new Set();
     const pendingEntries = entryList.rows.filter(entry => entry.payment_status === 'pending');
     
+    // Count pending entries even if they don't have selected numbers
+    let pendingEntriesCount = pendingEntries.length;
+    
     for (const entry of pendingEntries) {
       if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
         for (const num of entry.selected_numbers) {
@@ -2236,15 +2246,29 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
     }
     
     // Create a range of all possible ticket numbers
-    const totalRange = Array.from({ length: competition.rows[0].total_tickets }, (_, i) => i + 1);
+    const totalRange = Array.from({ length: totalTickets }, (_, i) => i + 1);
+    
+    // Choose the more accurate value for purchased tickets:
+    // If we have specific numbers, use that count, otherwise fall back to tickets_sold from competition
+    const purchasedTicketsCount = purchasedNumbers.size > 0 ? 
+                                purchasedNumbers.size : 
+                                ticketsSold;
+    
+    console.log(`Competition ${numId} stats:`, {
+      ticketsFromDB: ticketsSold,
+      purchasedNumbersCount: purchasedNumbers.size,
+      purchasedEntriesCount: completedEntriesCount,
+      inCartNumbersCount: inCartNumbers.size,
+      inCartEntriesCount: pendingEntriesCount
+    });
     
     // Return comprehensive stats
     res.json({
-      totalTickets: competition.rows[0].total_tickets,
-      purchasedTickets: purchasedNumbers.size,
+      totalTickets: totalTickets,
+      purchasedTickets: purchasedTicketsCount,
       inCartTickets: inCartNumbers.size,
-      availableTickets: competition.rows[0].total_tickets - purchasedNumbers.size - inCartNumbers.size,
-      soldTicketsCount: purchasedNumbers.size,
+      availableTickets: totalTickets - purchasedTicketsCount - inCartNumbers.size,
+      soldTicketsCount: purchasedTicketsCount,
       allNumbers: {
         totalRange: totalRange,
         purchased: Array.from(purchasedNumbers),
