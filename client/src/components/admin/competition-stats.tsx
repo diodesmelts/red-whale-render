@@ -62,8 +62,32 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
       try {
         console.log(`🎟️ Fetching ticket stats for competition ${competition.id}`);
         
-        // First get the ticket stats
-        const statsResponse = await fetch(`/api/admin/competitions/${competition.id}/ticket-stats`, {
+        // Check if we're in production (Render) environment
+        const isProduction = window.location.hostname.includes('render.com') || 
+                           window.location.hostname.includes('onrender.com') ||
+                           window.location.hostname.includes('bluewhalecompetitions.co.uk') ||
+                           window.location.hostname.includes('mobycomps.co.uk');
+        
+        // Add extra debugging for auth issues
+        const isAuthenticated = document.cookie.includes('bw.sid');
+                           
+        // Determine the correct API base URL - no need for a different base in production
+        // We just need to use the same paths consistently
+        const apiBase = '';
+        
+        console.log(`🔑 Auth status: Cookie exists? ${isAuthenticated ? 'Yes' : 'No'}, Is production? ${isProduction ? 'Yes' : 'No'}`);
+        console.log(`🔍 Debug cookies: ${document.cookie.split(';').map(c => c.trim()).join(' | ')}`);
+        console.log(`🌐 Current location: ${window.location.href}`);
+        
+        // Add debug logging
+        console.log(`Environment: ${isProduction ? 'Production' : 'Development'}`);
+        console.log(`Hostname: ${window.location.hostname}`);
+        
+        // First get the ticket stats with production-aware path
+        const statsUrl = `${apiBase}/api/admin/competitions/${competition.id}/ticket-stats`;
+        console.log(`Making stats API request to: ${statsUrl}`);
+        
+        const statsResponse = await fetch(statsUrl, {
           credentials: 'include',
           headers: { 'Cache-Control': 'no-cache' }
         });
@@ -84,7 +108,11 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         
         // Then get in-cart numbers
         try {
-          const cartResponse = await fetch(`/api/admin/competitions/${competition.id}/cart-items`, {
+          // Use the same environment detection logic for cart items API
+          const cartUrl = `${apiBase}/api/admin/competitions/${competition.id}/cart-items`;
+          console.log(`Making cart API request to: ${cartUrl}`);
+          
+          const cartResponse = await fetch(cartUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -161,7 +189,24 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
               Stats data unavailable
             </p>
             <p className="text-xs text-muted-foreground mt-2 text-center max-w-sm">
-              The competition statistics cannot be displayed at this time.
+              This could be due to authentication issues or missing API endpoints in the deployment. 
+              See browser console for details.
+            </p>
+          </div>
+          
+          {/* Show debug info for admins to help troubleshoot */}
+          <div className="mt-6 p-4 border border-amber-200 rounded-md bg-amber-50 text-amber-800 text-xs">
+            <p className="font-medium mb-2">Debug Information:</p>
+            <ul className="space-y-1">
+              <li>- Competition ID: {competition?.id || 'Not available'}</li>
+              <li>- Host: {window.location.hostname}</li>
+              <li>- Path: {window.location.pathname}</li>
+              <li>- Auth Cookie Present: {document.cookie.includes('bw.sid') ? 'Yes' : 'No'}</li>
+              <li>- Error Status: {hasError ? 'Error fetching data' : 'No data returned'}</li>
+            </ul>
+            <p className="mt-3 text-xs">
+              If this issue persists, check that the ticket-stats and cart-items API endpoints 
+              are properly implemented in both server.ts and server-docker.cjs files.
             </p>
           </div>
         </CardContent>
