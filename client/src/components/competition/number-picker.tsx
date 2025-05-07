@@ -42,70 +42,49 @@ export function NumberPicker({
     setSelectedNumbers(initialSelectedNumbers);
   }, [initialSelectedNumbers]);
 
-  // Fetch taken numbers when the dialog opens
+  // Fetch ticket statuses when the dialog opens
   useEffect(() => {
     if (isDialogOpen && competitionId) {
-      // EMERGENCY: Directly console log all numbers directly from the admin view for comparison
-      const emergencyDiagnostic = async () => {
+      console.log(`🎟️ Fetching ticket statuses for competition ${competitionId}`);
+      
+      // New unified ticket status approach
+      const fetchTicketStatuses = async () => {
         try {
-          console.log(`🆘 EMERGENCY DIAGNOSTIC - Competition ${competitionId}`);
+          // Use the new unified ticket status endpoint
+          const response = await fetch(`/api/competitions/${competitionId}/ticket-status`);
           
-          // First get admin stats for complete detail
-          const adminStatsUrl = `/api/competitions/${competitionId}/admin-stats`;
-          console.log(`🔍 Fetching from ${adminStatsUrl}`);
-          const adminResponse = await fetch(adminStatsUrl);
-          
-          if (adminResponse.ok) {
-            const adminData = await adminResponse.json();
-            console.log(`🔍 ADMIN VIEW DATA: ${JSON.stringify(adminData)}`);
-            console.log(`🔍 ADMIN VIEW shows ${adminData.purchasedTickets} purchased tickets`);
+          if (response.ok) {
+            const ticketStatus = await response.json();
             
-            if (adminData.allNumbers?.purchased) {
-              console.log(`🔍 PURCHASED NUMBERS according to ADMIN: ${JSON.stringify(adminData.allNumbers.purchased)}`);
-            }
+            console.log(`🎟️ Received ticket statuses for competition ${competitionId}:`, {
+              purchased: ticketStatus.ticketStatuses.purchased.length,
+              reserved: ticketStatus.ticketStatuses.reserved.length,
+              available: ticketStatus.ticketStatuses.available.length
+            });
             
-            // Now get the taken-numbers data to compare
-            const takenNumbersUrl = `/api/competitions/${competitionId}/taken-numbers`;
-            console.log(`🔍 Fetching from ${takenNumbersUrl}`);
-            const takenResponse = await fetch(takenNumbersUrl);
+            // Combine purchased and reserved tickets as taken
+            const takenTickets = [
+              ...ticketStatus.ticketStatuses.purchased,
+              ...ticketStatus.ticketStatuses.reserved
+            ];
             
-            if (takenResponse.ok) {
-              const takenData = await takenResponse.json();
-              console.log(`🔍 TAKEN NUMBERS DATA: ${JSON.stringify(takenData)}`);
-              
-              // Log differences between the two datasets
-              const adminPurchased = new Set(adminData.allNumbers.purchased);
-              const takenNumbers = new Set(takenData.takenNumbers);
-              
-              console.log(`🔍 ADMIN shows ${adminPurchased.size} purchased numbers`);
-              console.log(`🔍 TAKEN NUMBERS shows ${takenNumbers.size} taken numbers`);
-              
-              // Find numbers in taken that aren't in admin purchased
-              const onlyInTaken = [...takenNumbers].filter(num => !adminPurchased.has(num));
-              console.log(`🔍 Numbers only in TAKEN: ${JSON.stringify(onlyInTaken)}`);
-              
-              // Find numbers in admin purchased that aren't in taken
-              const onlyInAdmin = [...adminPurchased].filter(num => !takenNumbers.has(num));
-              console.log(`🔍 Numbers only in ADMIN: ${JSON.stringify(onlyInAdmin)}`);
-              
-              // Use admin data directly for maximum synchronization
-              const allUnavailable = [...adminData.allNumbers.purchased, ...adminData.allNumbers.inCart];
-              console.log(`🔍 Setting ${allUnavailable.length} numbers as taken`);
-              
-              // DIRECTLY use exactly what admin sees for perfect sync
-              setTakenNumbers(allUnavailable);
-              return;
-            }
+            console.log(`🎟️ Setting ${takenTickets.length} numbers as taken`);
+            setTakenNumbers(takenTickets);
+          } else {
+            console.error('Failed to fetch ticket statuses:', await response.text());
+            
+            // Fallback to legacy endpoint if new endpoint fails
+            console.log(`🔄 Falling back to legacy endpoint for competition ${competitionId}`);
+            fetchTakenNumbers();
           }
         } catch (error) {
-          console.error(`❌ Error in emergency diagnostic: ${error}`);
+          console.error('Error fetching ticket statuses:', error);
+          // Fall back to legacy implementation
+          fetchTakenNumbers();
         }
-        
-        // If all else fails, fallback to original implementation
-        fetchTakenNumbers();
       };
-      
-      emergencyDiagnostic();
+
+      fetchTicketStatuses();
     }
   }, [isDialogOpen, competitionId]);
 
