@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { CompetitionStats } from "@/components/admin/competition-stats";
 import { GlobalWinnerLookup } from "@/components/admin/global-winner-lookup";
 import {
   Card,
@@ -16,8 +15,28 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import { Competition } from "@shared/schema";
+
+// Simple card to replace the Competition Stats component
+const SimpleCompetitionCard = ({ competition }: { competition: Competition }) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">{competition.title}</CardTitle>
+        <CardDescription>ID: {competition.id}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <p><strong>Status:</strong> {competition.isLive ? 'Live' : 'Draft'}</p>
+          <p><strong>Price:</strong> £{competition.ticketPrice.toFixed(2)}</p>
+          <p><strong>Tickets:</strong> {competition.totalTickets}</p>
+          <p><strong>Draw Date:</strong> {new Date(competition.drawDate).toLocaleDateString()}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function CompetitionOverview() {
   // Fetch all competitions with admin endpoint and proper authentication
@@ -129,7 +148,7 @@ export default function CompetitionOverview() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {activeCompetitions.map((competition) => (
-                  <CompetitionStats key={competition.id} competition={competition} />
+                  <SimpleCompetitionCard key={competition.id} competition={competition} />
                 ))}
               </div>
             )}
@@ -148,7 +167,7 @@ export default function CompetitionOverview() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {pastCompetitions.map((competition) => (
-                  <CompetitionStats key={competition.id} competition={competition} />
+                  <SimpleCompetitionCard key={competition.id} competition={competition} />
                 ))}
               </div>
             )}
