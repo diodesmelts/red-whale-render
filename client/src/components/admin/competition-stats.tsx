@@ -64,10 +64,22 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         
         // Check if we're in production (Render) environment - critical for proper API path detection
         // Adding specific domain checks because some production sites are running on Render
+        const isMobyComps = window.location.hostname.includes('mobycomps.co.uk');
+        
+        // If we're on mobycomps.co.uk, this needs special handling
+        // Add extensive debug info for mobycomps since it's problematic
+        if (isMobyComps) {
+          console.log('🌊 MOBYCOMPS.CO.UK DETECTED! Using special handling for this domain.');
+          console.log('Current hostname:', window.location.hostname);
+          console.log('Current path:', window.location.pathname);
+          console.log('Current URL:', window.location.href);
+          console.log('Auth cookie present:', document.cookie.includes('bw.sid'));
+        }
+        
         const isRender = window.location.hostname.includes('render.com') || 
                          window.location.hostname.includes('onrender.com') ||
                          window.location.hostname.includes('bluewhalecompetitions.co.uk') ||
-                         window.location.hostname.includes('mobycomps.co.uk');
+                         isMobyComps; // Use the flag for consistent detection
         
         // All production environments need special handling
         const isProduction = isRender;
@@ -388,6 +400,32 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
 
   // Error handling - competition missing or data fetch error
   if (hasError || !stats) {
+    // Check if we're on mobycomps.co.uk - we need to know this for the debug display
+    const isMobyComps = window.location.hostname.includes('mobycomps.co.uk');
+    
+    // For mobycomps - try one final desperate fix
+    if (isMobyComps && competition?.id) {
+      // Redirect to the same page to trigger a fresh try
+      console.log("🚨 MOBYCOMPS EMERGENCY: Attempting to access special direct endpoint");
+      // Try to call the special endpoint directly
+      fetch(`/mobycomps-api/stats/${competition.id}`)
+        .then(response => {
+          console.log("Mobycomps direct endpoint response:", response.status);
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error(`Failed with ${response.status}`);
+        })
+        .then(data => {
+          console.log("Mobycomps direct endpoint data:", data);
+          // If we got data, reload the page to try one more time
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error("Mobycomps endpoint error:", error);
+        });
+    }
+    
     return (
       <Card>
         <CardHeader>
@@ -422,7 +460,10 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
               <li>- Competition ID: {competition?.id || 'Not available'}</li>
               <li>- Host: {window.location.hostname}</li>
               <li>- Path: {window.location.pathname}</li>
-              <li>- Is Render: {window.location.hostname.includes('render.com') || window.location.hostname.includes('onrender.com') ? 'Yes' : 'No'}</li>
+              <li>- Is Render: {window.location.hostname.includes('render.com') || 
+                     window.location.hostname.includes('onrender.com') || 
+                     window.location.hostname.includes('mobycomps.co.uk') ? 'Yes' : 'No'}</li>
+              <li>- Is MobyComps: {isMobyComps ? 'Yes' : 'No'}</li>
               <li>- Auth Cookie Present: {document.cookie.includes('bw.sid') ? 'Yes' : 'No'}</li>
               <li>- Error Status: {hasError ? 'Error fetching data' : 'No data returned'}</li>
             </ul>
@@ -430,6 +471,13 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
               <strong>Render-specific solution:</strong> Make sure server-docker.cjs has the admin API endpoints 
               properly registered with the isAdmin middleware. Check lines 1899 and 1973 in that file.
             </p>
+            {isMobyComps && (
+              <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-md text-blue-800">
+                <p><strong>MobyComps Direct Endpoint:</strong> Attempting to access special direct endpoint at:<br/>
+                <code>/mobycomps-api/stats/{competition?.id}</code><br/>
+                If this works, the page will reload automatically.</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

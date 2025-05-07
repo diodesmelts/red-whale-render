@@ -67,6 +67,12 @@ app.use(cors({
       return callback(null, true);
     }
     
+    // Special check for mobycomps.co.uk - this site has been problematic
+    if (origin.includes('mobycomps.co.uk')) {
+      console.log(`🌊 MOBYCOMPS DOMAIN DETECTED in CORS: ${origin}`);
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.replit.dev') || origin.endsWith('.onrender.com')) {
       console.log(`Origin ${origin} is allowed by CORS`);
       return callback(null, true);
@@ -1981,11 +1987,46 @@ function renderCompatibleAdminAuth(req, res, next) {
   });
 }
 
+// Special environment detection endpoint for mobycomps.co.uk
+app.get('/mobycomps-api/environment', async (req, res) => {
+  // Set CORS headers specifically for mobycomps.co.uk
+  const origin = req.headers.origin;
+  if (origin && (origin.includes('mobycomps.co.uk'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    console.log(`🌊 ENV: Setting CORS origin to: ${origin}`);
+  } else {
+    res.header('Access-Control-Allow-Origin', '*');
+    console.log('🌊 ENV: Using wildcard CORS origin');
+  }
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Return environment information to help debug
+  res.json({
+    isRender: true,
+    mobycompsSpecialEndpointsEnabled: true,
+    environment: process.env.NODE_ENV || 'unknown',
+    timestamp: new Date().toISOString(),
+    origin: req.headers.origin,
+    cookie: req.headers.cookie ? 'PRESENT' : 'MISSING',
+    host: req.headers.host,
+    referer: req.headers.referer
+  });
+});
+
 // Special direct endpoints specifically for mobycomps.co.uk domain without auth
 // Stats endpoint - GET request with CORS headers
 app.get('/mobycomps-api/stats/:id', async (req, res) => {
   // Set CORS headers specifically for mobycomps.co.uk and www.mobycomps.co.uk
-  res.header('Access-Control-Allow-Origin', 'https://www.mobycomps.co.uk');
+  // Determine which domain to use for CORS based on the Origin header
+  const origin = req.headers.origin;
+  if (origin && (origin.includes('mobycomps.co.uk'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    console.log(`🌊 STATS: Setting CORS origin to: ${origin}`);
+  } else {
+    // Default to www version if we can't determine origin
+    res.header('Access-Control-Allow-Origin', '*');
+    console.log('🌊 STATS: Using wildcard CORS origin');
+  }
   res.header('Access-Control-Allow-Credentials', 'true');
   
   // Handle preflight OPTIONS request
@@ -2219,7 +2260,16 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
 // Cart endpoint for mobycomps.co.uk - POST request with CORS headers
 app.post('/mobycomps-api/cart/:id', async (req, res) => {
   // Set CORS headers specifically for mobycomps.co.uk and www.mobycomps.co.uk
-  res.header('Access-Control-Allow-Origin', 'https://www.mobycomps.co.uk');
+  // Determine which domain to use for CORS based on the Origin header
+  const origin = req.headers.origin;
+  if (origin && (origin.includes('mobycomps.co.uk'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    console.log(`🌊 CART: Setting CORS origin to: ${origin}`);
+  } else {
+    // Default to wildcard if we can't determine origin
+    res.header('Access-Control-Allow-Origin', '*');
+    console.log('🌊 CART: Using wildcard CORS origin');
+  }
   res.header('Access-Control-Allow-Credentials', 'true');
   
   // Handle preflight OPTIONS request
