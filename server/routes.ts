@@ -223,12 +223,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid competition ID format' });
       }
       
-      // Return empty cart - since this is a non-authenticated endpoint
-      // For now, we just return an empty cart to give the client the right data structure
-      res.json({
-        competitionId: numId,
-        inCartNumbers: []
-      });
+      // Use the ticket service to get in-cart numbers for consistency
+      try {
+        const { TicketService } = await import('./ticket-service');
+        const takenNumbers = await TicketService.getTakenNumbers(numId);
+        
+        console.log(`🛒 PUBLIC CART returning ${takenNumbers.inCart.length} in-cart numbers via TicketService`);
+        
+        // Return the in-cart numbers from the ticket service
+        return res.json({
+          competitionId: numId,
+          inCartNumbers: takenNumbers.inCart
+        });
+      } catch (serviceError) {
+        console.error('Error using TicketService for public cart:', serviceError);
+        
+        // Fallback to empty cart for resilience
+        return res.json({
+          competitionId: numId,
+          inCartNumbers: []
+        });
+      }
     } catch (error: any) {
       console.error('Error processing public cart request:', error);
       res.status(500).json({ message: error.message });
@@ -309,11 +324,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid competition ID format' });
       }
       
-      // Return empty cart - since this is a non-authenticated endpoint
-      res.json({
-        competitionId: numId,
-        inCartNumbers: []
-      });
+      // Use the ticket service to get in-cart numbers for consistency
+      try {
+        const { TicketService } = await import('./ticket-service');
+        const takenNumbers = await TicketService.getTakenNumbers(numId);
+        
+        console.log(`🛒 ADMIN CART returning ${takenNumbers.inCart.length} in-cart numbers via TicketService`);
+        
+        // Return the in-cart numbers from the ticket service
+        return res.json({
+          competitionId: numId,
+          inCartNumbers: takenNumbers.inCart
+        });
+      } catch (serviceError) {
+        console.error('Error using TicketService for admin cart:', serviceError);
+        
+        // Fallback to empty cart for resilience
+        return res.json({
+          competitionId: numId,
+          inCartNumbers: []
+        });
+      }
     } catch (error: any) {
       console.error('Error processing admin cart request:', error);
       res.status(500).json({ message: error.message });
@@ -394,11 +425,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid competition ID format' });
       }
       
-      // Return empty cart - since this is a non-authenticated endpoint
-      res.json({
-        competitionId: numId,
-        inCartNumbers: []
-      });
+      // Use the ticket service to get in-cart numbers for consistency
+      try {
+        const { TicketService } = await import('./ticket-service');
+        const takenNumbers = await TicketService.getTakenNumbers(numId);
+        
+        console.log(`🛒 MOBYCOMPS API returning ${takenNumbers.inCart.length} in-cart numbers via TicketService`);
+        
+        // Return the in-cart numbers from the ticket service
+        return res.json({
+          competitionId: numId,
+          inCartNumbers: takenNumbers.inCart
+        });
+      } catch (serviceError) {
+        console.error('Error using TicketService for mobycomps cart:', serviceError);
+        
+        // Fallback to empty cart for resilience
+        return res.json({
+          competitionId: numId,
+          inCartNumbers: []
+        });
+      }
     } catch (error: any) {
       console.error('Error processing mobycomps cart request:', error);
       res.status(500).json({ message: error.message });
