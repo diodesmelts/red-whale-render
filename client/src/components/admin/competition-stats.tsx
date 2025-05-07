@@ -785,7 +785,7 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         </CardHeader>
         <CardContent className="space-y-6 pt-4">
           {/* Stats Cards Grid */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
               <div className="flex items-center gap-2 mb-1">
                 <TicketIcon className="h-4 w-4 text-muted-foreground" />
@@ -800,14 +800,6 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
                 <span className="text-xs font-medium text-muted-foreground">Purchased</span>
               </div>
               <span className="text-xl font-bold text-green-600">{purchasedTickets}</span>
-            </div>
-            
-            <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
-              <div className="flex items-center gap-2 mb-1">
-                <ShoppingCart className="h-4 w-4 text-blue-600" />
-                <span className="text-xs font-medium text-muted-foreground">In Cart</span>
-              </div>
-              <span className="text-xl font-bold text-blue-600">{inCartTicketsCount}</span>
             </div>
             
             <div className="bg-card border rounded-lg p-3 flex flex-col items-center justify-center">
@@ -839,21 +831,7 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
               </div>
             </div>
             
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs">
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
-                  <span>In Cart</span>
-                </span>
-                <span className="font-medium">{inCartPercentage.toFixed(1)}%</span>
-              </div>
-              <div className="h-1.5 bg-muted w-full rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-blue-500 transition-all" 
-                  style={{ width: `${inCartPercentage}%` }}
-                />
-              </div>
-            </div>
+
             
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
