@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Competition } from "@shared/schema";
 import { Loader2, Lock, AlertCircle, TicketIcon, ShoppingCart, CheckCircle2 } from "lucide-react";
 import {
@@ -17,36 +17,70 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+// Interface for stats data structure
+interface TicketStats {
+  totalTickets: number;
+  purchasedTickets: number;
+  inCartTickets: number;
+  availableTickets: number;
+  soldTicketsCount: number;
+  allNumbers: {
+    totalRange: number[];
+    purchased: number[];
+    inCart: number[];
+  };
+}
+
+// Interface for cart items response
+interface CartItemsResponse {
+  competitionId: number;
+  inCartNumbers: number[];
+}
+
 // Minimal standalone component that doesn't rely on React Query or other dependencies
 export function CompetitionStats({ competition }: { competition: Competition }) {
   const [showNumberGrid, setShowNumberGrid] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<TicketStats | null>(null);
   const [inCartNumbers, setInCartNumbers] = useState<number[]>([]);
-
-  // Use plain React effects for fetching data - more reliable across environments
-  useState(() => {
-    async function fetchData() {
+  
+  // Use effect to fetch data when component mounts or competition changes
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchData = async () => {
       if (!competition?.id) {
-        setHasError(true);
-        setIsLoading(false);
+        console.error('No competition ID provided for stats');
+        if (isMounted) {
+          setHasError(true);
+          setIsLoading(false);
+        }
         return;
       }
 
       try {
+        console.log(`🎟️ Fetching ticket stats for competition ${competition.id}`);
+        
         // First get the ticket stats
         const statsResponse = await fetch(`/api/admin/competitions/${competition.id}/ticket-stats`, {
           credentials: 'include',
           headers: { 'Cache-Control': 'no-cache' }
         });
         
+        console.log(`Stats response status: ${statsResponse.status}`);
+        
         if (!statsResponse.ok) {
+          console.error(`Failed to fetch stats: ${statsResponse.status} ${statsResponse.statusText}`);
           throw new Error(`Stats API Error: ${statsResponse.status}`);
         }
         
         const statsData = await statsResponse.json();
-        setStats(statsData);
+        console.log('Stats data received:', statsData);
+        
+        if (isMounted) {
+          setStats(statsData);
+        }
         
         // Then get in-cart numbers
         try {
@@ -60,8 +94,10 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
           });
           
           if (cartResponse.ok) {
-            const cartData = await cartResponse.json();
-            if (cartData && Array.isArray(cartData.inCartNumbers)) {
+            const cartData: CartItemsResponse = await cartResponse.json();
+            console.log('Cart data received:', cartData);
+            
+            if (isMounted && cartData && Array.isArray(cartData.inCartNumbers)) {
               setInCartNumbers(cartData.inCartNumbers);
             }
           }
@@ -70,16 +106,25 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
           // We don't fail the whole component for cart errors
         }
         
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error("Error loading competition stats:", error);
-        setHasError(true);
-        setIsLoading(false);
+        if (isMounted) {
+          setHasError(true);
+          setIsLoading(false);
+        }
       }
-    }
+    };
     
     fetchData();
-  });
+    
+    // Cleanup function to prevent setting state on unmounted component
+    return () => {
+      isMounted = false;
+    };
+  }, [competition?.id]); // Only re-run if competition ID changes
 
   // Loading state
   if (isLoading) {
@@ -144,12 +189,8 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
   const percentSold = totalTickets ? ((purchasedTickets / totalTickets) * 100).toFixed(1) + '%' : '0%';
   
   // Basic range generation for the number grid
-  const generateRange = (start: number, end: number) => {
-    const result = [];
-    for (let i = start; i <= end; i++) {
-      result.push(i);
-    }
-    return result;
+  const generateRange = (start: number, end: number): number[] => {
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
   
   // Ensure we have all number arrays with fallbacks
