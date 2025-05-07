@@ -65,9 +65,8 @@ export class TicketService {
       // Get the ticketsSold count from competition
       const ticketsSold = competition[0].ticketsSold || 0;
       
-      // If we have fewer purchased numbers than the ticketsSold count,
-      // we need to generate additional purchased numbers to match the count
-      if (ticketsSold > purchasedNumbers.size) {
+      // Only generate additional tickets if ticketsSold is explicitly set to a positive number
+      if (competition[0].ticketsSold !== null && ticketsSold > purchasedNumbers.size) {
         console.log(`🎫 TicketService: Generating additional ${ticketsSold - purchasedNumbers.size} purchased numbers to match ticketsSold`);
         
         // Create a range of all possible ticket numbers
@@ -84,6 +83,9 @@ export class TicketService {
         for (const num of additionalNumbers) {
           purchasedNumbers.add(num);
         }
+      } else if (competition[0].ticketsSold === null && ticketsSold > 0) {
+        // Log this case for debugging - shouldn't happen but might help diagnose issues
+        console.log(`⚠️ TicketService: ticketsSold is ${ticketsSold} but competition.ticketsSold is null - not generating additional tickets`);
       }
       
       // Return all taken numbers 
