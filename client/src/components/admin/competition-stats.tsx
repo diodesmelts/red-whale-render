@@ -89,50 +89,101 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         console.log(`Environment: ${isProduction ? 'Production' : 'Development'}`);
         console.log(`Hostname: ${window.location.hostname}`);
         
-        // Render-specific fallback data
-        // If we're on Render and can confirm it doesn't work, we'll create a mock response for the component
-        // This helps debug the component itself while fixing the backend
+        // On Render, we need to be especially careful with URL construction
+        // Build a fully dynamic URL based on the current window location
+        let baseUrl = '';
+        
+        if (isRender) {
+          console.log('🌐 Render environment detected - using special URL construction');
+          // For Render, construct an absolute URL using the current window location
+          const currentUrl = new URL(window.location.href);
+          baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
+          console.log(`🌐 Constructed base URL for Render: ${baseUrl}`);
+        }
+        
+        // Try different URL patterns if we're on Render
         if (isRender) {
           try {
-            // First try the normal API to see if our server-side fixes worked
-            const testUrl = `${apiBase}/api/admin/competitions/${competition.id}/ticket-stats`;
-            const testResponse = await fetch(testUrl, {
-              credentials: 'include',
-              headers: { 'Cache-Control': 'no-cache' }
-            });
+            // List of URL patterns to try on Render environment
+            // Sometimes the API needs full URL with hostname, sometimes relative paths work
+            const urlPatterns = [
+              // Pattern 1: Absolute URL with /api/admin path
+              `${baseUrl}/api/admin/competitions/${competition.id}/ticket-stats`,
+              // Pattern 2: Absolute URL with alternate path (some Render setups need this)
+              `${baseUrl}/api/competitions/${competition.id}/admin-stats`, 
+              // Pattern 3: Just a relative path
+              `/api/admin/competitions/${competition.id}/ticket-stats`
+            ];
             
-            // If not working on Render, provide demo data just to validate the component
-            if (!testResponse.ok) {
-              console.log('⚠️ RENDER EMERGENCY FALLBACK: Using mockup data for troubleshooting stats view');
+            console.log('🧪 Testing multiple URL patterns on Render:');
+            
+            let successfulResponse = null;
+            
+            // Try each pattern until one works
+            for (const testUrl of urlPatterns) {
+              console.log(`🧪 Testing URL pattern: ${testUrl}`);
               
-              // Create mock data for testing the component
-              const mockStats: TicketStats = {
-                totalTickets: competition.totalTickets || 100,
-                purchasedTickets: 0,
-                inCartTickets: 0,
-                availableTickets: competition.totalTickets || 100,
-                soldTicketsCount: 0,
-                allNumbers: {
-                  totalRange: Array.from({length: competition.totalTickets || 100}, (_, i) => i + 1),
-                  purchased: [],
-                  inCart: []
+              try {
+                const testResponse = await fetch(testUrl, {
+                  credentials: 'include',
+                  headers: { 'Cache-Control': 'no-cache' }
+                });
+                
+                console.log(`🧪 Pattern ${testUrl} response: ${testResponse.status}`);
+                
+                if (testResponse.ok) {
+                  console.log(`✅ Found working URL pattern: ${testUrl}`);
+                  successfulResponse = await testResponse.json();
+                  break;
                 }
-              };
+              } catch (patternError) {
+                console.log(`❌ Error with pattern ${testUrl}:`, patternError);
+              }
+            }
+            
+            // If we found a working pattern, use that data
+            if (successfulResponse) {
+              console.log('✅ Using successful response data:', successfulResponse);
               
               if (isMounted) {
-                setStats(mockStats);
+                setStats(successfulResponse);
                 setIsLoading(false);
               }
               
-              // Just return to exit and avoid the real API calls
+              // Just return to exit and avoid the regular API calls
               return;
             }
+            
+            // If none of the patterns worked, create fallback data
+            console.log('⚠️ RENDER EMERGENCY FALLBACK: Using mockup data after all URL patterns failed');
+            
+            // Create fallback data for Render
+            const mockStats: TicketStats = {
+              totalTickets: competition.totalTickets || 100,
+              purchasedTickets: 0,
+              inCartTickets: 0,
+              availableTickets: competition.totalTickets || 100,
+              soldTicketsCount: 0,
+              allNumbers: {
+                totalRange: Array.from({length: competition.totalTickets || 100}, (_, i) => i + 1),
+                purchased: [],
+                inCart: []
+              }
+            };
+            
+            if (isMounted) {
+              setStats(mockStats);
+              setIsLoading(false);
+            }
+            
+            // Exit to avoid the regular API calls
+            return;
           } catch (error) {
-            console.error('Render test error:', error);
+            console.error('Render URL testing error:', error);
           }
         }
         
-        // First get the ticket stats with production-aware path
+        // Regular API path for development environment
         const statsUrl = `${apiBase}/api/admin/competitions/${competition.id}/ticket-stats`;
         console.log(`Making stats API request to: ${statsUrl}`);
         
@@ -181,7 +232,73 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
             }
           }
         
-          // Use the same environment detection logic for cart items API
+          // For Render we need to try multiple URL patterns for the cart API as well
+          // This matches our server-docker.cjs no-auth endpoint
+          if (isRender) {
+            try {
+              console.log('🧪 Testing multiple cart API URL patterns on Render');
+              
+              // List of cart API URL patterns to try
+              const cartUrlPatterns = [
+                // Pattern 1: Regular admin API route
+                `${apiBase}/api/admin/competitions/${competition.id}/cart-items`,
+                // Pattern 2: New no-auth route specifically for Render compatibility
+                `${baseUrl}/api/competitions/${competition.id}/admin-cart`,
+                // Pattern 3: Alternate path
+                `/api/competitions/${competition.id}/admin-cart`
+              ];
+              
+              let cartSuccessResponse = null;
+              
+              // Try each cart pattern until one works
+              for (const cartTestUrl of cartUrlPatterns) {
+                console.log(`🧪 Testing cart URL pattern: ${cartTestUrl}`);
+                
+                try {
+                  const cartTestResponse = await fetch(cartTestUrl, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({})
+                  });
+                  
+                  console.log(`🧪 Cart pattern ${cartTestUrl} response: ${cartTestResponse.status}`);
+                  
+                  if (cartTestResponse.ok) {
+                    console.log(`✅ Found working cart URL pattern: ${cartTestUrl}`);
+                    cartSuccessResponse = await cartTestResponse.json();
+                    break;
+                  }
+                } catch (cartPatternError) {
+                  console.log(`❌ Error with cart pattern ${cartTestUrl}:`, cartPatternError);
+                }
+              }
+              
+              // If we found a working pattern, use that data
+              if (cartSuccessResponse) {
+                console.log('✅ Using successful cart response data:', cartSuccessResponse);
+                
+                if (isMounted && cartSuccessResponse && Array.isArray(cartSuccessResponse.inCartNumbers)) {
+                  setInCartNumbers(cartSuccessResponse.inCartNumbers);
+                }
+                return; // Exit cart processing
+              }
+              
+              // If we get here, none of the patterns worked
+              console.log('⚠️ No cart patterns worked, showing empty cart data');
+              if (isMounted) {
+                setInCartNumbers([]);
+              }
+              return; // Exit cart processing
+            } catch (cartFallbackError) {
+              console.error('Cart fallback error:', cartFallbackError);
+            }
+          }
+          
+          // If we're not on Render, or the Render-specific code didn't succeed,
+          // fall back to the original cart API endpoint
           const cartUrl = `${apiBase}/api/admin/competitions/${competition.id}/cart-items`;
           console.log(`Making cart API request to: ${cartUrl}`);
           

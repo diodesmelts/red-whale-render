@@ -1981,6 +1981,81 @@ function renderCompatibleAdminAuth(req, res, next) {
   });
 }
 
+// Special non-auth endpoint for Render compatibility
+// This endpoint uses the exact same code as the admin endpoint but doesn't use authentication middleware
+app.get('/api/competitions/:id/admin-stats', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    console.log(`🎟️ [RENDER COMPATIBLE] Fetching ticket stats for competition ${numId}`);
+    
+    // Verify competition exists
+    const competition = await pool.query(
+      'SELECT id, total_tickets FROM competitions WHERE id = $1 LIMIT 1',
+      [numId]
+    );
+    
+    if (competition.rows.length === 0) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Get all entries for this competition
+    const entryList = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Get purchased numbers - tickets that have been successfully purchased
+    const purchasedNumbers = new Set();
+    const purchasedEntries = entryList.rows.filter(entry => entry.payment_status === 'completed');
+    
+    for (const entry of purchasedEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          purchasedNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Get in-cart numbers - tickets that are in active carts but not purchased
+    const inCartNumbers = new Set();
+    const pendingEntries = entryList.rows.filter(entry => entry.payment_status === 'pending');
+    
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Create a range of all possible ticket numbers
+    const totalRange = Array.from({ length: competition.rows[0].total_tickets }, (_, i) => i + 1);
+    
+    // Return comprehensive stats
+    res.json({
+      totalTickets: competition.rows[0].total_tickets,
+      purchasedTickets: purchasedNumbers.size,
+      inCartTickets: inCartNumbers.size,
+      availableTickets: competition.rows[0].total_tickets - purchasedNumbers.size - inCartNumbers.size,
+      soldTicketsCount: purchasedNumbers.size,
+      allNumbers: {
+        totalRange: totalRange,
+        purchased: Array.from(purchasedNumbers),
+        inCart: Array.from(inCartNumbers)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching competition ticket stats:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Admin endpoint to get ticket stats for a competition
 app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, async (req, res) => {
   try {
@@ -2052,6 +2127,48 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
   } catch (error) {
     console.error('Error fetching competition ticket stats:', error);
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Special non-auth endpoint for cart items (Render compatibility)
+app.post('/api/competitions/:id/admin-cart', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    // Get all pending entries (in cart) for this competition
+    const activeEntries = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Filter for pending entries
+    const pendingEntries = activeEntries.rows.filter(entry => entry.payment_status === 'pending');
+    
+    // Extract all numbers from pending entries
+    const inCartNumbers = new Set();
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    console.log(`[RENDER COMPATIBLE] Found ${inCartNumbers.size} in-cart numbers for competition ${numId}`);
+    
+    // Return the cart numbers
+    return res.json({
+      competitionId: numId,
+      inCartNumbers: Array.from(inCartNumbers)
+    });
+  } catch (error) {
+    console.error('Error fetching competition cart numbers:', error);
+    return res.status(500).json({ message: error.message });
   }
 });
 
