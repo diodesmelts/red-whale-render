@@ -837,36 +837,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       👉 Request Body: ${JSON.stringify(req.body || {})}
       `);
       
-      // Get actual cart items for this competition
+      // CRITICAL: Use the shared ticket service to ensure perfect consistency across all endpoints
       try {
-        const entries = await dataStorage.getEntriesByCompetition(competitionId);
+        // Import the ticket service
+        const { TicketService } = await import('./ticket-service');
+        const takenNumbers = await TicketService.getTakenNumbers(competitionId);
         
-        // Extract numbers in cart (pending entries)
-        const inCartNumbers = [];
+        console.log(`🛒 ACTIVE-CART-ITEMS returning ${takenNumbers.inCart.length} in-cart numbers via TicketService`);
         
-        entries.forEach(entry => {
-          if (entry.selectedNumbers && entry.paymentStatus === 'pending') {
-            try {
-              // Handle both array and JSON string formats
-              let numbers;
-              if (typeof entry.selectedNumbers === 'string') {
-                numbers = JSON.parse(entry.selectedNumbers);
-              } else if (Array.isArray(entry.selectedNumbers)) {
-                numbers = entry.selectedNumbers;
-              }
-              
-              if (Array.isArray(numbers)) {
-                inCartNumbers.push(...numbers);
-              }
-            } catch (e) {
-              console.error('Error parsing selected numbers:', e);
-            }
-          }
-        });
+        // Extract numbers in cart directly from the ticket service - no additional processing needed
+        const inCartNumbers = takenNumbers.inCart;
         
-        // Return the unique numbers in cart
-        console.log(`📊 Legacy endpoint returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId}`);
-        return res.json({ inCartNumbers: Array.from(new Set(inCartNumbers)) });
+        // Return the in-cart numbers directly from the service
+        console.log(`📊 Legacy endpoint returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId} (via TicketService)`);
+        return res.json({ inCartNumbers: inCartNumbers });
       } 
       catch (err) {
         console.error(`Error retrieving in-cart numbers: ${err}`);
@@ -905,36 +889,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ====================================
       `);
 
-      // Get actual cart items for this competition
+      // CRITICAL: Use the shared ticket service to ensure perfect consistency across all endpoints
       try {
-        const entries = await dataStorage.getEntriesByCompetition(competitionId);
+        // Import the ticket service
+        const { TicketService } = await import('./ticket-service');
+        const takenNumbers = await TicketService.getTakenNumbers(competitionId);
         
-        // Extract numbers in cart (pending entries)
-        const inCartNumbers = [];
+        console.log(`🛒 CATCH-ALL HANDLER returning ${takenNumbers.inCart.length} in-cart numbers via TicketService`);
         
-        entries.forEach(entry => {
-          if (entry.selectedNumbers && entry.paymentStatus === 'pending') {
-            try {
-              // Handle both array and JSON string formats
-              let numbers;
-              if (typeof entry.selectedNumbers === 'string') {
-                numbers = JSON.parse(entry.selectedNumbers);
-              } else if (Array.isArray(entry.selectedNumbers)) {
-                numbers = entry.selectedNumbers;
-              }
-              
-              if (Array.isArray(numbers)) {
-                inCartNumbers.push(...numbers);
-              }
-            } catch (e) {
-              console.error('Error parsing selected numbers:', e);
-            }
-          }
-        });
+        // Extract numbers in cart directly from the ticket service - no additional processing needed
+        const inCartNumbers = takenNumbers.inCart;
         
-        // Return the unique numbers in cart
-        console.log(`📊 Catch-all handler returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId}`);
-        return res.json({ inCartNumbers: Array.from(new Set(inCartNumbers)) });
+        // Return the in-cart numbers directly from the service
+        console.log(`📊 Catch-all handler returning ${inCartNumbers.length} in-cart numbers for competition ${competitionId} (via TicketService)`);
+        return res.json({ inCartNumbers: inCartNumbers });
       } 
       catch (err) {
         console.error(`Error retrieving in-cart numbers in catch-all handler: ${err}`);
