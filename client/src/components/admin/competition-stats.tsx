@@ -715,13 +715,17 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
   const availableTickets = stats.availableTickets || (totalTickets - purchasedTickets - inCartTicketsCount);
   
   // Calculate percentages for visualization (with safety checks)
+  // We no longer include inCartTickets in our display, so our percentages need to be recalculated
+  // to only show purchased vs available tickets (only 2 categories instead of 3)
   const safeCalculatePercentage = (value: number) => {
     if (!totalTickets || totalTickets <= 0) return 0;
     return (value / totalTickets) * 100;
   };
   
   const purchasedPercentage = safeCalculatePercentage(purchasedTickets);
-  const inCartPercentage = safeCalculatePercentage(inCartTicketsCount);
+  // Since we're not showing in-cart anymore, just make this 0
+  const inCartPercentage = 0;
+  // Available percentage should now be the remainder after purchased
   const availablePercentage = safeCalculatePercentage(availableTickets);
   
   // Sale status percentage with fallback
@@ -887,18 +891,15 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
                         <div 
                           className={`
                             flex items-center justify-center rounded-md p-2 text-xs font-medium
-                            ${isPurchased ? 'bg-green-100 text-green-800' : ''}
-                            ${isInCart ? 'bg-blue-100 text-blue-800' : ''}
-                            ${!isPurchased && !isInCart ? 'bg-gray-100 text-gray-800' : ''}
+                            ${isPurchased ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
                           `}
                         >
                           {number}
                           {isPurchased && <Lock className="h-3 w-3 ml-1" />}
-                          {isInCart && <ShoppingCart className="h-3 w-3 ml-1" />}
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {isPurchased ? 'Purchased' : isInCart ? 'In Cart' : 'Available'}
+                        {isPurchased ? 'Purchased' : 'Available'}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
