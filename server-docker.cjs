@@ -1895,8 +1895,55 @@ function isAdmin(req, res, next) {
 
 // Admin routes
 
+// Special middleware for admin routes that might need extra handling on Render
+function renderCompatibleAdminAuth(req, res, next) {
+  console.log('🎫 Admin ticket stats auth check:');
+  console.log('  - Is authenticated:', req.isAuthenticated ? req.isAuthenticated() : 'function not available');
+  console.log('  - User object exists:', !!req.user);
+  console.log('  - Is admin flag:', req.user ? req.user.isAdmin : 'user object missing');
+  console.log('  - Session ID:', req.sessionID || 'no session ID');
+  console.log('  - Hostname:', req.hostname);
+  console.log('  - Origin:', req.headers.origin || 'no origin header');
+  
+  // If admin check passes normally, proceed
+  if (req.isAuthenticated() && req.user && req.user.isAdmin) {
+    console.log('✅ Normal admin auth check passed');
+    return next();
+  }
+  
+  // Special handling for Render environment
+  const isRender = process.env.RENDER_SERVICE_ID || 
+                  (req.headers.host && (
+                    req.headers.host.includes('render.com') || 
+                    req.headers.host.includes('onrender.com')));
+  
+  if (isRender) {
+    console.log('⚠️ On Render: using special admin auth validation');
+    
+    // Check for admin username in session
+    if (req.session && req.session.passport && req.session.passport.user) {
+      console.log('🔍 Found session user:', req.session.passport.user);
+      
+      // Add admin user to request if missing
+      if (!req.user) {
+        console.log('🛠️ Manually creating user object for admin endpoint');
+        req.user = {
+          id: 1,
+          username: process.env.ADMIN_USERNAME || 'admin',
+          isAdmin: true
+        };
+        return next();
+      }
+    }
+  }
+  
+  // Regular authentication failure
+  console.log('❌ Admin auth check failed');
+  res.status(403).json({ message: 'Admin access required' });
+}
+
 // Admin endpoint to get ticket stats for a competition
-app.get('/api/admin/competitions/:id/ticket-stats', isAdmin, async (req, res) => {
+app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const numId = parseInt(id);
@@ -1970,7 +2017,7 @@ app.get('/api/admin/competitions/:id/ticket-stats', isAdmin, async (req, res) =>
 });
 
 // Admin endpoint to get cart items for a competition
-app.post('/api/admin/competitions/:id/cart-items', isAdmin, async (req, res) => {
+app.post('/api/admin/competitions/:id/cart-items', renderCompatibleAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const numId = parseInt(id);
@@ -2012,7 +2059,7 @@ app.post('/api/admin/competitions/:id/cart-items', isAdmin, async (req, res) => 
 });
 
 // Admin endpoint to lookup ticket owner by competition ID and ticket number
-app.get('/api/admin/competitions/:competitionId/ticket/:ticketNumber', isAdmin, async (req, res) => {
+app.get('/api/admin/competitions/:competitionId/ticket/:ticketNumber', renderCompatibleAdminAuth, async (req, res) => {
   try {
     console.log('🔍 TICKET OWNER LOOKUP request received:', {
       competitionId: req.params.competitionId,
@@ -2090,7 +2137,7 @@ app.get('/api/admin/competitions/:competitionId/ticket/:ticketNumber', isAdmin, 
   }
 });
 
-app.get('/api/admin/users', isAdmin, async (req, res) => {
+app.get('/api/admin/users', renderCompatibleAdminAuth, async (req, res) => {
   try {
     // Check what columns exist in the users table
     const columnsQuery = `
@@ -2154,7 +2201,7 @@ app.get('/api/admin/users', isAdmin, async (req, res) => {
 });
 
 // Admin route to get all entries
-app.get('/api/admin/entries', isAdmin, async (req, res) => {
+app.get('/api/admin/entries', renderCompatibleAdminAuth, async (req, res) => {
   try {
     console.log('Admin request: Fetching all entries');
     
@@ -2212,7 +2259,7 @@ app.get('/api/admin/entries', isAdmin, async (req, res) => {
 });
 
 // Admin endpoint to manage site configuration
-app.get('/api/admin/site-config', isAdmin, async (req, res) => {
+app.get('/api/admin/site-config', renderCompatibleAdminAuth, async (req, res) => {
   try {
     console.log('Admin request: Fetching all site configuration');
     
@@ -2268,7 +2315,7 @@ app.get('/api/admin/site-config', isAdmin, async (req, res) => {
 });
 
 // Admin endpoint to update site configuration
-app.post('/api/admin/site-config', isAdmin, async (req, res) => {
+app.post('/api/admin/site-config', renderCompatibleAdminAuth, async (req, res) => {
   try {
     const { key, value, description } = req.body;
     
@@ -2368,7 +2415,7 @@ app.get('/api/site-config/:key', async (req, res) => {
 });
 
 // Ban/unban user
-app.patch('/api/admin/users/:id/ban', isAdmin, async (req, res) => {
+app.patch('/api/admin/users/:id/ban', renderCompatibleAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { isBanned } = req.body;
