@@ -34,7 +34,6 @@ import AboutUs from "@/pages/about-us";
 import AdminDashboard from "@/pages/admin/index";
 import CompetitionsManagement from "@/pages/admin/competitions";
 import CompetitionOverview from "@/pages/admin/competition-overview";
-import UnifiedCompetitionsManager from "@/pages/admin/unified-competitions";
 import UsersManagement from "@/pages/admin/users";
 import AdminSettings from "@/pages/admin/settings";
 import SiteConfigPage from "@/pages/admin/site-config";
