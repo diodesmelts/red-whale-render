@@ -212,16 +212,48 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
           }
         }
         
-        // Regular API path for development environment
+        // Try the public endpoint first (will work in all environments)
+        const publicStatsUrl = `${apiBase}/api/competitions/${competition.id}/public-stats`;
+        console.log(`Making stats API request to: ${publicStatsUrl}`);
+        
+        try {
+          const publicStatsResponse = await fetch(publicStatsUrl, {
+            credentials: 'include',
+            headers: { 'Cache-Control': 'no-cache' }
+          });
+          
+          console.log(`Public stats response status: ${publicStatsResponse.status}`);
+          
+          if (publicStatsResponse.ok) {
+            const statsData = await publicStatsResponse.json();
+            if (isMounted) {
+              setStats(statsData);
+              setIsLoading(false);
+            }
+            
+            // Get cart data separately
+            try {
+              await fetchCartData();
+            } catch (cartError) {
+              console.error("Non-fatal cart data error:", cartError);
+            }
+            
+            return; // Exit if this worked
+          }
+        } catch (publicError) {
+          console.error("Public stats endpoint error, falling back to admin endpoint:", publicError);
+        }
+        
+        // If public endpoint fails, try the admin endpoint as a fallback
         const statsUrl = `${apiBase}/api/admin/competitions/${competition.id}/ticket-stats`;
-        console.log(`Making stats API request to: ${statsUrl}`);
+        console.log(`Making admin stats API request to: ${statsUrl}`);
         
         const statsResponse = await fetch(statsUrl, {
           credentials: 'include',
           headers: { 'Cache-Control': 'no-cache' }
         });
         
-        console.log(`Stats response status: ${statsResponse.status}`);
+        console.log(`Admin stats response status: ${statsResponse.status}`);
         
         if (!statsResponse.ok) {
           console.error(`Failed to fetch stats: ${statsResponse.status} ${statsResponse.statusText}`);
