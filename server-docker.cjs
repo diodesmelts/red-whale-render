@@ -1981,6 +1981,92 @@ function renderCompatibleAdminAuth(req, res, next) {
   });
 }
 
+// Special direct endpoints specifically for mobycomps.co.uk domain without auth
+// Stats endpoint - GET request with CORS headers
+app.get('/mobycomps-api/stats/:id', async (req, res) => {
+  // Set CORS headers specifically for mobycomps.co.uk and www.mobycomps.co.uk
+  res.header('Access-Control-Allow-Origin', 'https://www.mobycomps.co.uk');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    return res.status(204).send();
+  }
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    console.log('🌊 MOBYCOMPS SPECIAL ENDPOINT: Direct stats access without auth');
+    console.log('Request headers:', JSON.stringify(req.headers));
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    // Verify competition exists
+    const competition = await pool.query(
+      'SELECT id, total_tickets FROM competitions WHERE id = $1 LIMIT 1',
+      [numId]
+    );
+    
+    if (competition.rows.length === 0) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    // Get all entries for this competition
+    const entryList = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Get purchased numbers - tickets that have been successfully purchased
+    const purchasedNumbers = new Set();
+    const purchasedEntries = entryList.rows.filter(entry => entry.payment_status === 'completed');
+    
+    for (const entry of purchasedEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          purchasedNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Get in-cart numbers - tickets that are in active carts but not purchased
+    const inCartNumbers = new Set();
+    const pendingEntries = entryList.rows.filter(entry => entry.payment_status === 'pending');
+    
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Create a range of all possible ticket numbers
+    const totalRange = Array.from({ length: competition.rows[0].total_tickets }, (_, i) => i + 1);
+    
+    // Return comprehensive stats
+    res.json({
+      totalTickets: competition.rows[0].total_tickets,
+      purchasedTickets: purchasedNumbers.size,
+      inCartTickets: inCartNumbers.size,
+      availableTickets: competition.rows[0].total_tickets - purchasedNumbers.size - inCartNumbers.size,
+      soldTicketsCount: purchasedNumbers.size,
+      allNumbers: {
+        totalRange: totalRange,
+        purchased: Array.from(purchasedNumbers),
+        inCart: Array.from(inCartNumbers)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching competition ticket stats:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Special non-auth endpoint for Render compatibility
 // This endpoint uses the exact same code as the admin endpoint but doesn't use authentication middleware
 app.get('/api/competitions/:id/admin-stats', async (req, res) => {
@@ -2127,6 +2213,61 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
   } catch (error) {
     console.error('Error fetching competition ticket stats:', error);
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Cart endpoint for mobycomps.co.uk - POST request with CORS headers
+app.post('/mobycomps-api/cart/:id', async (req, res) => {
+  // Set CORS headers specifically for mobycomps.co.uk and www.mobycomps.co.uk
+  res.header('Access-Control-Allow-Origin', 'https://www.mobycomps.co.uk');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'POST');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    return res.status(204).send();
+  }
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    console.log('🌊 MOBYCOMPS SPECIAL ENDPOINT: Direct cart access without auth');
+    console.log('Request headers:', JSON.stringify(req.headers));
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    // Get all pending entries (in cart) for this competition
+    const activeEntries = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Filter for pending entries
+    const pendingEntries = activeEntries.rows.filter(entry => entry.payment_status === 'pending');
+    
+    // Extract all numbers from pending entries
+    const inCartNumbers = new Set();
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    console.log(`[MOBYCOMPS SPECIAL] Found ${inCartNumbers.size} in-cart numbers for competition ${numId}`);
+    
+    // Return the cart numbers
+    return res.json({
+      competitionId: numId,
+      inCartNumbers: Array.from(inCartNumbers)
+    });
+  } catch (error) {
+    console.error('Error fetching competition cart numbers:', error);
+    return res.status(500).json({ message: error.message });
   }
 });
 

@@ -63,11 +63,14 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         console.log(`🎟️ Fetching ticket stats for competition ${competition.id}`);
         
         // Check if we're in production (Render) environment - critical for proper API path detection
+        // Adding specific domain checks because some production sites are running on Render
         const isRender = window.location.hostname.includes('render.com') || 
-                         window.location.hostname.includes('onrender.com');
-        const isProduction = isRender || 
-                             window.location.hostname.includes('bluewhalecompetitions.co.uk') || 
-                             window.location.hostname.includes('mobycomps.co.uk');
+                         window.location.hostname.includes('onrender.com') ||
+                         window.location.hostname.includes('bluewhalecompetitions.co.uk') ||
+                         window.location.hostname.includes('mobycomps.co.uk');
+        
+        // All production environments need special handling
+        const isProduction = isRender;
         
         // Add extra debugging for auth issues
         const isAuthenticated = document.cookie.includes('bw.sid');
@@ -112,7 +115,21 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
               // Pattern 2: Absolute URL with alternate path (some Render setups need this)
               `${baseUrl}/api/competitions/${competition.id}/admin-stats`, 
               // Pattern 3: Just a relative path
-              `/api/admin/competitions/${competition.id}/ticket-stats`
+              `/api/admin/competitions/${competition.id}/ticket-stats`,
+              // Pattern 4: Relative path with no-auth endpoint
+              `/api/competitions/${competition.id}/admin-stats`,
+              // Pattern 5: Second level domain with standard admin path
+              `https://api.${window.location.hostname}/admin/competitions/${competition.id}/ticket-stats`,
+              // Pattern 6: Direct IP/hostname with no subdomain (removes www if present)
+              `${window.location.protocol}//${window.location.hostname.replace('www.', '')}/api/competitions/${competition.id}/admin-stats`,
+              // Pattern 7: Absolute URL with second-level domain backend
+              `${baseUrl.replace('www.', '')}/api/competitions/${competition.id}/admin-stats`,
+              // Pattern 8: Special direct mobycomps endpoint
+              `/mobycomps-api/stats/${competition.id}`,
+              // Pattern 9: Absolute mobycomps URL
+              `${baseUrl}/mobycomps-api/stats/${competition.id}`,
+              // Pattern 10: Absolute domain-rooted mobycomps URL
+              `${window.location.protocol}//${window.location.hostname}/mobycomps-api/stats/${competition.id}`
             ];
             
             console.log('🧪 Testing multiple URL patterns on Render:');
@@ -245,7 +262,21 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
                 // Pattern 2: New no-auth route specifically for Render compatibility
                 `${baseUrl}/api/competitions/${competition.id}/admin-cart`,
                 // Pattern 3: Alternate path
-                `/api/competitions/${competition.id}/admin-cart`
+                `/api/competitions/${competition.id}/admin-cart`,
+                // Pattern 4: No-www domain with admin-cart endpoint
+                `${window.location.protocol}//${window.location.hostname.replace('www.', '')}/api/competitions/${competition.id}/admin-cart`,
+                // Pattern 5: Second level domain with standard admin path
+                `https://api.${window.location.hostname}/admin/competitions/${competition.id}/cart-items`,
+                // Pattern 6: Absolute URL with second-level domain backend
+                `${baseUrl.replace('www.', '')}/api/competitions/${competition.id}/admin-cart`,
+                // Pattern 7: Try different method/path pattern
+                `${baseUrl}/api/competitions/${competition.id}/cart`,
+                // Pattern 8: Special mobycomps cart endpoint
+                `/mobycomps-api/cart/${competition.id}`,
+                // Pattern 9: Absolute mobycomps URL
+                `${baseUrl}/mobycomps-api/cart/${competition.id}`,
+                // Pattern 10: Absolute domain-rooted mobycomps URL
+                `${window.location.protocol}//${window.location.hostname}/mobycomps-api/cart/${competition.id}`
               ];
               
               let cartSuccessResponse = null;
