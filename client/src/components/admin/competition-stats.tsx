@@ -39,7 +39,13 @@ interface CartItemsResponse {
 
 // Minimal standalone component that doesn't rely on React Query or other dependencies
 export function CompetitionStats({ competition }: { competition: Competition }) {
-  const [showNumberGrid, setShowNumberGrid] = useState(true); // Default to showing the grid
+  // Use false as the default state to match the UI (grid hidden by default)
+  const [showNumberGrid, setShowNumberGrid] = useState(false);
+  
+  // Add debugging for visibility toggling
+  useEffect(() => {
+    console.log(`🔍 GRID VISIBILITY: ${showNumberGrid ? 'VISIBLE' : 'HIDDEN'} for competition ${competition.id}`);
+  }, [showNumberGrid, competition.id]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [stats, setStats] = useState<TicketStats | null>(null);
@@ -869,7 +875,10 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         <CardFooter className="pt-0">
           <Button 
             variant="outline" 
-            onClick={() => setShowNumberGrid(!showNumberGrid)}
+            onClick={() => {
+              console.log(`🔘 Button clicked - toggling grid from ${showNumberGrid} to ${!showNumberGrid}`);
+              setShowNumberGrid(!showNumberGrid);
+            }}
             className="w-full text-sm"
             size="sm"
           >
@@ -878,52 +887,59 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         </CardFooter>
       </Card>
 
-      {/* Always show the ticket number grid - no conditional rendering */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-foreground">{competition.title} - Ticket Numbers</CardTitle>
-          <CardDescription>
-            View the status of individual ticket numbers
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <div className="grid grid-cols-10 gap-2 md:grid-cols-20">
-            {allNumbers.totalRange.slice(0, 500).map((number: number) => {
-              const isPurchased = allNumbers.purchased.includes(number);
-              const isInCart = allNumbers.inCart.includes(number);
-              
-              return (
-                <TooltipProvider key={number}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div 
-                        className={`
-                          flex items-center justify-center rounded-md p-2 text-xs font-medium
-                          ${isPurchased ? 'bg-green-100 text-green-800' : ''}
-                          ${isInCart ? 'bg-blue-100 text-blue-800' : ''}
-                          ${!isPurchased && !isInCart ? 'bg-gray-100 text-gray-800' : ''}
-                        `}
-                      >
-                        {number}
-                        {isPurchased && <Lock className="h-3 w-3 ml-1" />}
-                        {isInCart && <ShoppingCart className="h-3 w-3 ml-1" />}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {isPurchased ? 'Purchased' : isInCart ? 'In Cart' : 'Available'}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              );
-            })}
-            {allNumbers.totalRange.length > 500 && (
-              <div className="col-span-full text-center text-sm text-muted-foreground py-2">
-                Showing first 500 tickets of {allNumbers.totalRange.length} total
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Conditionally render the ticket number grid */}
+      {showNumberGrid ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-foreground">{competition.title} - Ticket Numbers</CardTitle>
+            <CardDescription>
+              View the status of individual ticket numbers
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <div className="grid grid-cols-10 gap-2 md:grid-cols-20">
+              {allNumbers.totalRange.slice(0, 500).map((number: number) => {
+                const isPurchased = allNumbers.purchased.includes(number);
+                const isInCart = allNumbers.inCart.includes(number);
+                
+                return (
+                  <TooltipProvider key={number}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div 
+                          className={`
+                            flex items-center justify-center rounded-md p-2 text-xs font-medium
+                            ${isPurchased ? 'bg-green-100 text-green-800' : ''}
+                            ${isInCart ? 'bg-blue-100 text-blue-800' : ''}
+                            ${!isPurchased && !isInCart ? 'bg-gray-100 text-gray-800' : ''}
+                          `}
+                        >
+                          {number}
+                          {isPurchased && <Lock className="h-3 w-3 ml-1" />}
+                          {isInCart && <ShoppingCart className="h-3 w-3 ml-1" />}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isPurchased ? 'Purchased' : isInCart ? 'In Cart' : 'Available'}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
+              {allNumbers.totalRange.length > 500 && (
+                <div className="col-span-full text-center text-sm text-muted-foreground py-2">
+                  Showing first 500 tickets of {allNumbers.totalRange.length} total
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        // Debug element to show when grid is hidden - helpful for development
+        <div className="hidden">
+          Grid is hidden. showNumberGrid = {String(showNumberGrid)}
+        </div>
+      )}
     </div>
   );
 }
