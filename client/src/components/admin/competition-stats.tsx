@@ -231,9 +231,53 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
               setIsLoading(false);
             }
             
-            // Get cart data separately
+            // Get cart data separately with public cart endpoint
             try {
-              await fetchCartData();
+              const publicCartUrl = `${apiBase}/api/competitions/${competition.id}/public-cart`;
+              console.log(`Making public cart API request to: ${publicCartUrl}`);
+              
+              const publicCartResponse = await fetch(publicCartUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({})
+              });
+              
+              if (publicCartResponse.ok) {
+                const cartData: CartItemsResponse = await publicCartResponse.json();
+                console.log('Public cart data received:', cartData);
+                
+                if (isMounted && cartData && Array.isArray(cartData.inCartNumbers)) {
+                  setInCartNumbers(cartData.inCartNumbers);
+                }
+                
+                // Exit if we got the data successfully
+                return;
+              }
+              
+              // If public cart endpoint failed, try the admin endpoint as fallback
+              const cartUrl = `${apiBase}/api/admin/competitions/${competition.id}/cart-items`;
+              console.log(`Falling back to admin cart API: ${cartUrl}`);
+              
+              const cartResponse = await fetch(cartUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({})
+              });
+              
+              if (cartResponse.ok) {
+                const cartData: CartItemsResponse = await cartResponse.json();
+                console.log('Admin cart data received:', cartData);
+                
+                if (isMounted && cartData && Array.isArray(cartData.inCartNumbers)) {
+                  setInCartNumbers(cartData.inCartNumbers);
+                }
+              }
             } catch (cartError) {
               console.error("Non-fatal cart data error:", cartError);
             }

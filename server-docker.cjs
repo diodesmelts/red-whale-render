@@ -2294,6 +2294,50 @@ app.get('/api/competitions/:id/public-stats', async (req, res) => {
   }
 });
 
+// Public endpoint for cart items (no auth required - works in all environments)
+app.post('/api/competitions/:id/public-cart', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    console.log(`🛒 Fetching public cart items for competition ${numId}`);
+    
+    // Get all pending entries (in cart) for this competition
+    const activeEntries = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Filter for pending entries
+    const pendingEntries = activeEntries.rows.filter(entry => entry.payment_status === 'pending');
+    
+    // Extract all numbers from pending entries
+    const inCartNumbers = new Set();
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    console.log(`Found ${inCartNumbers.size} in-cart numbers for competition ${numId} (public endpoint)`);
+    
+    // Return the cart numbers
+    return res.json({
+      competitionId: numId,
+      inCartNumbers: Array.from(inCartNumbers)
+    });
+  } catch (error) {
+    console.error('Error fetching public competition cart numbers:', error);
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 // Admin endpoint to get ticket stats for a competition
 app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, async (req, res) => {
   try {
