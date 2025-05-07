@@ -49,6 +49,40 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
   useEffect(() => {
     let isMounted = true;
     
+    // Helper function to fetch cart data
+    const fetchCartData = async () => {
+      if (!competition?.id) return false;
+      
+      try {
+        // Get cart data
+        const cartUrl = `/api/admin/competitions/${competition.id}/cart-items`;
+        console.log(`Making cart API request to: ${cartUrl}`);
+        
+        const cartResponse = await fetch(cartUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({})
+        });
+        
+        if (cartResponse.ok) {
+          const cartData: CartItemsResponse = await cartResponse.json();
+          console.log('Cart data received:', cartData);
+          
+          if (isMounted && cartData && Array.isArray(cartData.inCartNumbers)) {
+            setInCartNumbers(cartData.inCartNumbers);
+          }
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error("Cart fetch error:", error);
+        return false;
+      }
+    };
+    
     const fetchData = async () => {
       if (!competition?.id) {
         console.error('No competition ID provided for stats');
@@ -212,80 +246,66 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
           }
         }
         
-        // Try the public endpoint first (will work in all environments)
-        const publicStatsUrl = `${apiBase}/api/competitions/${competition.id}/public-stats`;
-        console.log(`Making stats API request to: ${publicStatsUrl}`);
+        // Skip directly to admin endpoints in development for now
+        // In production, the public endpoints will be properly configured
         
-        try {
-          const publicStatsResponse = await fetch(publicStatsUrl, {
-            credentials: 'include',
-            headers: { 'Cache-Control': 'no-cache' }
-          });
-          
-          console.log(`Public stats response status: ${publicStatsResponse.status}`);
-          
-          if (publicStatsResponse.ok) {
-            const statsData = await publicStatsResponse.json();
-            if (isMounted) {
-              setStats(statsData);
-              setIsLoading(false);
+        // In Render environment, try alternate paths
+        if (isRender) {
+          try {
+            console.log('🧪 Testing multiple URL patterns for stats on Render');
+            
+            // List of URL patterns to try on Render environment
+            const urlPatterns = [
+              // Specialized Mobycomps API
+              `/mobycomps-api/stats/${competition.id}`,
+              // Non-auth admin stats endpoint
+              `/api/competitions/${competition.id}/admin-stats`,
+              // Absolute URL to non-auth endpoint
+              `${window.location.protocol}//${window.location.hostname}/api/competitions/${competition.id}/admin-stats`
+            ];
+            
+            let successfulResponse = null;
+            
+            // Try each pattern until one works
+            for (const testUrl of urlPatterns) {
+              console.log(`🧪 Testing URL pattern: ${testUrl}`);
+              
+              try {
+                const testResponse = await fetch(testUrl, {
+                  credentials: 'include',
+                  headers: { 'Cache-Control': 'no-cache' }
+                });
+                
+                console.log(`🧪 Pattern ${testUrl} response: ${testResponse.status}`);
+                
+                if (testResponse.ok) {
+                  console.log(`✅ Found working URL pattern: ${testUrl}`);
+                  successfulResponse = await testResponse.json();
+                  break;
+                }
+              } catch (patternError) {
+                console.log(`❌ Error with pattern ${testUrl}:`, patternError);
+              }
             }
             
-            // Get cart data separately with public cart endpoint
-            try {
-              const publicCartUrl = `${apiBase}/api/competitions/${competition.id}/public-cart`;
-              console.log(`Making public cart API request to: ${publicCartUrl}`);
+            // If we found a working pattern, use that data
+            if (successfulResponse) {
+              console.log('✅ Using successful response data:', successfulResponse);
               
-              const publicCartResponse = await fetch(publicCartUrl, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({})
-              });
-              
-              if (publicCartResponse.ok) {
-                const cartData: CartItemsResponse = await publicCartResponse.json();
-                console.log('Public cart data received:', cartData);
-                
-                if (isMounted && cartData && Array.isArray(cartData.inCartNumbers)) {
-                  setInCartNumbers(cartData.inCartNumbers);
-                }
-                
-                // Exit if we got the data successfully
-                return;
+              if (isMounted) {
+                setStats(successfulResponse);
+                setIsLoading(false);
               }
               
-              // If public cart endpoint failed, try the admin endpoint as fallback
-              const cartUrl = `${apiBase}/api/admin/competitions/${competition.id}/cart-items`;
-              console.log(`Falling back to admin cart API: ${cartUrl}`);
+              // Try to get cart data
+              await fetchCartData();
               
-              const cartResponse = await fetch(cartUrl, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({})
-              });
-              
-              if (cartResponse.ok) {
-                const cartData: CartItemsResponse = await cartResponse.json();
-                console.log('Admin cart data received:', cartData);
-                
-                if (isMounted && cartData && Array.isArray(cartData.inCartNumbers)) {
-                  setInCartNumbers(cartData.inCartNumbers);
-                }
-              }
-            } catch (cartError) {
-              console.error("Non-fatal cart data error:", cartError);
+              // Just return to exit and avoid the regular API calls
+              return;
             }
-            
-            return; // Exit if this worked
+          } catch (error) {
+            console.error('Render URL testing error:', error);
           }
-        } catch (publicError) {
-          console.error("Public stats endpoint error, falling back to admin endpoint:", publicError);
         }
         
         // If public endpoint fails, try the admin endpoint as a fallback
