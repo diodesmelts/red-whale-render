@@ -69,33 +69,69 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
         console.log(`🎟️ Loading stats for competition ID: ${competition.id}`);
         setIsLoading(true);
         
-        // SIMPLIFIED APPROACH:
-        // 1. We'll use a single endpoint approach for competition stats to reduce complexity
-        // 2. Determine environment once and use consistent strategy
+        // Use the new unified ticket status endpoint as the primary data source
+        const ticketStatusUrl = `/api/competitions/${competition.id}/ticket-status`;
         
-        // Detect Render environment (more reliable check)
-        const isProduction = window.location.hostname !== 'localhost' 
-                            && !window.location.hostname.includes('replit.dev');
-        const isMobyComps = window.location.hostname.includes('mobycomps.co.uk');
-        const isRender = isProduction || isMobyComps;
+        console.log(`🎟️ Fetching from unified ticket status endpoint: ${ticketStatusUrl}`);
         
-        console.log(`📊 Environment: ${isProduction ? 'Production' : 'Development'}, Mobycomps: ${isMobyComps}`);
+        try {
+          const ticketStatusResponse = await fetch(ticketStatusUrl, {
+            headers: { 'Cache-Control': 'no-cache' },
+          });
+          
+          console.log(`🎟️ Ticket status response: ${ticketStatusResponse.status}`);
+          
+          if (ticketStatusResponse.ok) {
+            const ticketStatus = await ticketStatusResponse.json();
+            console.log('🎟️ Ticket status data received successfully:', {
+              purchased: ticketStatus.ticketStatuses.purchased.length,
+              reserved: ticketStatus.ticketStatuses.reserved.length,
+              available: ticketStatus.ticketStatuses.available.length
+            });
+            
+            if (isMounted) {
+              // Transform the ticket status data into the format expected by the admin view
+              const statsData: TicketStats = {
+                totalTickets: ticketStatus.totalTickets,
+                purchasedTickets: ticketStatus.ticketStatuses.purchased.length,
+                inCartTickets: ticketStatus.ticketStatuses.reserved.length,
+                availableTickets: ticketStatus.ticketStatuses.available.length,
+                soldTicketsCount: ticketStatus.ticketStatuses.purchased.length,
+                allNumbers: {
+                  totalRange: Array.from({length: ticketStatus.totalTickets}, (_, i) => i + 1),
+                  purchased: ticketStatus.ticketStatuses.purchased,
+                  inCart: ticketStatus.ticketStatuses.reserved
+                }
+              };
+              
+              setStats(statsData);
+              setInCartNumbers(ticketStatus.ticketStatuses.reserved);
+              setIsLoading(false);
+            }
+            return; // Exit if successful
+          }
+        } catch (ticketStatusError) {
+          console.error('🎟️ Error with ticket status endpoint:', ticketStatusError);
+        }
         
-        // First try the direct stats endpoint without authentication
+        // Fall back to legacy endpoints if the unified endpoint fails
+        console.log('⚠️ Unified endpoint failed, falling back to legacy endpoints');
+        
+        // Try the direct stats endpoint without authentication
         const directStatsUrl = `/api/competitions/${competition.id}/admin-stats`;
         
-        console.log(`📊 Trying direct stats URL: ${directStatsUrl}`);
+        console.log(`📊 Trying legacy direct stats URL: ${directStatsUrl}`);
         
         try {
           const statsResponse = await fetch(directStatsUrl, {
             headers: { 'Cache-Control': 'no-cache' },
           });
           
-          console.log(`📊 Direct stats response status: ${statsResponse.status}`);
+          console.log(`📊 Legacy direct stats response status: ${statsResponse.status}`);
           
           if (statsResponse.ok) {
             const statsData = await statsResponse.json();
-            console.log('📊 Stats data received successfully from direct endpoint');
+            console.log('📊 Stats data received successfully from legacy endpoint');
             
             if (isMounted) {
               setStats(statsData);
@@ -107,7 +143,7 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
             return; // Exit if successful
           }
         } catch (directError) {
-          console.error('📊 Error with direct stats endpoint:', directError);
+          console.error('📊 Error with legacy direct stats endpoint:', directError);
         }
         
         // If direct stats failed, try the admin endpoint
@@ -157,33 +193,6 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
           }
         } catch (adminError) {
           console.error('📊 Error with admin stats endpoint:', adminError);
-        }
-        
-        // If we're specifically on mobycomps.co.uk, try the special direct endpoint
-        if (isMobyComps) {
-          const mobyStatsUrl = `/mobycomps-api/stats/${competition.id}`;
-          
-          console.log(`📊 Trying mobycomps special URL: ${mobyStatsUrl}`);
-          
-          try {
-            const mobyResponse = await fetch(mobyStatsUrl);
-            
-            console.log(`📊 Mobycomps response status: ${mobyResponse.status}`);
-            
-            if (mobyResponse.ok) {
-              const mobyData = await mobyResponse.json();
-              console.log('📊 Stats data received successfully from mobycomps endpoint');
-              
-              if (isMounted) {
-                setStats(mobyData);
-                setInCartNumbers([]);
-                setIsLoading(false);
-              }
-              return; // Exit if successful
-            }
-          } catch (mobyError) {
-            console.error('📊 Error with mobycomps endpoint:', mobyError);
-          }
         }
         
         // If everything fails, display a fallback from the competition object itself
