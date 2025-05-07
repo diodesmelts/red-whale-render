@@ -1,6 +1,9 @@
-import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Enum for ticket status
+export const ticketStatusEnum = pgEnum('ticket_status', ['available', 'reserved', 'purchased']);
 
 // User schema
 export const users = pgTable("users", {
@@ -68,6 +71,18 @@ export const siteConfig = pgTable("site_config", {
   key: text("key").notNull().unique(),
   value: text("value"),
   description: text("description"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Ticket statuses schema - track individual ticket numbers and their statuses
+export const ticketStatuses = pgTable("ticket_statuses", {
+  id: serial("id").primaryKey(),
+  competitionId: integer("competition_id").notNull(),
+  ticketNumber: integer("ticket_number").notNull(),
+  status: text("status").notNull().$type<'available' | 'reserved' | 'purchased'>().default('available'),
+  entryId: integer("entry_id"),
+  userId: integer("user_id"),
+  reservedUntil: timestamp("reserved_until"),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
