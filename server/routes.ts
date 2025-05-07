@@ -256,94 +256,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Competition not found' });
       }
       
-      // Get all entries for this competition to calculate stats
-      const entryList = await db.select()
-        .from(entries)
-        .where(eq(entries.competitionId, numId));
+      // CRITICAL: Use the ticket service for consistent number tracking
+      const { TicketService } = await import('./ticket-service');
+      const takenNumbers = await TicketService.getTakenNumbers(numId);
       
-      console.log(`📊 Found ${entryList.length} entries for competition ${numId}`);
+      // Calculate ticket counts
+      const totalTickets = competition[0].totalTickets;
+      const purchasedTickets = takenNumbers.purchased.length;
+      const inCartTickets = takenNumbers.inCart.length;
+      const availableTickets = totalTickets - purchasedTickets - inCartTickets;
       
-      // Calculate purchased tickets (completed payment status)
-      const purchasedNumbers = new Set();
-      const purchasedEntries = entryList.filter(entry => entry.paymentStatus === 'completed');
-      console.log(`📊 Found ${purchasedEntries.length} completed entries`);
+      console.log(`📊 Stats summary for competition ${numId} (via TicketService):`, {
+        totalTickets,
+        purchasedTickets,
+        inCartTickets,
+        availableTickets
+      });
       
-      for (const entry of purchasedEntries) {
-        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
-          for (const num of entry.selectedNumbers) {
-            purchasedNumbers.add(Number(num));
-          }
-        }
-      }
-      
-      // Calculate in-cart tickets (pending payment status)
-      const inCartNumbers = new Set();
-      const pendingEntries = entryList.filter(entry => entry.paymentStatus === 'pending');
-      console.log(`📊 Found ${pendingEntries.length} pending entries`);
-      
-      for (const entry of pendingEntries) {
-        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
-          for (const num of entry.selectedNumbers) {
-            inCartNumbers.add(Number(num));
-          }
-        }
-      }
-      
-      // Calculate total range of numbers
+      // Create total range
       const totalRange = Array.from(
         { length: competition[0].totalTickets }, 
         (_, i) => i + 1
       );
       
-      // If tickets_sold is set in the competition but we have no purchased numbers, 
-      // we use the tickets_sold value and generate random numbers to match
-      const purchasedCount = purchasedNumbers.size;
-      const inCartCount = inCartNumbers.size;
-      const ticketsSold = competition[0].ticketsSold || 0;
-      
-      // Use the greater of our calculated purchases or the competition's ticketsSold value
-      const finalPurchasedTickets = Math.max(purchasedCount, ticketsSold);
-      
-      // If we need to generate additional purchased numbers to match ticketsSold
-      if (ticketsSold > purchasedCount) {
-        console.log(`📊 Generating additional ${ticketsSold - purchasedCount} purchased numbers to match ticketsSold`);
-        
-        // Find available numbers that aren't in purchasedNumbers or inCartNumbers
-        const allTakenNumbers = new Set([...purchasedNumbers, ...inCartNumbers]);
-        const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
-        
-        // Add enough random available numbers to match tickets_sold
-        const additionalNeeded = ticketsSold - purchasedCount;
-        const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
-        
-        for (const num of additionalNumbers) {
-          purchasedNumbers.add(num);
-        }
-      }
-      
-      const totalTickets = competition[0].totalTickets;
-      const availableTickets = totalTickets - finalPurchasedTickets - inCartCount;
-      
-      console.log(`📊 Stats summary for competition ${numId}:`, {
-        totalTickets,
-        purchasedTickets: finalPurchasedTickets,
-        inCartTickets: inCartCount,
-        availableTickets,
-        purchasedNumbersCount: purchasedNumbers.size,
-        inCartNumbersCount: inCartNumbers.size
-      });
-      
-      // Return stats
+      // Return stats with consistent numbers from the service
       res.json({
         totalTickets,
-        purchasedTickets: finalPurchasedTickets,
-        inCartTickets: inCartCount,
+        purchasedTickets,
+        inCartTickets,
         availableTickets,
-        soldTicketsCount: finalPurchasedTickets,
+        soldTicketsCount: purchasedTickets,
         allNumbers: {
           totalRange,
-          purchased: Array.from(purchasedNumbers),
-          inCart: Array.from(inCartNumbers)
+          purchased: takenNumbers.purchased,
+          inCart: takenNumbers.inCart
         }
       });
     } catch (error: any) {
@@ -374,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Special mobycomps.co.uk specific endpoints
+  // Special mobycomps.co.uk specific endpoints - also using central ticket service
   app.get('/mobycomps-api/stats/:id', async (req, res) => {
     try {
       console.log('📊 MOBYCOMPS SPECIFIC STATS ENDPOINT: Processing request for competition', req.params.id);
@@ -395,94 +341,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Competition not found' });
       }
       
-      // Get all entries for this competition to calculate stats
-      const entryList = await db.select()
-        .from(entries)
-        .where(eq(entries.competitionId, numId));
+      // CRITICAL: Use the same ticket service for consistent number tracking
+      const { TicketService } = await import('./ticket-service');
+      const takenNumbers = await TicketService.getTakenNumbers(numId);
       
-      console.log(`📊 [MOBYCOMPS] Found ${entryList.length} entries for competition ${numId}`);
+      // Calculate ticket counts - using the shared ticket service
+      const totalTickets = competition[0].totalTickets;
+      const purchasedTickets = takenNumbers.purchased.length; 
+      const inCartTickets = takenNumbers.inCart.length;
+      const availableTickets = totalTickets - purchasedTickets - inCartTickets;
       
-      // Calculate purchased tickets (completed payment status)
-      const purchasedNumbers = new Set();
-      const purchasedEntries = entryList.filter(entry => entry.paymentStatus === 'completed');
-      console.log(`📊 [MOBYCOMPS] Found ${purchasedEntries.length} completed entries`);
+      console.log(`📊 [MOBYCOMPS] Stats summary for competition ${numId} (via TicketService):`, {
+        totalTickets,
+        purchasedTickets,
+        inCartTickets,
+        availableTickets
+      });
       
-      for (const entry of purchasedEntries) {
-        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
-          for (const num of entry.selectedNumbers) {
-            purchasedNumbers.add(Number(num));
-          }
-        }
-      }
-      
-      // Calculate in-cart tickets (pending payment status)
-      const inCartNumbers = new Set();
-      const pendingEntries = entryList.filter(entry => entry.paymentStatus === 'pending');
-      console.log(`📊 [MOBYCOMPS] Found ${pendingEntries.length} pending entries`);
-      
-      for (const entry of pendingEntries) {
-        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
-          for (const num of entry.selectedNumbers) {
-            inCartNumbers.add(Number(num));
-          }
-        }
-      }
-      
-      // Calculate total range of numbers
+      // Create total range
       const totalRange = Array.from(
         { length: competition[0].totalTickets }, 
         (_, i) => i + 1
       );
       
-      // If tickets_sold is set in the competition but we have no purchased numbers, 
-      // we use the tickets_sold value and generate random numbers to match
-      const purchasedCount = purchasedNumbers.size;
-      const inCartCount = inCartNumbers.size;
-      const ticketsSold = competition[0].ticketsSold || 0;
-      
-      // Use the greater of our calculated purchases or the competition's ticketsSold value
-      const finalPurchasedTickets = Math.max(purchasedCount, ticketsSold);
-      
-      // If we need to generate additional purchased numbers to match ticketsSold
-      if (ticketsSold > purchasedCount) {
-        console.log(`📊 [MOBYCOMPS] Generating additional ${ticketsSold - purchasedCount} purchased numbers to match ticketsSold`);
-        
-        // Find available numbers that aren't in purchasedNumbers or inCartNumbers
-        const allTakenNumbers = new Set([...purchasedNumbers, ...inCartNumbers]);
-        const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
-        
-        // Add enough random available numbers to match tickets_sold
-        const additionalNeeded = ticketsSold - purchasedCount;
-        const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
-        
-        for (const num of additionalNumbers) {
-          purchasedNumbers.add(num);
-        }
-      }
-      
-      const totalTickets = competition[0].totalTickets;
-      const availableTickets = totalTickets - finalPurchasedTickets - inCartCount;
-      
-      console.log(`📊 [MOBYCOMPS] Stats summary for competition ${numId}:`, {
-        totalTickets,
-        purchasedTickets: finalPurchasedTickets,
-        inCartTickets: inCartCount,
-        availableTickets,
-        purchasedNumbersCount: purchasedNumbers.size,
-        inCartNumbersCount: inCartNumbers.size
-      });
-      
-      // Return stats
+      // Return stats with consistent numbers from the service
       res.json({
         totalTickets,
-        purchasedTickets: finalPurchasedTickets,
-        inCartTickets: inCartCount,
+        purchasedTickets,
+        inCartTickets,
         availableTickets,
-        soldTicketsCount: finalPurchasedTickets,
+        soldTicketsCount: purchasedTickets,
         allNumbers: {
           totalRange,
-          purchased: Array.from(purchasedNumbers),
-          inCart: Array.from(inCartNumbers)
+          purchased: takenNumbers.purchased,
+          inCart: takenNumbers.inCart
         }
       });
     } catch (error: any) {
@@ -834,7 +726,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // API endpoint to get taken numbers for a competition - SYNCHRONIZED with admin view
+  // API endpoint to get taken numbers for a competition - using central ticket service for consistency
   app.get("/api/competitions/:id/taken-numbers", async (req, res) => {
     try {
       // Validate ID
@@ -843,107 +735,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid competition ID" });
       }
 
-      console.log(`⚠️ TAKEN NUMBERS REQUEST: Competition ID ${id} - using DIRECT ADMIN-STATS IMPLEMENTATION for perfect synchronization`);
+      console.log(`⚠️ TAKEN NUMBERS REQUEST: Competition ID ${id} - using TICKET SERVICE for perfect synchronization with admin view`);
 
-      // CRITICAL: We call the admin-stats endpoint directly by redirecting
-      // to ensure perfect consistency with the admin view
+      // CRITICAL: Use the shared ticket service to ensure perfect consistency
       try {
-        // First verify the competition exists
-        const competitionList = await db.select()
-          .from(competitions)
-          .where(eq(competitions.id, id))
-          .limit(1);
-          
-        if (!competitionList.length) {
-          return res.status(404).json({ message: 'Competition not found' });
-        }
+        // Import the ticket service
+        const { TicketService } = await import('./ticket-service');
         
-        const competition = competitionList[0];
+        // Get taken numbers directly from the service
+        const takenNumbers = await TicketService.getTakenNumbers(id);
         
-        // Get all entries for this competition to calculate stats
-        const entryList = await db.select()
-          .from(entries)
-          .where(eq(entries.competitionId, id));
+        // Combine purchased and in-cart numbers for the API response
+        const allTakenNumbers = [...takenNumbers.purchased, ...takenNumbers.inCart];
         
-        console.log(`📊 TAKEN-NUMBERS: Found ${entryList.length} entries for competition ${id}`);
-        
-        // Calculate purchased tickets (completed payment status)
-        const purchasedNumbers = new Set();
-        const purchasedEntries = entryList.filter(entry => entry.paymentStatus === 'completed');
-        console.log(`📊 TAKEN-NUMBERS: Found ${purchasedEntries.length} completed entries`);
-        
-        for (const entry of purchasedEntries) {
-          if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
-            for (const num of entry.selectedNumbers) {
-              purchasedNumbers.add(Number(num));
-            }
-          }
-        }
-        
-        // Calculate in-cart tickets (pending payment status)
-        const inCartNumbers = new Set();
-        const pendingEntries = entryList.filter(entry => entry.paymentStatus === 'pending');
-        console.log(`📊 TAKEN-NUMBERS: Found ${pendingEntries.length} pending entries`);
-        
-        for (const entry of pendingEntries) {
-          if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
-            for (const num of entry.selectedNumbers) {
-              inCartNumbers.add(Number(num));
-            }
-          }
-        }
-        
-        // Calculate total range of numbers
-        const totalRange = Array.from(
-          { length: competition.totalTickets }, 
-          (_, i) => i + 1
-        );
-        
-        // If tickets_sold is set in the competition but we have no purchased numbers, 
-        // we use the tickets_sold value and generate random numbers to match
-        const purchasedCount = purchasedNumbers.size;
-        const inCartCount = inCartNumbers.size;
-        const ticketsSold = competition.ticketsSold || 0;
-        
-        // Use the greater of our calculated purchases or the competition's ticketsSold value
-        const finalPurchasedTickets = Math.max(purchasedCount, ticketsSold);
-        
-        // If we need to generate additional purchased numbers to match ticketsSold
-        if (ticketsSold > purchasedCount) {
-          console.log(`📊 TAKEN-NUMBERS: Generating additional ${ticketsSold - purchasedCount} purchased numbers to match ticketsSold`);
-          
-          // Find available numbers that aren't in purchasedNumbers or inCartNumbers
-          const allTakenNumbers = new Set([...purchasedNumbers, ...inCartNumbers]);
-          const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
-          
-          // Add enough random available numbers to match tickets_sold
-          const additionalNeeded = ticketsSold - purchasedCount;
-          const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
-          
-          for (const num of additionalNumbers) {
-            purchasedNumbers.add(num);
-          }
-        }
-        
-        // Get all taken numbers (both purchased and in cart)
-        const takenNumbers = [...Array.from(purchasedNumbers), ...Array.from(inCartNumbers)];
-        
-        console.log(`📊 TAKEN-NUMBERS: Returning ${takenNumbers.length} taken numbers:`, {
-          purchased: purchasedNumbers.size,
-          inCart: inCartNumbers.size,
-          isDirectAdminImplementation: true
+        console.log(`📊 TAKEN-NUMBERS: Returning ${allTakenNumbers.length} taken numbers via ticket service:`, {
+          purchased: takenNumbers.purchased.length,
+          inCart: takenNumbers.inCart.length,
+          isFromTicketService: true
         });
         
         // Return taken numbers in the expected format
         return res.json({ 
           competitionId: id,
-          takenNumbers: takenNumbers,
+          takenNumbers: allTakenNumbers,
           _debug: {
-            purchasedCount: purchasedNumbers.size,
-            inCartCount: inCartNumbers.size,
-            totalTickets: competition.totalTickets,
-            ticketsSold: ticketsSold,
-            source: "direct-admin-implementation"
+            purchasedCount: takenNumbers.purchased.length,
+            inCartCount: takenNumbers.inCart.length,
+            source: "central-ticket-service"
           }
         });
         

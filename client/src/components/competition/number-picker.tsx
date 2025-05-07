@@ -45,50 +45,67 @@ export function NumberPicker({
   // Fetch taken numbers when the dialog opens
   useEffect(() => {
     if (isDialogOpen && competitionId) {
-      console.log(`🚀 NumberPicker dialog opened for competition ${competitionId} - fetching taken numbers`);
-      
-      // CRITICAL: We now fetch directly from the admin endpoint to ensure 100% consistency
-      // This ensures that we're using the same exact data source as the admin view
-      const fetchAdminStats = async () => {
+      // EMERGENCY: Directly console log all numbers directly from the admin view for comparison
+      const emergencyDiagnostic = async () => {
         try {
-          console.log(`🚀 Fetching direct from admin-stats endpoint for competition ${competitionId}`);
-          const adminResponse = await fetch(`/api/competitions/${competitionId}/admin-stats`);
+          console.log(`🆘 EMERGENCY DIAGNOSTIC - Competition ${competitionId}`);
+          
+          // First get admin stats for complete detail
+          const adminStatsUrl = `/api/competitions/${competitionId}/admin-stats`;
+          console.log(`🔍 Fetching from ${adminStatsUrl}`);
+          const adminResponse = await fetch(adminStatsUrl);
           
           if (adminResponse.ok) {
             const adminData = await adminResponse.json();
-            console.log(`✅ Admin data received:`, {
-              purchasedCount: adminData.purchasedTickets,
-              availableCount: adminData.availableTickets,
-              inCartCount: adminData.inCartTickets,
-              purchasedArray: adminData.allNumbers?.purchased?.length
-            });
+            console.log(`🔍 ADMIN VIEW DATA: ${JSON.stringify(adminData)}`);
+            console.log(`🔍 ADMIN VIEW shows ${adminData.purchasedTickets} purchased tickets`);
             
-            // Use the admin data directly instead of the taken-numbers endpoint
-            if (adminData.allNumbers && Array.isArray(adminData.allNumbers.purchased)) {
-              console.log(`📊 Setting ${adminData.allNumbers.purchased.length} purchased numbers and ${adminData.allNumbers.inCart.length} in-cart numbers as taken`);
+            if (adminData.allNumbers?.purchased) {
+              console.log(`🔍 PURCHASED NUMBERS according to ADMIN: ${JSON.stringify(adminData.allNumbers.purchased)}`);
+            }
+            
+            // Now get the taken-numbers data to compare
+            const takenNumbersUrl = `/api/competitions/${competitionId}/taken-numbers`;
+            console.log(`🔍 Fetching from ${takenNumbersUrl}`);
+            const takenResponse = await fetch(takenNumbersUrl);
+            
+            if (takenResponse.ok) {
+              const takenData = await takenResponse.json();
+              console.log(`🔍 TAKEN NUMBERS DATA: ${JSON.stringify(takenData)}`);
               
-              // Combine all unavailable numbers - both purchased and in cart
-              const allUnavailable = [
-                ...adminData.allNumbers.purchased,
-                ...adminData.allNumbers.inCart
-              ];
+              // Log differences between the two datasets
+              const adminPurchased = new Set(adminData.allNumbers.purchased);
+              const takenNumbers = new Set(takenData.takenNumbers);
               
-              // Set them as taken numbers
+              console.log(`🔍 ADMIN shows ${adminPurchased.size} purchased numbers`);
+              console.log(`🔍 TAKEN NUMBERS shows ${takenNumbers.size} taken numbers`);
+              
+              // Find numbers in taken that aren't in admin purchased
+              const onlyInTaken = [...takenNumbers].filter(num => !adminPurchased.has(num));
+              console.log(`🔍 Numbers only in TAKEN: ${JSON.stringify(onlyInTaken)}`);
+              
+              // Find numbers in admin purchased that aren't in taken
+              const onlyInAdmin = [...adminPurchased].filter(num => !takenNumbers.has(num));
+              console.log(`🔍 Numbers only in ADMIN: ${JSON.stringify(onlyInAdmin)}`);
+              
+              // Use admin data directly for maximum synchronization
+              const allUnavailable = [...adminData.allNumbers.purchased, ...adminData.allNumbers.inCart];
+              console.log(`🔍 Setting ${allUnavailable.length} numbers as taken`);
+              
+              // DIRECTLY use exactly what admin sees for perfect sync
               setTakenNumbers(allUnavailable);
               return;
             }
-          } else {
-            console.warn(`❌ Failed to get admin stats, status: ${adminResponse.status}`);
           }
         } catch (error) {
-          console.error(`❌ Error fetching admin stats: ${error}`);
+          console.error(`❌ Error in emergency diagnostic: ${error}`);
         }
         
-        // Fallback to the usual fetchTakenNumbers if admin endpoint failed
+        // If all else fails, fallback to original implementation
         fetchTakenNumbers();
       };
       
-      fetchAdminStats();
+      emergencyDiagnostic();
     }
   }, [isDialogOpen, competitionId]);
 
