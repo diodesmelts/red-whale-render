@@ -2281,6 +2281,100 @@ app.get('/api/admin/competitions/:id/ticket-stats', renderCompatibleAdminAuth, a
   }
 });
 
+// Stats endpoint for mobycomps.co.uk - GET request with CORS headers
+app.get('/mobycomps-api/stats/:id', async (req, res) => {
+  // Set CORS headers specifically for mobycomps.co.uk and www.mobycomps.co.uk
+  // Determine which domain to use for CORS based on the Origin header
+  const origin = req.headers.origin;
+  if (origin && (origin.includes('mobycomps.co.uk'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    console.log(`🌊 STATS: Setting CORS origin to: ${origin}`);
+  } else {
+    // Default to wildcard if we can't determine origin
+    res.header('Access-Control-Allow-Origin', '*');
+    console.log('🌊 STATS: Using wildcard CORS origin');
+  }
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    return res.status(204).send();
+  }
+  
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    console.log('🌊 MOBYCOMPS SPECIAL ENDPOINT: Direct stats access without auth');
+    console.log('Request headers:', JSON.stringify(req.headers));
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    // Get competition information including tickets_sold
+    const competition = await pool.query(
+      'SELECT id, total_tickets, tickets_sold FROM competitions WHERE id = $1 LIMIT 1',
+      [numId]
+    );
+    
+    if (competition.rows.length === 0) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    const compData = competition.rows[0];
+    const totalTickets = compData.total_tickets;
+    const ticketsSold = compData.tickets_sold || 0;
+    
+    // Get all entries for this competition
+    const entryList = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Get in-cart numbers
+    const inCartNumbers = new Set();
+    const pendingEntries = entryList.rows.filter(entry => entry.payment_status === 'pending');
+    
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Create a range of all possible ticket numbers
+    const totalRange = Array.from({ length: totalTickets }, (_, i) => i + 1);
+    
+    // Calculate stats for response
+    console.log(`[MOBYCOMPS SPECIAL] Competition ${numId} stats:`, {
+      totalTickets,
+      ticketsSold,
+      inCartCount: inCartNumbers.size
+    });
+    
+    // Return comprehensive stats - use tickets_sold directly from the DB
+    return res.json({
+      totalTickets: totalTickets,
+      purchasedTickets: ticketsSold,
+      inCartTickets: inCartNumbers.size,
+      availableTickets: totalTickets - ticketsSold - inCartNumbers.size,
+      soldTicketsCount: ticketsSold,
+      allNumbers: {
+        totalRange: totalRange,
+        purchased: [], // Empty array since we don't have specific numbers
+        inCart: Array.from(inCartNumbers)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching competition stats:', error);
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 // Cart endpoint for mobycomps.co.uk - POST request with CORS headers
 app.post('/mobycomps-api/cart/:id', async (req, res) => {
   // Set CORS headers specifically for mobycomps.co.uk and www.mobycomps.co.uk
@@ -2341,6 +2435,78 @@ app.post('/mobycomps-api/cart/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching competition cart numbers:', error);
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+// Special non-auth endpoint for ticket stats (Render compatibility)
+app.get('/api/competitions/:id/admin-stats', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const numId = parseInt(id);
+    
+    if (isNaN(numId)) {
+      return res.status(400).json({ message: 'Invalid competition ID format' });
+    }
+    
+    console.log(`[RENDER COMPATIBLE] Fetching ticket stats for competition ${numId}`);
+    
+    // Get competition information including tickets_sold
+    const competition = await pool.query(
+      'SELECT id, total_tickets, tickets_sold FROM competitions WHERE id = $1 LIMIT 1',
+      [numId]
+    );
+    
+    if (competition.rows.length === 0) {
+      return res.status(404).json({ message: 'Competition not found' });
+    }
+    
+    const compData = competition.rows[0];
+    const totalTickets = compData.total_tickets;
+    const ticketsSold = compData.tickets_sold || 0;
+    
+    // Get all entries for this competition
+    const entryList = await pool.query(
+      'SELECT id, user_id, competition_id, selected_numbers, payment_status FROM entries WHERE competition_id = $1',
+      [numId]
+    );
+    
+    // Get in-cart numbers
+    const inCartNumbers = new Set();
+    const pendingEntries = entryList.rows.filter(entry => entry.payment_status === 'pending');
+    
+    for (const entry of pendingEntries) {
+      if (entry.selected_numbers && Array.isArray(entry.selected_numbers)) {
+        for (const num of entry.selected_numbers) {
+          inCartNumbers.add(Number(num));
+        }
+      }
+    }
+    
+    // Create a range of all possible ticket numbers
+    const totalRange = Array.from({ length: totalTickets }, (_, i) => i + 1);
+    
+    console.log(`[RENDER COMPATIBLE] Competition ${numId} stats:`, {
+      totalTickets,
+      ticketsSold,
+      inCartCount: inCartNumbers.size
+    });
+    
+    // Return comprehensive stats - use tickets_sold directly from the DB
+    return res.json({
+      totalTickets: totalTickets,
+      purchasedTickets: ticketsSold,
+      inCartTickets: inCartNumbers.size,
+      availableTickets: totalTickets - ticketsSold - inCartNumbers.size,
+      soldTicketsCount: ticketsSold,
+      allNumbers: {
+        totalRange: totalRange,
+        purchased: [], // Empty array since we don't have specific numbers
+        inCart: Array.from(inCartNumbers)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching competition stats:', error);
     return res.status(500).json({ message: error.message });
   }
 });
