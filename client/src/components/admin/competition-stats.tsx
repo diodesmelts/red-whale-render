@@ -49,40 +49,6 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
   useEffect(() => {
     let isMounted = true;
     
-    // Helper function to fetch cart data
-    const fetchCartData = async () => {
-      if (!competition?.id) return false;
-      
-      try {
-        // Get cart data
-        const cartUrl = `/api/admin/competitions/${competition.id}/cart-items`;
-        console.log(`Making cart API request to: ${cartUrl}`);
-        
-        const cartResponse = await fetch(cartUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({})
-        });
-        
-        if (cartResponse.ok) {
-          const cartData: CartItemsResponse = await cartResponse.json();
-          console.log('Cart data received:', cartData);
-          
-          if (isMounted && cartData && Array.isArray(cartData.inCartNumbers)) {
-            setInCartNumbers(cartData.inCartNumbers);
-          }
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.error("Cart fetch error:", error);
-        return false;
-      }
-    };
-    
     const fetchData = async () => {
       if (!competition?.id) {
         console.error('No competition ID provided for stats');
@@ -91,6 +57,157 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
           setIsLoading(false);
         }
         return;
+      }
+      
+      try {
+        console.log(`🎟️ Loading stats for competition ID: ${competition.id}`);
+        setIsLoading(true);
+        
+        // SIMPLIFIED APPROACH:
+        // 1. We'll use a single endpoint approach for competition stats to reduce complexity
+        // 2. Determine environment once and use consistent strategy
+        
+        // Detect Render environment (more reliable check)
+        const isProduction = window.location.hostname !== 'localhost' 
+                            && !window.location.hostname.includes('replit.dev');
+        const isMobyComps = window.location.hostname.includes('mobycomps.co.uk');
+        const isRender = isProduction || isMobyComps;
+        
+        console.log(`📊 Environment: ${isProduction ? 'Production' : 'Development'}, Mobycomps: ${isMobyComps}`);
+        
+        // First try the direct stats endpoint without authentication
+        const directStatsUrl = `/api/competitions/${competition.id}/admin-stats`;
+        
+        console.log(`📊 Trying direct stats URL: ${directStatsUrl}`);
+        
+        try {
+          const statsResponse = await fetch(directStatsUrl, {
+            headers: { 'Cache-Control': 'no-cache' },
+          });
+          
+          console.log(`📊 Direct stats response status: ${statsResponse.status}`);
+          
+          if (statsResponse.ok) {
+            const statsData = await statsResponse.json();
+            console.log('📊 Stats data received successfully from direct endpoint');
+            
+            if (isMounted) {
+              setStats(statsData);
+              setIsLoading(false);
+              
+              // For cart data, just set empty array since we can't authenticate
+              setInCartNumbers([]);
+            }
+            return; // Exit if successful
+          }
+        } catch (directError) {
+          console.error('📊 Error with direct stats endpoint:', directError);
+        }
+        
+        // If direct stats failed, try the admin endpoint
+        const adminStatsUrl = `/api/admin/competitions/${competition.id}/ticket-stats`;
+        
+        console.log(`📊 Trying admin stats URL: ${adminStatsUrl}`);
+        
+        try {
+          const adminResponse = await fetch(adminStatsUrl, {
+            credentials: 'include',
+            headers: { 'Cache-Control': 'no-cache' },
+          });
+          
+          console.log(`📊 Admin stats response status: ${adminResponse.status}`);
+          
+          if (adminResponse.ok) {
+            const adminData = await adminResponse.json();
+            console.log('📊 Stats data received successfully from admin endpoint');
+            
+            if (isMounted) {
+              setStats(adminData);
+              
+              // Get cart data from admin endpoint
+              try {
+                const cartUrl = `/api/admin/competitions/${competition.id}/cart-items`;
+                const cartResponse = await fetch(cartUrl, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({})
+                });
+                
+                if (cartResponse.ok) {
+                  const cartData = await cartResponse.json();
+                  if (cartData && Array.isArray(cartData.inCartNumbers)) {
+                    setInCartNumbers(cartData.inCartNumbers);
+                  }
+                }
+              } catch (cartError) {
+                console.error('Cart fetch error:', cartError);
+                setInCartNumbers([]);
+              }
+              
+              setIsLoading(false);
+            }
+            return; // Exit if successful
+          }
+        } catch (adminError) {
+          console.error('📊 Error with admin stats endpoint:', adminError);
+        }
+        
+        // If we're specifically on mobycomps.co.uk, try the special direct endpoint
+        if (isMobyComps) {
+          const mobyStatsUrl = `/mobycomps-api/stats/${competition.id}`;
+          
+          console.log(`📊 Trying mobycomps special URL: ${mobyStatsUrl}`);
+          
+          try {
+            const mobyResponse = await fetch(mobyStatsUrl);
+            
+            console.log(`📊 Mobycomps response status: ${mobyResponse.status}`);
+            
+            if (mobyResponse.ok) {
+              const mobyData = await mobyResponse.json();
+              console.log('📊 Stats data received successfully from mobycomps endpoint');
+              
+              if (isMounted) {
+                setStats(mobyData);
+                setInCartNumbers([]);
+                setIsLoading(false);
+              }
+              return; // Exit if successful
+            }
+          } catch (mobyError) {
+            console.error('📊 Error with mobycomps endpoint:', mobyError);
+          }
+        }
+        
+        // If everything fails, display a fallback from the competition object itself
+        console.log('📊 All endpoints failed, creating fallback data from competition object');
+        
+        if (isMounted) {
+          // Fallback to using the competition object data
+          const fallbackStats = {
+            totalTickets: competition.totalTickets || 0,
+            purchasedTickets: 0,
+            inCartTickets: 0,
+            availableTickets: competition.totalTickets || 0,
+            soldTicketsCount: 0,
+            allNumbers: {
+              totalRange: Array.from({length: competition.totalTickets || 0}, (_, i) => i + 1),
+              purchased: [],
+              inCart: []
+            }
+          };
+          
+          setStats(fallbackStats);
+          setInCartNumbers([]);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('❌ Critical error loading competition stats:', error);
+        if (isMounted) {
+          setHasError(true);
+          setIsLoading(false);
+        }
       }
 
       try {
