@@ -1,24 +1,21 @@
 import { db } from './db';
-import { competitions, entries } from '@shared/schema';
-import { eq } from 'drizzle-orm';
+import { competitions, entries, ticketStatuses, type TicketStatusResponse } from '@shared/schema';
+import { eq, and, gt, isNull, inArray, sql, desc, asc } from 'drizzle-orm';
 
 /**
- * A dedicated ticket service to ensure consistent ticket status 
- * between the admin view and user interface
+ * Enhanced Ticket Service - Centralized Ticket Status Management
+ * 
+ * This service provides a single source of truth for ticket statuses,
+ * ensuring consistency between the admin dashboard and customer frontend.
  */
 export class TicketService {
   /**
-   * Get all taken ticket numbers for a competition
-   * This is the source of truth for ALL ticket status inquiries
-   * CRITICAL: Both admin view and user number selection MUST use this
+   * Initialize the ticket statuses for a competition
+   * This should be called when a competition is created or reset
    */
-  static async getTakenNumbers(competitionId: number): Promise<{
-    purchased: number[];
-    inCart: number[];
-    all: number[];
-  }> {
+  static async initializeTicketStatuses(competitionId: number): Promise<void> {
     try {
-      console.log(`🎫 TicketService: Getting taken numbers for competition ${competitionId}`);
+      console.log(`🎟️ Initializing ticket statuses for competition ${competitionId}`);
       
       // First get the competition to verify existence and get total tickets
       const competition = await db.select()
@@ -27,131 +24,410 @@ export class TicketService {
         .limit(1);
         
       if (!competition.length) {
-        console.error(`🎫 TicketService: Competition ${competitionId} not found`);
+        console.error(`🎟️ Competition ${competitionId} not found for initialization`);
         throw new Error('Competition not found');
       }
+      
+      // Check if statuses already exist for this competition
+      const existingStatuses = await db.select({ count: sql<number>`count(*)` })
+        .from(ticketStatuses)
+        .where(eq(ticketStatuses.competitionId, competitionId));
+      
+      const statusCount = existingStatuses[0]?.count || 0;
+      
+      if (statusCount > 0) {
+        console.log(`🎟️ ${statusCount} ticket statuses already exist for competition ${competitionId}`);
+        return; // Statuses already initialized
+      }
+      
+      // Create ticket statuses for each ticket number
+      const totalTickets = competition[0].totalTickets;
+      const bulkInsertValues = [];
+      
+      for (let i = 1; i <= totalTickets; i++) {
+        bulkInsertValues.push({
+          competitionId,
+          ticketNumber: i,
+          status: 'available' as 'available' | 'reserved' | 'purchased',
+        });
+      }
+      
+      // Use batch insert for better performance
+      const batchSize = 1000;
+      for (let i = 0; i < bulkInsertValues.length; i += batchSize) {
+        const batch = bulkInsertValues.slice(i, i + batchSize);
+        await db.insert(ticketStatuses).values(batch);
+      }
+      
+      console.log(`🎟️ Successfully initialized ${totalTickets} ticket statuses for competition ${competitionId}`);
+    } catch (error) {
+      console.error(`Error initializing ticket statuses: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Get the current status of all tickets for a competition
+   * This is the central source of truth for the entire application
+   */
+  static async getTicketStatuses(competitionId: number): Promise<TicketStatusResponse> {
+    try {
+      console.log(`🎟️ Getting ticket statuses for competition ${competitionId}`);
+      
+      // First ensure the competition exists
+      const competition = await db.select()
+        .from(competitions)
+        .where(eq(competitions.id, competitionId))
+        .limit(1);
+        
+      if (!competition.length) {
+        console.error(`🎟️ Competition ${competitionId} not found`);
+        throw new Error('Competition not found');
+      }
+      
+      // Check if we need to initialize this competition's ticket statuses
+      const statusCheck = await db.select({ count: sql<number>`count(*)` })
+        .from(ticketStatuses)
+        .where(eq(ticketStatuses.competitionId, competitionId));
+      
+      if (statusCheck[0].count === 0) {
+        await this.initializeTicketStatuses(competitionId);
+      }
+      
+      // Prepare containers for results
+      const result: TicketStatusResponse = {
+        competitionId,
+        totalTickets: competition[0].totalTickets,
+        ticketStatuses: {
+          available: [],
+          reserved: [],
+          purchased: []
+        }
+      };
+      
+      // Get all ticket statuses for the competition
+      const allStatuses = await db.select()
+        .from(ticketStatuses)
+        .where(eq(ticketStatuses.competitionId, competitionId))
+        .orderBy(asc(ticketStatuses.ticketNumber));
+      
+      // Sort tickets by status
+      for (const ticket of allStatuses) {
+        if (ticket.status === 'available') {
+          result.ticketStatuses.available.push(ticket.ticketNumber);
+        } else if (ticket.status === 'reserved') {
+          result.ticketStatuses.reserved.push(ticket.ticketNumber);
+        } else if (ticket.status === 'purchased') {
+          result.ticketStatuses.purchased.push(ticket.ticketNumber);
+        }
+      }
+      
+      // Add metadata for convenience
+      result._meta = {
+        ticketsSold: result.ticketStatuses.purchased.length,
+        ticketsReserved: result.ticketStatuses.reserved.length,
+        ticketsAvailable: result.ticketStatuses.available.length,
+        statusTimestamp: new Date().toISOString()
+      };
+      
+      console.log(`🎟️ Returning ticket statuses for competition ${competitionId}: ` +
+        `${result.ticketStatuses.purchased.length} purchased, ` +
+        `${result.ticketStatuses.reserved.length} reserved, ` +
+        `${result.ticketStatuses.available.length} available`);
+      
+      return result;
+    } catch (error) {
+      console.error(`Error getting ticket statuses: ${error}`);
+      throw error;
+    }
+  }
+  
+  /**
+   * Legacy method for backward compatibility
+   * Use getTicketStatuses for new code
+   */
+  static async getTakenNumbers(competitionId: number): Promise<{
+    purchased: number[];
+    inCart: number[];
+    all: number[];
+  }> {
+    try {
+      console.log(`🎟️ Legacy getTakenNumbers called for competition ${competitionId}`);
+      
+      // Use the new method internally
+      const statuses = await this.getTicketStatuses(competitionId);
+      
+      // Map new format to old format
+      return {
+        purchased: statuses.ticketStatuses.purchased,
+        inCart: statuses.ticketStatuses.reserved,
+        all: [...statuses.ticketStatuses.purchased, ...statuses.ticketStatuses.reserved]
+      };
+    } catch (error) {
+      console.error(`Error in legacy getTakenNumbers: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Reserve tickets for a user (e.g., when added to cart)
+   */
+  static async reserveTickets(competitionId: number, ticketNumbers: number[], userId: number): Promise<boolean> {
+    try {
+      console.log(`🎟️ Reserving tickets ${ticketNumbers.join(', ')} for user ${userId} in competition ${competitionId}`);
+      
+      // Check if all requested tickets are available
+      const ticketData = await db.select()
+        .from(ticketStatuses)
+        .where(
+          and(
+            eq(ticketStatuses.competitionId, competitionId),
+            inArray(ticketStatuses.ticketNumber, ticketNumbers)
+          )
+        );
+        
+      // Verify all tickets exist
+      if (ticketData.length !== ticketNumbers.length) {
+        console.error(`🎟️ Not all requested tickets exist for competition ${competitionId}`);
+        return false;
+      }
+      
+      // Verify all tickets are available
+      const unavailableTickets = ticketData.filter(t => t.status !== 'available');
+      if (unavailableTickets.length > 0) {
+        console.error(`🎟️ Some tickets are not available: ${unavailableTickets.map(t => t.ticketNumber).join(', ')}`);
+        return false;
+      }
+      
+      // Set reservation expiry time (30 minutes from now)
+      const reservedUntil = new Date();
+      reservedUntil.setMinutes(reservedUntil.getMinutes() + 30);
+      
+      // Update ticket statuses to reserved
+      await db.update(ticketStatuses)
+        .set({ 
+          status: 'reserved', 
+          userId,
+          reservedUntil
+        })
+        .where(
+          and(
+            eq(ticketStatuses.competitionId, competitionId),
+            inArray(ticketStatuses.ticketNumber, ticketNumbers)
+          )
+        );
+      
+      console.log(`🎟️ Successfully reserved ${ticketNumbers.length} tickets for user ${userId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error reserving tickets: ${error}`);
+      return false;
+    }
+  }
+
+  /**
+   * Mark tickets as purchased (e.g., after payment completed)
+   */
+  static async purchaseTickets(competitionId: number, ticketNumbers: number[], userId: number, entryId: number): Promise<boolean> {
+    try {
+      console.log(`🎟️ Marking tickets ${ticketNumbers.join(', ')} as purchased for user ${userId} in competition ${competitionId}`);
+      
+      // Update tickets to purchased status
+      const result = await db.update(ticketStatuses)
+        .set({ 
+          status: 'purchased', 
+          userId,
+          entryId,
+          reservedUntil: null
+        })
+        .where(
+          and(
+            eq(ticketStatuses.competitionId, competitionId),
+            inArray(ticketStatuses.ticketNumber, ticketNumbers),
+            eq(ticketStatuses.userId, userId)
+          )
+        );
+      
+      // Also update competition's ticketsSold count
+      const [competition] = await db.select()
+        .from(competitions)
+        .where(eq(competitions.id, competitionId))
+        .limit(1);
+      
+      if (competition) {
+        const currentSold = competition.ticketsSold || 0;
+        await db.update(competitions)
+          .set({ ticketsSold: currentSold + ticketNumbers.length })
+          .where(eq(competitions.id, competitionId));
+      }
+      
+      console.log(`🎟️ Successfully marked ${ticketNumbers.length} tickets as purchased for user ${userId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error purchasing tickets: ${error}`);
+      return false;
+    }
+  }
+
+  /**
+   * Release reserved tickets (e.g., when removed from cart or reservation expired)
+   */
+  static async releaseTickets(competitionId: number, ticketNumbers: number[]): Promise<boolean> {
+    try {
+      console.log(`🎟️ Releasing tickets ${ticketNumbers.join(', ')} for competition ${competitionId}`);
+      
+      // Update tickets back to available status
+      await db.update(ticketStatuses)
+        .set({ 
+          status: 'available', 
+          userId: null,
+          entryId: null,
+          reservedUntil: null
+        })
+        .where(
+          and(
+            eq(ticketStatuses.competitionId, competitionId),
+            inArray(ticketStatuses.ticketNumber, ticketNumbers),
+            eq(ticketStatuses.status, 'reserved')
+          )
+        );
+      
+      console.log(`🎟️ Successfully released tickets for competition ${competitionId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error releasing tickets: ${error}`);
+      return false;
+    }
+  }
+
+  /**
+   * Release all expired ticket reservations
+   */
+  static async releaseExpiredReservations(): Promise<number> {
+    try {
+      console.log(`🎟️ Releasing all expired ticket reservations`);
+      
+      const now = new Date();
+      
+      // Find and release all tickets with expired reservations
+      const result = await db.update(ticketStatuses)
+        .set({ 
+          status: 'available', 
+          userId: null,
+          entryId: null,
+          reservedUntil: null
+        })
+        .where(
+          and(
+            eq(ticketStatuses.status, 'reserved'),
+            // Use SQL version of the comparison to avoid type errors
+            sql`${ticketStatuses.reservedUntil} < ${now}`
+          )
+        );
+      
+      // Count affected rows
+      const rowCount = result.rowCount || 0;
+      
+      console.log(`🎟️ Released ${rowCount || 0} expired ticket reservations`);
+      return rowCount || 0;
+    } catch (error) {
+      console.error(`Error releasing expired reservations: ${error}`);
+      return 0;
+    }
+  }
+
+  /**
+   * Check if a specific ticket number is available for a competition
+   */
+  static async isNumberAvailable(competitionId: number, ticketNumber: number): Promise<boolean> {
+    try {
+      // Get the current status of the ticket
+      const [ticketStatus] = await db.select()
+        .from(ticketStatuses)
+        .where(
+          and(
+            eq(ticketStatuses.competitionId, competitionId),
+            eq(ticketStatuses.ticketNumber, ticketNumber)
+          )
+        )
+        .limit(1);
+      
+      // If ticket not found or status is available
+      return !ticketStatus || ticketStatus.status === 'available';
+    } catch (error) {
+      console.error(`Error checking ticket availability: ${error}`);
+      return false; // Default to unavailable on error for safety
+    }
+  }
+
+  /**
+   * Synchronize ticket statuses with entries data
+   * This ensures consistency between the entries table and ticket_statuses table
+   */
+  static async syncWithEntries(competitionId: number): Promise<void> {
+    try {
+      console.log(`🎟️ Synchronizing ticket statuses with entries for competition ${competitionId}`);
+      
+      // First reset all tickets to available 
+      await db.update(ticketStatuses)
+        .set({ 
+          status: 'available', 
+          userId: null,
+          entryId: null,
+          reservedUntil: null
+        })
+        .where(eq(ticketStatuses.competitionId, competitionId));
       
       // Get all entries for this competition
       const entryList = await db.select()
         .from(entries)
         .where(eq(entries.competitionId, competitionId));
       
-      console.log(`🎫 TicketService: Found ${entryList.length} entries for competition ${competitionId}`);
-      
-      // SPECIAL: Show entries for debugging
-      console.log(`🔍 All entries for competition ${competitionId}:`, 
-        entryList.map(entry => ({
-          id: entry.id,
-          paymentStatus: entry.paymentStatus,
-          selectedNumbers: entry.selectedNumbers
-        }))
-      );
-      
-      // Process purchased tickets (completed payment status)
-      const purchasedNumbers = new Set<number>();
-      const purchasedEntries = entryList.filter(entry => entry.paymentStatus === 'completed');
-      
-      for (const entry of purchasedEntries) {
-        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+      // Process completed entries
+      for (const entry of entryList) {
+        if (entry.paymentStatus === 'completed' && entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+          // Mark tickets as purchased
           for (const num of entry.selectedNumbers) {
-            purchasedNumbers.add(Number(num));
+            await db.update(ticketStatuses)
+              .set({ 
+                status: 'purchased', 
+                userId: entry.userId,
+                entryId: entry.id
+              })
+              .where(
+                and(
+                  eq(ticketStatuses.competitionId, competitionId),
+                  eq(ticketStatuses.ticketNumber, Number(num))
+                )
+              );
+          }
+        } else if (entry.paymentStatus === 'pending' && entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
+          // Mark tickets as reserved
+          const reservedUntil = new Date();
+          reservedUntil.setMinutes(reservedUntil.getMinutes() + 30);
+          
+          for (const num of entry.selectedNumbers) {
+            await db.update(ticketStatuses)
+              .set({ 
+                status: 'reserved', 
+                userId: entry.userId,
+                entryId: entry.id,
+                reservedUntil
+              })
+              .where(
+                and(
+                  eq(ticketStatuses.competitionId, competitionId),
+                  eq(ticketStatuses.ticketNumber, Number(num))
+                )
+              );
           }
         }
       }
       
-      // Process in-cart tickets (pending payment status)
-      const inCartNumbers = new Set<number>();
-      const pendingEntries = entryList.filter(entry => entry.paymentStatus === 'pending');
-      
-      for (const entry of pendingEntries) {
-        if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers)) {
-          for (const num of entry.selectedNumbers) {
-            inCartNumbers.add(Number(num));
-          }
-        }
-      }
-      
-      // Get the ticketsSold count from competition
-      const ticketsSold = competition[0].ticketsSold || 0;
-      
-      // CRITICAL: List locked numbers for debugging - this is what's causing the issue!
-      const purchasedArray = Array.from(purchasedNumbers);
-      const inCartArray = Array.from(inCartNumbers);
-      console.log(`🔍 TICKET CHECK: competition ${competitionId}`, {
-        id: competition[0].id,
-        title: competition[0].title,
-        ticketsSold: competition[0].ticketsSold,
-        purchasedNumbers: purchasedArray,
-        inCartNumbers: inCartArray 
-      });
-      
-      // EXTREMELY IMPORTANT: For numbers 2, 15, and 27 specifically
-      if (purchasedArray.includes(2) || purchasedArray.includes(15) || purchasedArray.includes(27)) {
-        console.log(`⚠️ FOUND PROBLEMATIC NUMBERS in purchased: ${purchasedArray.filter(n => [2, 15, 27].includes(n))}`);
-      }
-      if (inCartArray.includes(2) || inCartArray.includes(15) || inCartArray.includes(27)) {
-        console.log(`⚠️ FOUND PROBLEMATIC NUMBERS in cart: ${inCartArray.filter(n => [2, 15, 27].includes(n))}`);
-      }
-      
-      // Only generate additional tickets if ticketsSold is explicitly set to a positive number
-      // AND if we actually need to add more tickets
-      if (competition[0].ticketsSold !== null && ticketsSold > purchasedNumbers.size) {
-        console.log(`🎫 TicketService: Generating additional ${ticketsSold - purchasedNumbers.size} purchased numbers to match ticketsSold`);
-        
-        // Create a range of all possible ticket numbers
-        const totalRange = Array.from({ length: competition[0].totalTickets }, (_, i) => i + 1);
-        
-        // Find available numbers that aren't in purchasedNumbers or inCartNumbers
-        // Convert Sets to Arrays before combining to fix TypeScript iteration error
-        const allTakenNumbers = new Set([...Array.from(purchasedNumbers), ...Array.from(inCartNumbers)]);
-        const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
-        
-        // Add enough random available numbers to match tickets_sold
-        const additionalNeeded = ticketsSold - purchasedNumbers.size;
-        const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
-        
-        console.log(`📊 Adding these specific numbers: ${additionalNumbers.join(', ')}`);
-        
-        for (const num of additionalNumbers) {
-          purchasedNumbers.add(num);
-        }
-      } else {
-        console.log(`🎫 No additional numbers needed for competition ${competitionId} - current purchased: ${purchasedArray.length}, ticketsSold: ${ticketsSold}`);
-        
-        // SPECIAL DEBUG: For competition with the issue, clear any fake tickets that might be stuck
-        if (competition[0].ticketsSold === null || competition[0].ticketsSold === 0) {
-          console.log(`🧹 Competition ${competitionId} has no tickets sold, ensuring clean state`);
-          // Don't do anything to the purchased numbers if we don't have any tickets sold
-        }
-      }
-      
-      // Return all taken numbers 
-      const result = {
-        purchased: Array.from(purchasedNumbers),
-        inCart: Array.from(inCartNumbers),
-        all: [...Array.from(purchasedNumbers), ...Array.from(inCartNumbers)]
-      };
-      
-      console.log(`🎫 TicketService: Returning ${result.purchased.length} purchased and ${result.inCart.length} in-cart numbers`);
-      
-      return result;
+      console.log(`🎟️ Successfully synchronized ticket statuses for competition ${competitionId}`);
     } catch (error) {
-      console.error('Error in TicketService.getTakenNumbers:', error);
+      console.error(`Error synchronizing ticket statuses: ${error}`);
       throw error;
-    }
-  }
-  
-  /**
-   * Check if a specific ticket number is available for a competition
-   */
-  static async isNumberAvailable(competitionId: number, ticketNumber: number): Promise<boolean> {
-    try {
-      const takenNumbers = await this.getTakenNumbers(competitionId);
-      return !takenNumbers.all.includes(ticketNumber);
-    } catch (error) {
-      console.error(`Error checking ticket availability for competition ${competitionId}, ticket ${ticketNumber}:`, error);
-      // Default to unavailable on error to prevent booking conflicts
-      return false;
     }
   }
 }

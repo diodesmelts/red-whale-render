@@ -773,8 +773,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // API endpoint to get taken numbers for a competition - using central ticket service for consistency
-  app.get("/api/competitions/:id/taken-numbers", async (req, res) => {
+  // Unified ticket status endpoint - single source of truth for both admin and frontend
+  app.get("/api/competitions/:id/ticket-status", async (req, res) => {
     try {
       // Validate ID
       const id = parseInt(req.params.id);
@@ -782,9 +782,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid competition ID" });
       }
 
-      console.log(`🎯 TAKEN NUMBERS REQUEST: Competition ID ${id} - using TICKET SERVICE for perfect synchronization with admin view`);
+      console.log(`🎟️ UNIFIED TICKET STATUS REQUEST: Competition ID ${id}`);
 
-      // First, get the competition details to verify ticketsSold status
+      // First, get the competition details to verify it exists
       const competition = await db.select()
         .from(competitions)
         .where(eq(competitions.id, id))
@@ -794,53 +794,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Competition not found" });
       }
       
-      console.log(`🎯 Competition details for debugging - ID ${id}:`, {
-        id: competition[0].id,
-        title: competition[0].title,
-        ticketsSold: competition[0].ticketsSold,
-        ticketsSoldIsNull: competition[0].ticketsSold === null,
-        totalTickets: competition[0].totalTickets
-      });
-      
-      // CRITICAL: Use the shared ticket service to ensure perfect consistency
+      // Use the enhanced ticket service
       try {
         // Import the ticket service
         const { TicketService } = await import('./ticket-service');
         
-        // Get taken numbers directly from the service
-        const takenNumbers = await TicketService.getTakenNumbers(id);
+        // Get ticket statuses from the service
+        const ticketStatus = await TicketService.getTicketStatuses(id);
         
-        // Combine purchased and in-cart numbers for the API response
-        const allTakenNumbers = [...takenNumbers.purchased, ...takenNumbers.inCart];
-        
-        // For debugging, show the exact list for this competition
-        console.log(`🎯 Numbers marked as purchased:`, takenNumbers.purchased);
-        console.log(`🎯 Numbers marked as in cart:`, takenNumbers.inCart);
-        
-        console.log(`📊 TAKEN-NUMBERS: Returning ${allTakenNumbers.length} taken numbers via ticket service:`, {
-          purchased: takenNumbers.purchased.length, 
-          inCart: takenNumbers.inCart.length,
-          isFromTicketService: true
+        console.log(`🎟️ Returning ticket status for competition ${id}:`, {
+          purchased: ticketStatus.ticketStatuses.purchased.length,
+          reserved: ticketStatus.ticketStatuses.reserved.length,
+          available: ticketStatus.ticketStatuses.available.length,
+          timestamp: ticketStatus._meta?.statusTimestamp
         });
         
-        // Return taken numbers in the expected format
-        return res.json({ 
-          competitionId: id,
-          takenNumbers: allTakenNumbers,
-          _debug: {
-            purchasedCount: takenNumbers.purchased.length,
-            inCartCount: takenNumbers.inCart.length,
-            source: "central-ticket-service"
-          }
-        });
+        // Return the unified ticket status format
+        return res.json(ticketStatus);
         
       } catch (error) {
-        console.error(`Error processing taken numbers for competition ${id}:`, error);
-        return res.status(500).json({ message: "Error processing taken numbers" });
+        console.error(`Error processing ticket status for competition ${id}:`, error);
+        return res.status(500).json({ message: "Error processing ticket status" });
       }
-      
     } catch (error: any) {
-      console.error(`Failed to fetch taken numbers for competition ${req.params.id}:`, error);
+      console.error(`Failed to fetch ticket status for competition ${req.params.id}:`, error);
+      return res.status(500).json({ message: error.message || "Failed to fetch ticket status" });
+    }
+  });
+  
+  // Legacy endpoint for backward compatibility - redirects to the unified endpoint
+  app.get("/api/competitions/:id/taken-numbers", async (req, res) => {
+    try {
+      // Validate ID
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid competition ID" });
+      }
+
+      console.log(`🔄 LEGACY ENDPOINT: Redirecting taken-numbers request to unified ticket status for competition ${id}`);
+
+      // Import the ticket service
+      const { TicketService } = await import('./ticket-service');
+      
+      // Use the legacy method which maps to the new format internally
+      const takenNumbers = await TicketService.getTakenNumbers(id);
+      
+      // Return data in the legacy format
+      return res.json({ 
+        competitionId: id,
+        takenNumbers: [...takenNumbers.purchased, ...takenNumbers.inCart],
+        _debug: {
+          purchasedCount: takenNumbers.purchased.length,
+          inCartCount: takenNumbers.inCart.length,
+          source: "legacy-adapter"
+        }
+      });
+    } catch (error: any) {
+      console.error(`Failed to fetch taken numbers (legacy) for competition ${req.params.id}:`, error);
       return res.status(500).json({ message: error.message || "Failed to fetch taken numbers" });
     }
   });

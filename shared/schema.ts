@@ -128,6 +128,12 @@ export const loginSchema = z.object({
   rememberMe: z.boolean().optional()
 });
 
+// Create insert schema for ticket statuses
+export const insertTicketStatusSchema = createInsertSchema(ticketStatuses).omit({
+  id: true,
+  updatedAt: true
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -139,4 +145,23 @@ export type Winner = typeof winners.$inferSelect;
 export type InsertWinner = z.infer<typeof insertWinnerSchema>;
 export type SiteConfig = typeof siteConfig.$inferSelect;
 export type InsertSiteConfig = z.infer<typeof insertSiteConfigSchema>;
+export type TicketStatus = typeof ticketStatuses.$inferSelect;
+export type InsertTicketStatus = z.infer<typeof insertTicketStatusSchema>;
 export type LoginCredentials = z.infer<typeof loginSchema>;
+
+// Define a common response type for ticket status data
+export interface TicketStatusResponse {
+  competitionId: number;
+  totalTickets: number;
+  ticketStatuses: {
+    available: number[];
+    reserved: number[];
+    purchased: number[];
+  };
+  _meta?: {
+    ticketsSold: number;
+    ticketsReserved: number;
+    ticketsAvailable: number;
+    statusTimestamp: string;
+  };
+}
