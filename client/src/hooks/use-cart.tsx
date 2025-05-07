@@ -45,6 +45,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Filter out expired items
         const now = Date.now();
         const validItems = parsedCart.filter(item => {
+          // First check if item is valid and has required properties
+          if (!item || typeof item !== 'object' || !('competitionId' in item)) {
+            return false;
+          }
+          
+          // Ensure selectedNumbers is an array
+          if (!Array.isArray(item.selectedNumbers)) {
+            item.selectedNumbers = [];
+          }
+          
           // Keep items that don't have an expiration yet (for backwards compatibility)
           // or items that haven't expired yet
           return !item.expiresAt || item.expiresAt > now;
@@ -82,6 +92,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setCartItems(prevItems => {
         // Check if any items are expired
         const validItems = prevItems.filter(item => {
+          // First check if item is valid and has required properties
+          if (!item || typeof item !== 'object' || !('competitionId' in item)) {
+            return false;
+          }
+          
+          // Ensure selectedNumbers is an array
+          if (!Array.isArray(item.selectedNumbers)) {
+            item.selectedNumbers = [];
+          }
+          
           return !item.expiresAt || item.expiresAt > now;
         });
         
@@ -142,7 +162,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
 
         // Combine previously selected numbers with new ones
-        const updatedNumbers = [...item.selectedNumbers, ...selectedNumbers].slice(0, newQuantity);
+        // Safely handle the case when item.selectedNumbers might not be iterable
+        const existingNumbers = Array.isArray(item.selectedNumbers) ? item.selectedNumbers : [];
+        const newNumbers = Array.isArray(selectedNumbers) ? selectedNumbers : [];
+        const updatedNumbers = [...existingNumbers, ...newNumbers].slice(0, newQuantity);
 
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex] = {
@@ -165,6 +188,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         description: `${quantity} ticket${quantity !== 1 ? 's' : ''} for ${competition.title} added to your cart.`,
       });
 
+      // Ensure selectedNumbers is an array before we use slice
+      const safeSelectedNumbers = Array.isArray(selectedNumbers) ? selectedNumbers : [];
+
       const now = Date.now();
       return [
         ...prevItems,
@@ -174,7 +200,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           imageUrl: competition.imageUrl,
           ticketPrice: competition.ticketPrice,
           ticketCount: quantity,
-          selectedNumbers: selectedNumbers.slice(0, quantity),
+          selectedNumbers: safeSelectedNumbers.slice(0, quantity),
           maxTicketsPerUser: competition.maxTicketsPerUser,
           totalTickets: competition.totalTickets,
           addedAt: now,
@@ -201,16 +227,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return prevItems;
       }
 
-      // Handle the selected numbers
-      let updatedNumbers = item.selectedNumbers;
+      // Handle the selected numbers safely
+      // Ensure item.selectedNumbers is an array
+      const existingNumbers = Array.isArray(item.selectedNumbers) ? item.selectedNumbers : [];
+      let updatedNumbers = existingNumbers;
       
       // If new numbers are provided, use them
       if (selectedNumbers) {
-        updatedNumbers = selectedNumbers.slice(0, newQuantity);
+        updatedNumbers = Array.isArray(selectedNumbers) ? selectedNumbers.slice(0, newQuantity) : [];
       } 
       // If quantity decreased, trim the selected numbers
       else if (newQuantity < item.ticketCount) {
-        updatedNumbers = item.selectedNumbers.slice(0, newQuantity);
+        updatedNumbers = existingNumbers.slice(0, newQuantity);
       }
 
       return prevItems.map((item) =>
