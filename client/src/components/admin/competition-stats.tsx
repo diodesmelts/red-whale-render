@@ -414,8 +414,7 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
                 setIsLoading(false);
               }
               
-              // Try to get cart data
-              await fetchCartData();
+              // No need to get cart data - already have it from the successful response
               
               // Just return to exit and avoid the regular API calls
               return;
@@ -697,11 +696,17 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
     );
   }
   
+  // Add extra debugging for stats and allNumbers
+  console.log("🧮 STATS DATA:", stats);
+  
   // Fallback values for missing data
   const totalTickets = competition.totalTickets || 0;
-  const purchasedTickets = stats.purchasedTickets || 0;
-  const inCartTicketsCount = inCartNumbers.length || 0;
-  const availableTickets = totalTickets - purchasedTickets - inCartTicketsCount;
+  
+  // Ensure we're handling both formats of the stats response properly
+  // Some endpoints return purchasedTickets, others may return soldTicketsCount
+  const purchasedTickets = stats.purchasedTickets || stats.soldTicketsCount || 0;
+  const inCartTicketsCount = inCartNumbers.length || stats.inCartTickets || 0;
+  const availableTickets = stats.availableTickets || (totalTickets - purchasedTickets - inCartTicketsCount);
   
   // Calculate percentages for visualization (with safety checks)
   const safeCalculatePercentage = (value: number) => {
@@ -721,12 +726,44 @@ export function CompetitionStats({ competition }: { competition: Competition }) 
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
   
-  // Ensure we have all number arrays with fallbacks
-  const allNumbers = {
-    totalRange: stats.allNumbers?.totalRange || generateRange(1, totalTickets),
-    purchased: stats.allNumbers?.purchased || [],
-    inCart: inCartNumbers
-  };
+  // Fully validate allNumbers from the stats response to prevent rendering errors
+  console.log("🧮 ATTEMPTING TO PROCESS allNumbers:", stats.allNumbers);
+  
+  let validatedAllNumbers;
+  
+  if (stats.allNumbers && 
+      Array.isArray(stats.allNumbers.totalRange) && 
+      Array.isArray(stats.allNumbers.purchased)) {
+    // Good data structure - use it
+    validatedAllNumbers = {
+      totalRange: stats.allNumbers.totalRange,
+      purchased: stats.allNumbers.purchased,
+      inCart: Array.isArray(inCartNumbers) ? inCartNumbers : []
+    };
+    console.log("✅ Valid allNumbers structure found in stats response");
+  } else {
+    // Fall back to generating our own data structure
+    console.log("⚠️ Invalid or missing allNumbers in stats response - generating fallback");
+    validatedAllNumbers = {
+      totalRange: generateRange(1, totalTickets),
+      purchased: [],
+      inCart: Array.isArray(inCartNumbers) ? inCartNumbers : []
+    };
+  }
+  
+  // Additional safety check for purchased numbers
+  if (!Array.isArray(validatedAllNumbers.purchased)) {
+    validatedAllNumbers.purchased = [];
+  }
+  
+  console.log("🧮 VALIDATED allNumbers:", validatedAllNumbers);
+  
+  // Final safety check - ensure totalRange is never empty even if API returns empty
+  if (!validatedAllNumbers.totalRange || validatedAllNumbers.totalRange.length === 0) {
+    validatedAllNumbers.totalRange = generateRange(1, totalTickets);
+  }
+  
+  const allNumbers = validatedAllNumbers;
   
   return (
     <div className="space-y-6">
