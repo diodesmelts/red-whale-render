@@ -45,6 +45,7 @@ export function NumberPicker({
   // Fetch taken numbers when the dialog opens
   useEffect(() => {
     if (isDialogOpen && competitionId) {
+      console.log(`🚀 NumberPicker dialog opened for competition ${competitionId} - fetching taken numbers`);
       fetchTakenNumbers();
     }
   }, [isDialogOpen, competitionId]);
@@ -52,6 +53,23 @@ export function NumberPicker({
   const fetchTakenNumbers = async () => {
     try {
       console.log(`🔍 Fetching taken numbers for competition ${competitionId}`);
+      
+      // COMPARISON DATA: Get admin stats to compare (this request is made just for debugging)
+      try {
+        const adminStatsResponse = await fetch(`/api/competitions/${competitionId}/admin-stats`);
+        if (adminStatsResponse.ok) {
+          const adminStats = await adminStatsResponse.json();
+          console.log(`📊 ADMIN VIEW: Competition ${competitionId} has:`, {
+            total: adminStats.totalTickets,
+            purchased: adminStats.purchasedTickets,
+            availableCount: adminStats.availableTickets,
+            purchasedNumbers: adminStats.allNumbers?.purchased?.length,
+            firstFewPurchased: adminStats.allNumbers?.purchased?.slice(0, 5)
+          });
+        }
+      } catch (statsError) {
+        console.error('❌ Error fetching admin stats for comparison:', statsError);
+      }
       
       // Use a POST for active cart items (needed to sync with other users' carts)
       // First make a request to fetch active cart items with an empty cart
@@ -68,7 +86,9 @@ export function NumberPicker({
         
         if (cartResponse.ok) {
           const cartData = await cartResponse.json();
-          console.log(`✅ Received ${cartData.inCartNumbers?.length || 0} active cart items`);
+          console.log(`✅ Received ${cartData.inCartNumbers?.length || 0} active cart items:`, {
+            inCartNumbers: cartData.inCartNumbers?.slice(0, 5) // Just show first 5 for debugging
+          });
           
           // Now fetch taken numbers
           try {
@@ -78,7 +98,9 @@ export function NumberPicker({
             
             if (takenResponse.ok) {
               const takenData = await takenResponse.json();
-              console.log(`✅ Received ${takenData.takenNumbers?.length || 0} taken numbers`);
+              console.log(`✅ Received ${takenData.takenNumbers?.length || 0} taken numbers:`, {
+                takenNumbers: takenData.takenNumbers?.slice(0, 10) // Just show first 10 for debugging
+              });
               
               // Combine the two sets of numbers
               const allTakenNumbers = [
@@ -87,7 +109,12 @@ export function NumberPicker({
               ];
               
               // Remove duplicates using Set
-              setTakenNumbers(Array.from(new Set(allTakenNumbers)));
+              const uniqueTakenNumbers = Array.from(new Set(allTakenNumbers));
+              console.log(`🔄 Combined ${uniqueTakenNumbers.length} unique unavailable numbers:`, {
+                firstFew: uniqueTakenNumbers.slice(0, 10)
+              });
+              
+              setTakenNumbers(uniqueTakenNumbers);
               return;
             } else {
               console.warn(`⚠️ Failed to fetch taken numbers: ${takenResponse.status}`);
@@ -97,6 +124,7 @@ export function NumberPicker({
           }
           
           // If we got here, the taken numbers request failed but cart request succeeded
+          console.log('⚠️ Using only cart data because taken-numbers endpoint failed');
           setTakenNumbers(cartData.inCartNumbers || []);
           return;
         } else {

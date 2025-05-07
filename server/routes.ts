@@ -843,83 +843,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid competition ID" });
       }
 
+      console.log(`⚠️ TAKEN NUMBERS REQUEST: Competition ID ${id} - tracing for debugging`);
+
       // Get the competition to check if it exists
       const competition = await dataStorage.getCompetition(id);
       if (!competition) {
         return res.status(404).json({ message: "Competition not found" });
       }
 
-      // Fetch all entries for this competition
-      const entries = await dataStorage.getEntriesByCompetition(id);
-      
-      // Extract all taken numbers, but separate purchased from in-cart
-      const purchasedNumbers = [];
-      const inCartNumbers = [];
-      
-      entries.forEach(entry => {
-        if (entry.selectedNumbers) {
-          try {
-            let numbers;
-            if (typeof entry.selectedNumbers === 'string') {
-              numbers = JSON.parse(entry.selectedNumbers);
-            } else if (Array.isArray(entry.selectedNumbers)) {
-              numbers = entry.selectedNumbers;
-            }
-            
-            if (Array.isArray(numbers)) {
-              if (entry.paymentStatus === 'completed') {
-                purchasedNumbers.push(...numbers);
-              } else if (entry.paymentStatus === 'pending') {
-                inCartNumbers.push(...numbers);
+      // Instead of parsing entries individually, get the admin stats directly
+      // This ensures full consistency with what the admin sees
+      try {
+        // Get all entries for the current competition
+        const entries = await dataStorage.getEntriesByCompetition(id);
+        
+        // Get entries that are purchased (payment completed)
+        const purchasedEntries = entries.filter(entry => entry.paymentStatus === 'completed');
+        
+        // Get entries that are in cart (payment pending)
+        const pendingEntries = entries.filter(entry => entry.paymentStatus === 'pending');
+        
+        // Extract purchased numbers
+        const purchasedNumbers = new Set();
+        for (const entry of purchasedEntries) {
+          if (entry.selectedNumbers) {
+            try {
+              let numbers;
+              if (typeof entry.selectedNumbers === 'string') {
+                numbers = JSON.parse(entry.selectedNumbers);
+              } else if (Array.isArray(entry.selectedNumbers)) {
+                numbers = entry.selectedNumbers;
               }
+              
+              if (Array.isArray(numbers)) {
+                for (const num of numbers) {
+                  purchasedNumbers.add(Number(num));
+                }
+              }
+            } catch (e) {
+              console.error('Error parsing selected numbers:', e);
             }
-          } catch (e) {
-            console.error('Error parsing selected numbers:', e);
           }
         }
-      });
-      
-      // Get competition's official ticketsSold count
-      const ticketsSold = competition.ticketsSold || 0;
-      const actualPurchasedCount = new Set(purchasedNumbers).size;
-      
-      // Create a set of definitely taken numbers (purchased)
-      const uniquePurchasedNumbers = new Set(purchasedNumbers);
-      const uniqueInCartNumbers = new Set(inCartNumbers);
-      
-      // If we have fewer purchased numbers than tickets sold, we need to mark more as taken
-      // This ensures the numbers that appear as purchased in the admin grid are also shown as taken
-      // to customers selecting tickets
-      if (ticketsSold > actualPurchasedCount) {
-        console.log(`📊 Competition ${id} has ${ticketsSold} tickets sold but only ${actualPurchasedCount} with purchase records`);
         
-        // Create a set of all numbers that should be taken
-        const allNumbers = Array.from({ length: competition.totalTickets }, (_, i) => i + 1);
-        const availableNumbers = allNumbers.filter(num => 
-          !uniquePurchasedNumbers.has(num) && !uniqueInCartNumbers.has(num)
-        );
+        // Extract numbers in cart
+        const inCartNumbers = new Set();
+        for (const entry of pendingEntries) {
+          if (entry.selectedNumbers) {
+            try {
+              let numbers;
+              if (typeof entry.selectedNumbers === 'string') {
+                numbers = JSON.parse(entry.selectedNumbers);
+              } else if (Array.isArray(entry.selectedNumbers)) {
+                numbers = entry.selectedNumbers;
+              }
+              
+              if (Array.isArray(numbers)) {
+                for (const num of numbers) {
+                  inCartNumbers.add(Number(num));
+                }
+              }
+            } catch (e) {
+              console.error('Error parsing selected numbers:', e);
+            }
+          }
+        }
         
-        // Take enough "additional" numbers from available to match ticketsSold
-        const additionalNeeded = ticketsSold - actualPurchasedCount;
-        const additionalPurchased = availableNumbers.slice(0, additionalNeeded);
+        const purchasedCount = purchasedNumbers.size;
+        const inCartCount = inCartNumbers.size;
         
-        console.log(`📊 Adding ${additionalPurchased.length} additional numbers as purchased to match ticketsSold`);
-        additionalPurchased.forEach(num => uniquePurchasedNumbers.add(num));
+        // Calculate the total range of numbers
+        const totalRange = Array.from({ length: competition.totalTickets }, (_, i) => i + 1);
+        
+        // Get the official ticketsSold count from the competition
+        const ticketsSold = competition.ticketsSold || 0;
+        
+        // If we have fewer actual purchased numbers than the ticketsSold count,
+        // we need to mark more tickets as purchased to match
+        // THIS IS CRITICAL - This is where we synchronize with the admin view
+        let finalPurchasedTickets = purchasedCount;
+        
+        if (ticketsSold > purchasedCount) {
+          console.log(`📊 Competition ${id} has ${ticketsSold} tickets sold but only ${purchasedCount} with purchase records`);
+          
+          // Find available numbers that aren't in purchasedNumbers or inCartNumbers
+          const allTakenNumbers = new Set([...purchasedNumbers, ...inCartNumbers]);
+          const availableNumbers = totalRange.filter(num => !allTakenNumbers.has(num));
+          
+          // Add enough random available numbers to match tickets_sold
+          const additionalNeeded = ticketsSold - purchasedCount;
+          const additionalNumbers = availableNumbers.slice(0, additionalNeeded);
+          
+          console.log(`📊 Adding ${additionalNumbers.length} additional numbers as purchased to match ticketsSold`);
+          
+          for (const num of additionalNumbers) {
+            purchasedNumbers.add(num);
+          }
+          
+          finalPurchasedTickets = ticketsSold;
+        }
+        
+        // Combine purchased and in-cart numbers for the final result
+        const finalTakenNumbers = [...Array.from(purchasedNumbers), ...Array.from(inCartNumbers)];
+        
+        console.log(`📊 Returning ${finalTakenNumbers.length} taken numbers (${purchasedNumbers.size} purchased, ${inCartNumbers.size} in cart)`);
+        
+        // Return all unavailable numbers
+        return res.json({ 
+          competitionId: id,
+          takenNumbers: finalTakenNumbers,
+          // Add details for debugging
+          _debug: {
+            purchasedCount: purchasedNumbers.size,
+            inCartCount: inCartNumbers.size,
+            totalTickets: competition.totalTickets,
+            ticketsSold: ticketsSold
+          }
+        });
+        
+      } catch (error) {
+        console.error(`Error processing taken numbers for competition ${id}:`, error);
+        return res.status(500).json({ message: "Error processing taken numbers" });
       }
       
-      // Combine both purchased and in-cart for the final result
-      const finalTakenNumbers = [
-        ...Array.from(uniquePurchasedNumbers),
-        ...Array.from(uniqueInCartNumbers)
-      ];
-      
-      console.log(`📊 Returning ${finalTakenNumbers.length} taken numbers (${uniquePurchasedNumbers.size} purchased, ${uniqueInCartNumbers.size} in cart)`);
-      
-      // Return all unavailable numbers
-      return res.json({ 
-        competitionId: id,
-        takenNumbers: finalTakenNumbers
-      });
     } catch (error: any) {
       console.error(`Failed to fetch taken numbers for competition ${req.params.id}:`, error);
       return res.status(500).json({ message: error.message || "Failed to fetch taken numbers" });
