@@ -1,0 +1,45 @@
+2025-05-10T08:56:30.873895336Z ==> Cloning from https://github.com/diodesmelts/RedWhale
+2025-05-10T08:56:35.354797904Z ==> Checking out commit 127fb03ea1a4c0158fa1c82046696550c57d5db6 in branch main
+2025-05-10T08:56:37.952338392Z ==> Using Node.js version 22.14.0 (default)
+2025-05-10T08:56:37.987362197Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-05-10T08:56:40.057312943Z ==> Using Bun version 1.1.0 (default)
+2025-05-10T08:56:40.057327808Z ==> Docs on specifying a bun version: https://render.com/docs/bun-version
+2025-05-10T08:56:40.127199708Z ==> Running build command 'npm install --save-dev @vitejs/plugin-react @tailwindcss/typography tailwindcss postcss autoprefixer vite esbuild typescript tsx @types/react && npm install && NODE_ENV=production npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist'...
+2025-05-10T08:56:50.517833429Z 
+2025-05-10T08:56:50.517856462Z added 423 packages, and audited 424 packages in 10s
+2025-05-10T08:56:50.517871486Z 
+2025-05-10T08:56:50.51788843Z 58 packages are looking for funding
+2025-05-10T08:56:50.517896323Z   run `npm fund` for details
+2025-05-10T08:56:50.52548444Z 
+2025-05-10T08:56:50.525499615Z 2 moderate severity vulnerabilities
+2025-05-10T08:56:50.525502294Z 
+2025-05-10T08:56:50.525504977Z To address all issues (including breaking changes), run:
+2025-05-10T08:56:50.525507693Z   npm audit fix --force
+2025-05-10T08:56:50.525509679Z 
+2025-05-10T08:56:50.525512411Z Run `npm audit` for details.
+2025-05-10T08:56:51.692712544Z 
+2025-05-10T08:56:51.692731817Z up to date, audited 424 packages in 1s
+2025-05-10T08:56:51.692742921Z 
+2025-05-10T08:56:51.692755628Z 58 packages are looking for funding
+2025-05-10T08:56:51.692763295Z   run `npm fund` for details
+2025-05-10T08:56:51.702653026Z 
+2025-05-10T08:56:51.702665214Z 2 moderate severity vulnerabilities
+2025-05-10T08:56:51.702667948Z 
+2025-05-10T08:56:51.702670717Z To address all issues (including breaking changes), run:
+2025-05-10T08:56:51.702673735Z   npm audit fix --force
+2025-05-10T08:56:51.702675826Z 
+2025-05-10T08:56:51.702678426Z Run `npm audit` for details.
+2025-05-10T08:56:52.169472422Z failed to load config from /opt/render/project/src/vite.config.js
+2025-05-10T08:56:52.169808505Z error during build:
+2025-05-10T08:56:52.169819545Z Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@vitejs/plugin-react' imported from /opt/render/project/src/vite.config.js.timestamp-1746867412167-f75b8baab86cd.mjs
+2025-05-10T08:56:52.169822901Z     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+2025-05-10T08:56:52.169825734Z     at packageResolve (node:internal/modules/esm/resolve:768:81)
+2025-05-10T08:56:52.169828006Z     at moduleResolve (node:internal/modules/esm/resolve:854:18)
+2025-05-10T08:56:52.169830205Z     at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-05-10T08:56:52.169832985Z     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-05-10T08:56:52.169835398Z     at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-05-10T08:56:52.16983769Z     at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-05-10T08:56:52.169839934Z     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-05-10T08:56:52.169843086Z     at ModuleJob._link (node:internal/modules/esm/module_job:135:49)
+2025-05-10T08:56:52.186024158Z ==> Build failed 😞
+2025-05-10T08:56:52.186039949Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys

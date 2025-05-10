@@ -1,0 +1,32 @@
+{
+  "name": "blue-whale-render",
+  "version": "1.0.0",
+  "description": "Render-specific package for Blue Whale Competitions",
+  "main": "server-render.js",
+  "scripts": {
+    "start": "node server-render.js",
+    "build-client": "vite build",
+    "build": "npm run build-client"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "connect-pg-simple": "^10.0.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.15.0",
+    "cors": "^2.8.5",
+    "cloudinary": "^2.6.0",
+    "multer": "^1.4.5-lts.2",
+    "stripe": "^18.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.2",
+    "vite": "^5.4.14",
+    "esbuild": "^0.25.0",
+    "postcss": "^8.4.47",
+    "autoprefixer": "^10.4.20",
+    "tailwindcss": "^3.4.17",
+    "@tailwindcss/typography": "^0.5.15"
+  }
+}
