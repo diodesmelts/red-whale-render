@@ -2273,6 +2273,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!competition) {
         return res.status(404).json({ success: false, message: 'Competition not found' });
       }
+
+      const { TicketService } = await import('./ticket-service');
       
       // Initialize ticket statuses
       await TicketService.initializeTicketStatuses(Number(competitionId));
@@ -2280,7 +2282,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Sync with existing entries
       await TicketService.syncWithEntries(Number(competitionId));
       
-      res.json({ 
+      // Return success
+      return res.status(200).json({ 
         success: true, 
         message: `Ticket statuses initialized for competition ${competitionId}`,
         competitionTitle: competition.title

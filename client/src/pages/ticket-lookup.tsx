@@ -64,6 +64,7 @@ export default function TicketLookupPage() {
   const [ticketOwner, setTicketOwner] = useState<TicketOwnerResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   // Load competition details
   const { data: competition, isLoading: isLoadingCompetition } = useQuery({
@@ -115,6 +116,40 @@ export default function TicketLookupPage() {
       setIsSearching(false);
     }
   };
+  
+  // Function to initialize ticket statuses for this competition
+  const initializeTicketStatuses = async () => {
+    setIsInitializing(true);
+    setError(null);
+    
+    try {
+      const response = await apiRequest(
+        'POST',
+        `/api/admin/initialize-tickets/${competitionId}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to initialize ticket statuses');
+      }
+      
+      // Success! Show a success message
+      const result = await response.json();
+      setError(`✅ Success! ${result.message}`);
+      
+    } catch (err: any) {
+      console.error('Error initializing ticket statuses:', err);
+      setError(`Failed to initialize ticket statuses: ${err.message}`);
+    } finally {
+      setIsInitializing(false);
+    }
+  };
 
   return (
     <AdminLayout>
@@ -126,6 +161,14 @@ export default function TicketLookupPage() {
               Look up who owns a specific ticket number
             </p>
           </div>
+          <Button 
+            variant="outline" 
+            onClick={initializeTicketStatuses}
+            disabled={isInitializing}
+            className="flex items-center"
+          >
+            {isInitializing ? "Initializing..." : "Initialize Ticket Statuses"}
+          </Button>
         </div>
 
         <Breadcrumb>
