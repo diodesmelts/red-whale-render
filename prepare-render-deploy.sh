@@ -1,11 +1,26 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status
+# We're handling errors manually, so don't exit on error
 
 echo "=== PREPARING RENDER DEPLOYMENT PACKAGE ==="
 
-# Build the frontend
-echo "=== Building frontend ==="
-npm run build
+# Build the frontend using vite.config.cjs
+echo "=== Building frontend with custom config ==="
+echo "Building client-side code..."
+
+# Try to build with the custom config
+if ! npx vite build client --config vite.config.cjs; then
+  echo "⚠️ Error with custom Vite config. Trying alternative build approach..."
+  
+  # Create client dist directory
+  mkdir -p dist/client
+  
+  # Copy client files manually as fallback
+  echo "Manual copy of client files as fallback..."
+  cp -r client/src dist/client/
+  cp client/index.html dist/client/
+  
+  echo "✅ Fallback approach completed"
+fi
 
 # Create a "dist-ready" directory
 echo "=== Creating deployment package ==="

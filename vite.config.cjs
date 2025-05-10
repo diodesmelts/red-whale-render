@@ -1,19 +1,25 @@
 // vite.config.cjs - CommonJS version specifically for Render
+const path = require('path');
+const { fileURLToPath } = require('url');
+
 module.exports = {
-  plugins: [],
+  plugins: [
+    require('@vitejs/plugin-react')()
+  ],
+  root: path.resolve(__dirname, 'client'),
   build: {
-    outDir: 'dist/client',
+    outDir: path.resolve(__dirname, 'dist/client'),
     emptyOutDir: true,
   },
   resolve: {
     alias: {
-      '@': '/client/src',
-      '@components': '/client/src/components',
-      '@hooks': '/client/src/hooks',
-      '@lib': '/client/src/lib',
-      '@pages': '/client/src/pages',
-      '@shared': '/shared',
-      '@assets': '/attached_assets',
+      '@': path.resolve(__dirname, 'client/src'),
+      '@components': path.resolve(__dirname, 'client/src/components'),
+      '@hooks': path.resolve(__dirname, 'client/src/hooks'),
+      '@lib': path.resolve(__dirname, 'client/src/lib'),
+      '@pages': path.resolve(__dirname, 'client/src/pages'),
+      '@shared': path.resolve(__dirname, 'shared'),
+      '@assets': path.resolve(__dirname, 'attached_assets'),
     },
   },
 };
