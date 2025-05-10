@@ -1,5 +1,5 @@
 import { db } from './db';
-import { competitions, entries, ticketStatuses, type TicketStatusResponse } from '@shared/schema';
+import { competitions, entries, ticketStatuses, users, type TicketStatusResponse } from '@shared/schema';
 import { eq, and, gt, isNull, inArray, sql, desc, asc } from 'drizzle-orm';
 
 /**
@@ -427,6 +427,112 @@ export class TicketService {
       console.log(`🎟️ Successfully synchronized ticket statuses for competition ${competitionId}`);
     } catch (error) {
       console.error(`Error synchronizing ticket statuses: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Get user details by ticket number for a specific competition
+   * Used for ticket lookup functionality
+   */
+  static async getUserByTicketNumber(competitionId: number, ticketNumber: number): Promise<{
+    ticketStatus: string;
+    user: { 
+      id: number;
+      username: string;
+      email: string;
+      phone?: string | null;
+      fullName?: string | null;
+    } | null;
+    entryId: number | null;
+    purchaseDate?: Date | null;
+  }> {
+    try {
+      console.log(`🎟️ Looking up user for ticket number ${ticketNumber} in competition ${competitionId}`);
+      
+      // Get the ticket status
+      const [ticket] = await db.select()
+        .from(ticketStatuses)
+        .where(
+          and(
+            eq(ticketStatuses.competitionId, competitionId),
+            eq(ticketStatuses.ticketNumber, ticketNumber)
+          )
+        )
+        .limit(1);
+      
+      if (!ticket) {
+        console.log(`🎟️ Ticket number ${ticketNumber} not found in competition ${competitionId}`);
+        return {
+          ticketStatus: 'not_found',
+          user: null,
+          entryId: null
+        };
+      }
+      
+      // If the ticket isn't purchased, return status but no user
+      if (ticket.status !== 'purchased') {
+        return {
+          ticketStatus: ticket.status,
+          user: null,
+          entryId: ticket.entryId
+        };
+      }
+      
+      // Get the user details
+      if (!ticket.userId) {
+        console.log(`🎟️ Ticket is purchased but no userId found for ticket ${ticketNumber}`);
+        return {
+          ticketStatus: ticket.status,
+          user: null,
+          entryId: ticket.entryId
+        };
+      }
+      
+      const [userDetails] = await db.select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        phone: users.phone,
+        fullName: users.fullName
+      })
+      .from(users)
+      .where(eq(users.id, ticket.userId))
+      .limit(1);
+      
+      // Get the entry to find purchase date
+      let purchaseDate = null;
+      if (ticket.entryId) {
+        const [entryDetails] = await db.select({
+          createdAt: entries.createdAt
+        })
+        .from(entries)
+        .where(eq(entries.id, ticket.entryId))
+        .limit(1);
+        
+        if (entryDetails) {
+          purchaseDate = entryDetails.createdAt;
+        }
+      }
+      
+      if (!userDetails) {
+        console.log(`🎟️ User with ID ${ticket.userId} not found for ticket ${ticketNumber}`);
+        return {
+          ticketStatus: ticket.status,
+          user: null,
+          entryId: ticket.entryId
+        };
+      }
+      
+      return {
+        ticketStatus: ticket.status,
+        user: userDetails,
+        entryId: ticket.entryId,
+        purchaseDate
+      };
+      
+    } catch (error) {
+      console.error(`Error getting user by ticket number: ${error}`);
       throw error;
     }
   }

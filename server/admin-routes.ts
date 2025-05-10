@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { db } from './db';
 import { competitions, entries, winners, siteConfig, users } from '@shared/schema';
+import { TicketService } from './ticket-service';
 import { eq, desc } from 'drizzle-orm';
 
 // Create a router
