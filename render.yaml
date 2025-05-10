@@ -1,7 +1,10 @@
 services:
   - type: web
     name: blue-whale-competitions
-    env: docker
+    env: node
+    plan: starter
+    buildCommand: ./render-build.sh
+    startCommand: node server-docker.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -20,6 +23,12 @@ services:
           name: blue-whale-db
           property: connectionString
         previewValue: postgres://postgres:postgres@postgres:5432/postgres?sslmode=require
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
         sync: false
 
 databases:
