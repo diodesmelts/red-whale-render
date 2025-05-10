@@ -1,54 +1,60 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Loader2, Server, CheckCircle2, AlertCircle } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2, RocketIcon, CheckIcon, XIcon } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export function RenderDeployment() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deployResult, setDeployResult] = useState<any>(null);
-  const [deployError, setDeployError] = useState<string | null>(null);
+  const [result, setResult] = useState<{
+    success: boolean;
+    message: string;
+    details?: string;
+    instructions?: string[];
+    logs?: string;
+  } | null>(null);
   const { toast } = useToast();
 
-  const handlePrepareForRender = async () => {
+  const handlePrepareRenderDeploy = async () => {
     setIsLoading(true);
-    setDeployError(null);
-    setDeployResult(null);
+    setResult(null);
     
     try {
-      const response = await apiRequest("POST", "/api/admin/prepare-render-deploy");
+      const response = await apiRequest(
+        'POST',
+        '/api/admin/prepare-render-deploy'
+      );
+
+      const data = await response.json();
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to prepare deployment package");
+      setResult(data);
+      
+      if (data.success) {
+        toast({
+          title: 'Deployment Package Created',
+          description: 'The Render deployment package has been created successfully',
+          variant: 'default',
+        });
+      } else {
+        toast({
+          title: 'Deployment Preparation Failed',
+          description: data.message || 'Failed to prepare for Render deployment',
+          variant: 'destructive',
+        });
       }
-      
-      const result = await response.json();
-      setDeployResult(result);
-      
-      toast({
-        title: "Deployment package created!",
-        description: "The Render deployment package has been successfully created.",
-      });
     } catch (error: any) {
-      console.error("Deployment preparation error:", error);
-      setDeployError(error.message || "An unknown error occurred");
-      
+      console.error('Deployment preparation error:', error);
       toast({
-        title: "Deployment preparation failed",
-        description: error.message || "Failed to prepare the deployment package",
-        variant: "destructive",
+        title: 'Error',
+        description: 'There was an error preparing the deployment package',
+        variant: 'destructive',
+      });
+      setResult({
+        success: false,
+        message: 'Server error. Please try again later.'
       });
     } finally {
       setIsLoading(false);
@@ -56,152 +62,99 @@ export function RenderDeployment() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="border-2 border-blue-200 shadow-md">
-        <CardHeader className="bg-blue-50">
-          <CardTitle className="flex items-center gap-2">
-            <Server className="h-5 w-5" />
-            Render Deployment
-          </CardTitle>
-          <CardDescription>
-            Create a pre-built package ready for deployment on Render
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <p className="text-sm">
-              This tool helps you prepare a pre-built version of your application that can be easily deployed to Render without build issues.
-            </p>
-            
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-4 text-sm">
-              <h4 className="font-semibold text-amber-800 mb-2">How it works:</h4>
-              <ol className="list-decimal pl-5 space-y-1 text-amber-700">
-                <li>This generates a simplified, pre-built package in a <code className="bg-amber-100 px-1 rounded">dist-ready</code> directory</li>
-                <li>Push this directory to GitHub</li>
-                <li>In Render, create a new Web Service pointing to this directory</li>
-                <li>No complex build commands required - it just works!</li>
-              </ol>
-            </div>
-            
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <RocketIcon className="h-5 w-5" /> 
+          Render Deployment
+        </CardTitle>
+        <CardDescription>
+          Prepare a pre-built deployment package for Render
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="bg-muted/50 p-4 rounded-md border">
+          <h3 className="font-medium mb-2">About Render Deployment</h3>
+          <p className="text-sm text-muted-foreground mb-2">
+            This tool creates a pre-built deployment package that can be pushed to GitHub
+            and deployed on Render without build errors. This avoids common issues with
+            the build process on Render.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            The package includes all the necessary files and a simplified package.json file
+            with the correct dependencies for Render.
+          </p>
+        </div>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
             <Button 
               variant="default" 
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-6 w-full"
-              onClick={() => setIsDialogOpen(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={isLoading}
             >
-              <Server className="mr-2 h-5 w-5" />
-              Prepare for Render Deployment
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Preparing Deployment Package...
+                </>
+              ) : (
+                <>Prepare for Render Deployment</>
+              )}
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Prepare Render Deployment Package</DialogTitle>
-            <DialogDescription>
-              This will create a pre-built deployment package that can be easily deployed to Render without build errors.
-            </DialogDescription>
-          </DialogHeader>
-          
-          {!isLoading && !deployResult && !deployError && (
-            <div className="py-4">
-              <p className="text-sm mb-4">
-                Are you sure you want to prepare a deployment package for Render? This process will:
-              </p>
-              <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Build your frontend application</li>
-                <li>Create a simplified server setup</li>
-                <li>Package everything in a "dist-ready" directory</li>
-                <li>Generate instructions for deploying to Render</li>
-              </ul>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Prepare Render Deployment Package</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will create a pre-built deployment package that can be
+                easily deployed to Render without build errors.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handlePrepareRenderDeploy}>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        
+        {result && (
+          <Alert variant={result.success ? "default" : "destructive"} className="mt-4">
+            <div className="flex items-center gap-2">
+              {result.success ? <CheckIcon className="h-4 w-4" /> : <XIcon className="h-4 w-4" />}
+              <AlertTitle>{result.success ? 'Success' : 'Error'}</AlertTitle>
             </div>
-          )}
-          
-          {isLoading && (
-            <div className="py-6 flex flex-col items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700 mb-4"></div>
-              <p className="text-center text-gray-600">Preparing deployment package...</p>
-              <p className="text-center text-gray-500 text-sm mt-2">This may take a minute or two</p>
-            </div>
-          )}
-          
-          {deployResult && (
-            <div className="py-4">
-              <Alert className="mb-4 border-green-200 bg-green-50">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <AlertTitle className="text-green-800">Success!</AlertTitle>
-                <AlertDescription className="text-green-700">
-                  Deployment package created successfully
-                </AlertDescription>
-              </Alert>
-              
-              <div className="space-y-3 mt-4">
-                <h4 className="font-medium">Next Steps:</h4>
-                <ol className="list-decimal pl-5 space-y-1 text-sm">
-                  {deployResult.instructions?.map((instruction: string, index: number) => (
+            <AlertDescription className="mt-2">{result.message}</AlertDescription>
+            
+            {result.details && (
+              <div className="mt-2 text-sm">
+                <p className="font-medium mt-2">Details:</p>
+                <p>{result.details}</p>
+              </div>
+            )}
+            
+            {result.instructions && result.instructions.length > 0 && (
+              <div className="mt-4 text-sm">
+                <p className="font-medium">Deployment Instructions:</p>
+                <ol className="list-decimal pl-5 mt-2 space-y-1">
+                  {result.instructions.map((instruction, index) => (
                     <li key={index}>{instruction}</li>
                   ))}
                 </ol>
               </div>
-            </div>
-          )}
-          
-          {deployError && (
-            <div className="py-4">
-              <Alert className="mb-4 border-red-200 bg-red-50">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <AlertTitle className="text-red-800">Error</AlertTitle>
-                <AlertDescription className="text-red-700">
-                  {deployError}
-                </AlertDescription>
-              </Alert>
-              <p className="text-sm mt-4">
-                Please try again or check the console for more details.
-              </p>
-            </div>
-          )}
-          
-          <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-2">
-            {!deployResult && !deployError && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="default"
-                  className="bg-blue-600 hover:bg-blue-700"
-                  onClick={handlePrepareForRender}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Preparing...
-                    </>
-                  ) : (
-                    "Prepare Package"
-                  )}
-                </Button>
-              </>
             )}
             
-            {(deployResult || deployError) && (
-              <Button
-                variant={deployResult ? "default" : "outline"}
-                onClick={() => setIsDialogOpen(false)}
-              >
-                {deployResult ? "Done" : "Close"}
-              </Button>
+            {result.logs && (
+              <div className="mt-4">
+                <p className="font-medium text-sm">Build Logs:</p>
+                <div className="mt-2 bg-black/10 p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-auto">
+                  {result.logs}
+                </div>
+              </div>
             )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+          </Alert>
+        )}
+      </CardContent>
+    </Card>
   );
 }
