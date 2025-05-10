@@ -635,4 +635,57 @@ adminRouter.get('/competitions/:competitionId/ticket/:ticketNumber/owner', isAdm
   }
 });
 
+// Prepare for Render deployment endpoint
+adminRouter.post('/prepare-render-deploy', isAdmin, async (req, res) => {
+  try {
+    console.log('🚀 Starting Render deployment preparation...');
+    
+    // Execute the shell script that prepares the deployment package
+    const { exec } = require('child_process');
+    const scriptPath = './prepare-render-deploy.sh';
+    
+    exec(`bash ${scriptPath}`, (error: any, stdout: string, stderr: string) => {
+      if (error) {
+        console.error(`❌ Execution error: ${error}`);
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Error executing deployment script', 
+          error: error.message,
+          stderr 
+        });
+      }
+      
+      if (stderr) {
+        console.warn(`⚠️ Script warnings: ${stderr}`);
+      }
+      
+      console.log(`📝 Script output: ${stdout}`);
+      
+      // Success response with detailed information
+      res.status(200).json({
+        success: true,
+        message: 'Render deployment package created successfully',
+        details: 'The deployment package is now ready in the "dist-ready" directory. Push this to GitHub and deploy it on Render.',
+        instructions: [
+          '1. Push the "dist-ready" directory to GitHub',
+          '2. On Render, create a new Web Service and connect to your GitHub repository',
+          '3. Set the Root Directory to "dist-ready"',
+          '4. Set the Build Command to: npm install',
+          '5. Set the Start Command to: node server-docker.js',
+          '6. Add the required environment variables (DATABASE_URL, STRIPE_SECRET_KEY, etc.)',
+          '7. Deploy your application'
+        ],
+        logs: stdout
+      });
+    });
+  } catch (error: any) {
+    console.error('❌ Error preparing for Render deployment:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to prepare for Render deployment', 
+      error: error.message 
+    });
+  }
+});
+
 export default adminRouter;
