@@ -22,6 +22,7 @@ type EntryWithCompetition = {
   userId: number;
   competitionId: number;
   ticketCount: number;
+  selectedNumbers?: number[];
   paymentStatus: string;
   stripePaymentId?: string;
   createdAt: string;
@@ -280,6 +281,33 @@ function EntryCard({ entry, status }: { entry: EntryWithCompetition, status: 'ac
         </CardHeader>
         
         <CardContent className="pb-2 flex-grow">
+          {/* Ticket Numbers Display */}
+          {entry.selectedNumbers && entry.selectedNumbers.length > 0 && (
+            <div className="mb-3">
+              <p className="text-xs text-muted-foreground mb-1 flex items-center">
+                <Ticket className="h-3 w-3 mr-1" /> Your Ticket Numbers:
+              </p>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {entry.selectedNumbers.map((number) => (
+                  <span 
+                    key={number} 
+                    className="inline-flex items-center justify-center h-6 w-8 bg-primary/10 text-primary text-xs font-medium rounded-md"
+                  >
+                    {number}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {entry.selectedNumbers && entry.selectedNumbers.length === 0 && (
+            <div className="mb-3">
+              <p className="text-xs text-muted-foreground mb-1 flex items-center">
+                <Ticket className="h-3 w-3 mr-1" /> Random numbers assigned
+              </p>
+            </div>
+          )}
+          
           {status === 'active' && (
             <div className="mb-2">
               <p className="text-xs text-muted-foreground mb-1">Time Remaining:</p>
