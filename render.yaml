@@ -3,7 +3,7 @@ services:
     name: blue-whale-competitions
     env: node
     plan: starter
-    buildCommand: ./render-build.sh
+    buildCommand: bash ./render-build.sh
     startCommand: node server-docker.js
     healthCheckPath: /api/health
     envVars:
