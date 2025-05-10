@@ -217,8 +217,8 @@ export function AddToCart({
             <div className="max-h-[280px] overflow-y-auto pr-2 my-2 custom-scrollbar">
               <div className="grid grid-cols-5 gap-2 py-2" data-testid="number-grid">
                 {Array.from({ length: competition.totalTickets }, (_, i) => i + 1).map(number => {
-                  // Get taken numbers from API or use fallback
-                  const takenNumbers = takenNumbersData?.takenNumbers || [2, 15, 27, 42, 56, 78, 91];
+                  // Get taken numbers from API or use empty array
+                  const takenNumbers = takenNumbersData?.takenNumbers || [];
                   const isTaken = takenNumbers.includes(number) && !selectedNumbers.includes(number);
                   
                   return (
