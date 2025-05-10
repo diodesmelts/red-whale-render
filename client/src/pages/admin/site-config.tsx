@@ -6,6 +6,7 @@ import { LogoUpload } from "@/components/admin/site-config/logo-upload";
 import { FooterSettings } from "@/components/admin/site-config/footer-settings";
 import { PaymentCardsUpload } from "@/components/admin/site-config/payment-cards-upload";
 import { PaymentCardsPreview } from "@/components/admin/site-config/payment-cards-preview";
+import { RenderDeployment } from "@/components/admin/site-config/render-deployment";
 import { useQuery } from "@tanstack/react-query";
 import { SiteConfig } from "@shared/schema";
 import { cn, getImageUrl } from "@/lib/utils";
@@ -52,6 +53,7 @@ export default function SiteConfigPage() {
             <TabsTrigger value="logo">Logo</TabsTrigger>
             <TabsTrigger value="payment-cards">Payment Cards</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
+            <TabsTrigger value="deployment" className="bg-blue-50 text-blue-600 hover:text-blue-700">Deployment</TabsTrigger>
           </TabsList>
           
           <TabsContent value="hero-banner" className="space-y-4">
@@ -219,6 +221,10 @@ export default function SiteConfigPage() {
                 <FooterSettings />
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="deployment">
+            <RenderDeployment />
           </TabsContent>
         </Tabs>
       </div>
