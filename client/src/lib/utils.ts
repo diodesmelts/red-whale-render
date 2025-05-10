@@ -95,6 +95,51 @@ export function truncateString(str: string, maxLength: number): string {
   return str.slice(0, maxLength) + "...";
 }
 
+/**
+ * Formats a phone number to a readable format
+ * Example: "1234567890" -> "+1 (234) 567-890"
+ */
+export function formatPhoneNumber(phoneNumber: string | null | undefined): string {
+  if (!phoneNumber) return '';
+  
+  // Remove any non-numeric characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  
+  // Check if it's already formatted
+  if (phoneNumber.includes(' ') || phoneNumber.includes('-') || phoneNumber.includes('(')) {
+    return phoneNumber;
+  }
+  
+  // International format with country code if the number is long enough
+  if (cleaned.length > 10) {
+    // Assuming first 1-3 digits are country code
+    const countryCode = cleaned.substring(0, cleaned.length - 10);
+    const areaCode = cleaned.substring(cleaned.length - 10, cleaned.length - 7);
+    const firstPart = cleaned.substring(cleaned.length - 7, cleaned.length - 4);
+    const lastPart = cleaned.substring(cleaned.length - 4);
+    
+    return `+${countryCode} (${areaCode}) ${firstPart}-${lastPart}`;
+  } 
+  // Standard 10 digit format for US/UK style numbers
+  else if (cleaned.length === 10) {
+    const areaCode = cleaned.substring(0, 3);
+    const firstPart = cleaned.substring(3, 6);
+    const lastPart = cleaned.substring(6);
+    
+    return `(${areaCode}) ${firstPart}-${lastPart}`;
+  }
+  // Just add hyphens for shorter numbers
+  else if (cleaned.length > 5) {
+    const firstPart = cleaned.substring(0, cleaned.length - 4);
+    const lastPart = cleaned.substring(cleaned.length - 4);
+    
+    return `${firstPart}-${lastPart}`;
+  }
+  
+  // For very short numbers or unusual formats, return as is
+  return phoneNumber;
+}
+
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   delay: number
