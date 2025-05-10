@@ -12,6 +12,8 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   displayName: text("display_name"),
+  fullName: text("full_name"),
+  phone: text("phone"),
   mascot: text("mascot").default("blue-whale"),
   stripeCustomerId: text("stripe_customer_id"),
   isAdmin: boolean("is_admin").default(false),

@@ -39,6 +39,7 @@ import AdminSettings from "@/pages/admin/settings";
 import SiteConfigPage from "@/pages/admin/site-config";
 import DevTools from "@/pages/admin/dev-tools";
 import EditCompetition from "@/pages/admin/edit-competition";
+import TicketLookupPage from "@/pages/ticket-lookup";
 
 // Dynamically import create-competition to avoid TypeScript issues
 const CreateCompetition = () => {

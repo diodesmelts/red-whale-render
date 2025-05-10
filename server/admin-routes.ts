@@ -572,50 +572,41 @@ adminRouter.get('/competitions/:competitionId/ticket/:ticketNumber', isAdmin, as
       return res.status(404).json({ message: 'Competition not found' });
     }
     
-    // Find the entry that contains this ticket number
-    const allEntries = await db.select()
-      .from(entries)
-      .where(eq(entries.competitionId, competitionId));
+    // Use the centralized TicketService to get ticket and user details
+    const ticketLookup = await TicketService.getUserByTicketNumber(competitionId, ticketNumber);
     
-    // Filter entries to find one with the matching ticket number
-    let ticketEntry = null;
-    
-    for (const entry of allEntries) {
-      if (entry.selectedNumbers && Array.isArray(entry.selectedNumbers) && 
-          entry.selectedNumbers.includes(ticketNumber)) {
-        ticketEntry = entry;
-        break;
-      }
-    }
-    
-    if (!ticketEntry) {
+    if (ticketLookup.ticketStatus === 'not_found') {
       return res.status(404).json({ 
-        message: 'Ticket not found or not yet purchased' 
+        message: 'Ticket not found in this competition' 
       });
     }
     
-    // Get user details
-    const user = await db.select()
-      .from(users)
-      .where(eq(users.id, ticketEntry.userId))
-      .limit(1);
-      
-    if (!user.length) {
-      return res.status(404).json({ message: 'User not found' });
+    if (ticketLookup.ticketStatus !== 'purchased') {
+      return res.status(404).json({ 
+        message: `Ticket is ${ticketLookup.ticketStatus}, not yet purchased` 
+      });
     }
     
-    // Don't send password to client
-    const { password, ...userWithoutPassword } = user[0];
+    if (!ticketLookup.user) {
+      return res.status(404).json({ 
+        message: 'User information not found for this ticket' 
+      });
+    }
     
     // Construct the response
     const ticketOwner = {
       ticketNumber,
-      userId: ticketEntry.userId,
-      userDetails: userWithoutPassword,
-      purchaseDate: ticketEntry.createdAt
+      ticketStatus: ticketLookup.ticketStatus,
+      userId: ticketLookup.user.id,
+      userDetails: {
+        ...ticketLookup.user,
+        // Don't include any sensitive information
+        password: undefined
+      },
+      purchaseDate: ticketLookup.purchaseDate
     };
     
-    console.log(`✅ Found owner for ticket #${ticketNumber}: User ID #${ticketEntry.userId}`);
+    console.log(`✅ Found owner for ticket #${ticketNumber}: User ID #${ticketLookup.user.id}`);
     
     res.json(ticketOwner);
   } catch (error: any) {
