@@ -3,7 +3,7 @@ services:
     name: blue-whale-competitions
     env: node
     plan: starter
-    buildCommand: bash ./render-build.sh
+    buildCommand: npm install --include=dev && npm install @vitejs/plugin-react @tailwindcss/typography tailwindcss postcss autoprefixer vite esbuild && npm run build
     startCommand: node server-docker.js
     healthCheckPath: /api/health
     envVars:

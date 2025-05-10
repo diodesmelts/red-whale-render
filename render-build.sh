@@ -3,6 +3,10 @@ set -e  # Exit immediately if a command exits with a non-zero status
 
 echo "Starting build process..."
 
+# Copy the package.docker.json to package.json to ensure all dependencies are installed
+echo "Using deployment-specific package.json..."
+cp package.docker.json package.json
+
 # Install ALL dependencies (including dev dependencies which are needed for the build)
 echo "Installing dependencies..."
 npm install --include=dev
@@ -13,7 +17,7 @@ npm install --no-save @vitejs/plugin-react @tailwindcss/typography tailwindcss p
 
 # Run Vite build directly
 echo "Building client with Vite..."
-./node_modules/.bin/vite build
+NODE_ENV=production ./node_modules/.bin/vite build
 
 # Build server with esbuild
 echo "Building server with esbuild..."
@@ -23,7 +27,7 @@ echo "Building server with esbuild..."
 echo "Preparing server file..."
 if [ ! -f server-docker.js ]; then
   echo "server-docker.js not found, creating it..."
-  cp server-docker.cjs server-docker.js 2>/dev/null || cp server-docker.js.bak server-docker.js 2>/dev/null || echo "export * from './server/index.js';" > server-docker.js
+  cp server-docker.cjs server-docker.js 2>/dev/null || cp server-docker.js.bak server-docker.js 2>/dev/null || echo "export * from './dist/index.js';" > server-docker.js
 fi
 
 # Ensure server-docker.js is executable
