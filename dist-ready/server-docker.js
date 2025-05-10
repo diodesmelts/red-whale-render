@@ -29,6 +29,11 @@ const pool = new Pool({
 // Create Express app
 const app = express();
 
+// Add a simple health check endpoint for Render
+app.get('/', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Detailed request logging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);

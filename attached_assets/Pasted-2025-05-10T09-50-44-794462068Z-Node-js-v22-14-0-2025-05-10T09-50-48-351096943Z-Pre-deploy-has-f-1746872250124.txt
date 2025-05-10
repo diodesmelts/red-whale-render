@@ -1,0 +1,50 @@
+2025-05-10T09:50:44.794462068Z Node.js v22.14.0
+2025-05-10T09:50:48.351096943Z ==> Pre-deploy has failed
+2025-05-10T09:50:48.590601395Z ==> Exited with status 1
+2025-05-10T09:50:48.742197227Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-05-10T09:52:43.589333766Z ==> Starting pre-deploy: node server-docker.js
+2025-05-10T09:52:55.167678533Z Trusting first proxy
+2025-05-10T09:52:55.167875927Z Session middleware configured
+2025-05-10T09:52:55.168059281Z Passport initialized
+2025-05-10T09:52:55.174120257Z 🚀 Server running on http://0.0.0.0:10000
+2025-05-10T09:52:55.174195009Z Environment: production
+2025-05-10T09:58:56.878938885Z ==> Pre-deploy has failed
+2025-05-10T09:59:01.759876271Z ==> Starting pre-deploy: node server-docker.js
+2025-05-10T09:59:13.489905989Z ==> Running 'node server-docker.js'
+2025-05-10T09:59:13.60574752Z Allowed CORS origins: [ 'http://localhost:3000', 'https://bluewhalecompetitions.co.uk' ]
+2025-05-10T09:59:13.605993496Z Environment: production
+2025-05-10T09:59:13.606850165Z Trusting first proxy
+2025-05-10T09:59:13.608002321Z Session middleware configured
+2025-05-10T09:59:13.608217975Z Passport initialized
+2025-05-10T09:59:13.614621229Z 🚀 Server running on http://0.0.0.0:10000
+2025-05-10T09:59:13.614706241Z Environment: production
+2025-05-10T10:02:32.157011114Z ==> Starting pre-deploy: node server-docker.js
+2025-05-10T10:02:35.115769317Z ==> Pre-deploy has failed
+2025-05-10T10:02:44.776889258Z ==> Running 'node server-docker.js'
+2025-05-10T10:02:44.896999554Z Allowed CORS origins: [ 'http://localhost:3000', 'https://bluewhalecompetitions.co.uk' ]
+2025-05-10T10:02:44.897185479Z Environment: production
+2025-05-10T10:02:44.898017279Z Trusting first proxy
+2025-05-10T10:02:44.898172063Z Session middleware configured
+2025-05-10T10:02:44.898355727Z Passport initialized
+2025-05-10T10:02:44.905617964Z 🚀 Server running on http://0.0.0.0:10000
+2025-05-10T10:02:44.905689325Z Environment: production
+2025-05-10T10:03:17.734273821Z ==> Pre-deploy has failed
+2025-05-10T10:03:23.177056911Z ==> Starting pre-deploy: node server-docker.js
+2025-05-10T10:03:38.928057405Z ==> Running 'node server-docker.js'
+2025-05-10T10:03:39.055021415Z Allowed CORS origins: [ 'http://localhost:3000', 'https://bluewhalecompetitions.co.uk' ]
+2025-05-10T10:03:39.05524284Z Environment: production
+2025-05-10T10:03:39.056153781Z Trusting first proxy
+2025-05-10T10:03:39.056330315Z Session middleware configured
+2025-05-10T10:03:39.05653468Z Passport initialized
+2025-05-10T10:03:39.064092578Z 🚀 Server running on http://0.0.0.0:10000
+2025-05-10T10:03:39.06416566Z Environment: production
+2025-05-10T10:07:25.473634068Z ==> Starting pre-deploy: node server-docker.js
+2025-05-10T10:07:28.894852996Z ==> Pre-deploy has failed
+2025-05-10T10:07:37.430624847Z ==> Running 'node server-docker.js'
+2025-05-10T10:07:37.54922382Z Allowed CORS origins: [ 'https://red-whale-render.onrender.com' ]
+2025-05-10T10:07:37.549394144Z Environment: production
+2025-05-10T10:07:37.551125683Z Trusting first proxy
+2025-05-10T10:07:37.551295247Z Session middleware configured
+2025-05-10T10:07:37.55147406Z Passport initialized
+2025-05-10T10:07:37.557748611Z 🚀 Server running on http://0.0.0.0:10000
+2025-05-10T10:07:37.557814842Z Environment: production
