@@ -219,8 +219,17 @@ adminRouter.post('/dev-create-test-competitions', isAdmin, async (req, res) => {
       
       try {
         const result = await db.insert(competitions).values(comp).returning();
+        const newCompId = result[0].id;
         results.push(result[0]);
-        console.log(`✅ Created competition: ${comp.title} with ID ${result[0].id}`);
+        console.log(`✅ Created competition: ${comp.title} with ID ${newCompId}`);
+        
+        // Initialize ticket statuses for this test competition
+        try {
+          console.log(`🎟️ Initializing ticket statuses for test competition ${newCompId}`);
+          await TicketService.initializeTicketStatuses(newCompId);
+        } catch (ticketError) {
+          console.error(`⚠️ Error initializing ticket statuses for test competition: ${ticketError}`);
+        }
       } catch (error) {
         console.error(`❌ Error creating competition ${comp.title}:`, error);
         // Continue with other competitions even if one fails
@@ -303,8 +312,19 @@ adminRouter.post('/dev-create-competition', isAdmin, async (req, res) => {
     });
     
     const result = await db.insert(competitions).values(competitionData).returning();
+    const newCompetitionId = result[0].id;
     
-    console.log(`✅ Successfully created competition: ${title} with ID ${result[0].id}`);
+    console.log(`✅ Successfully created competition: ${title} with ID ${newCompetitionId}`);
+    
+    // Initialize ticket statuses for the new competition
+    try {
+      console.log(`🎟️ Initializing ticket statuses for new competition ${newCompetitionId}`);
+      await TicketService.initializeTicketStatuses(newCompetitionId);
+      console.log(`✅ Ticket statuses initialized for competition ${newCompetitionId}`);
+    } catch (ticketError) {
+      console.error(`⚠️ Error initializing ticket statuses: ${ticketError}`);
+      // We don't fail the request if this fails, as the competition was created successfully
+    }
     
     return res.status(201).json(result[0]);
   } catch (error: any) {
