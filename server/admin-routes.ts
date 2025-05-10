@@ -640,20 +640,15 @@ adminRouter.post('/prepare-render-deploy', isAdmin, async (req, res) => {
   try {
     console.log('🚀 Starting Render deployment preparation...');
     
-    // Execute the shell script that prepares the deployment package
-    const { exec } = require('child_process');
+    // Import child_process dynamically using ES modules style
+    const { exec } = await import('child_process');
+    const { promisify } = await import('util');
+    
+    const execPromisified = promisify(exec);
     const scriptPath = './prepare-render-deploy.sh';
     
-    exec(`bash ${scriptPath}`, (error: any, stdout: string, stderr: string) => {
-      if (error) {
-        console.error(`❌ Execution error: ${error}`);
-        return res.status(500).json({ 
-          success: false, 
-          message: 'Error executing deployment script', 
-          error: error.message,
-          stderr 
-        });
-      }
+    try {
+      const { stdout, stderr } = await execPromisified(`bash ${scriptPath}`);
       
       if (stderr) {
         console.warn(`⚠️ Script warnings: ${stderr}`);
@@ -677,7 +672,15 @@ adminRouter.post('/prepare-render-deploy', isAdmin, async (req, res) => {
         ],
         logs: stdout
       });
-    });
+    } catch (execError: any) {
+      console.error(`❌ Execution error: ${execError}`);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Error executing deployment script', 
+        error: execError.message,
+        stderr: execError.stderr 
+      });
+    }
   } catch (error: any) {
     console.error('❌ Error preparing for Render deployment:', error);
     res.status(500).json({ 
