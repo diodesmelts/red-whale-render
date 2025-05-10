@@ -1416,9 +1416,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const entries = await dataStorage.getEntries(req.user!.id);
       
+      // Deduplicate entries with same ticket numbers for the same competition
+      // This is a temporary fix to handle multiple entries with identical ticket numbers
+      const uniqueEntries = [];
+      const processedCompTickets = new Map(); // Map to track competition-ticket pairs already processed
+      
+      for (const entry of entries) {
+        if (!entry.selectedNumbers || entry.selectedNumbers.length === 0) {
+          // Always include entries with no ticket numbers
+          uniqueEntries.push(entry);
+          continue;
+        }
+        
+        // Create a unique key for this competition and its ticket numbers
+        const ticketKey = `${entry.competitionId}:${entry.selectedNumbers.sort().join(',')}`;
+        
+        // Only add the entry if this exact set of ticket numbers hasn't been processed
+        if (!processedCompTickets.has(ticketKey)) {
+          processedCompTickets.set(ticketKey, true);
+          uniqueEntries.push(entry);
+        } else {
+          console.log(`Skipping duplicate entry for competition ${entry.competitionId} with tickets ${entry.selectedNumbers}`);
+        }
+      }
+      
       // Fetch competitions for each entry
       const entriesWithDetails = await Promise.all(
-        entries.map(async (entry) => {
+        uniqueEntries.map(async (entry) => {
           const competition = await dataStorage.getCompetition(entry.competitionId);
           return {
             ...entry,
