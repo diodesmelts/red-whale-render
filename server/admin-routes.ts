@@ -544,7 +544,7 @@ adminRouter.post('/competitions/:id/cart-items', isAdmin, async (req, res) => {
 });
 
 // Admin endpoint to lookup ticket owner by competition ID and ticket number
-adminRouter.get('/competitions/:competitionId/ticket/:ticketNumber', isAdmin, async (req, res) => {
+adminRouter.get('/competitions/:competitionId/ticket/:ticketNumber/owner', isAdmin, async (req, res) => {
   try {
     console.log('🔍 TICKET OWNER LOOKUP request received:', {
       competitionId: req.params.competitionId,
