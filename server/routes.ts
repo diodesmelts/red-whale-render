@@ -2262,6 +2262,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ticket status initialization endpoint (admin only)
+  app.post('/api/admin/initialize-tickets/:competitionId', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { competitionId } = req.params;
+      console.log(`Admin requested ticket status initialization for competition ${competitionId}`);
+      
+      // Check if the competition exists
+      const competition = await dataStorage.getCompetition(Number(competitionId));
+      if (!competition) {
+        return res.status(404).json({ success: false, message: 'Competition not found' });
+      }
+      
+      // Initialize ticket statuses
+      await TicketService.initializeTicketStatuses(Number(competitionId));
+      
+      // Sync with existing entries
+      await TicketService.syncWithEntries(Number(competitionId));
+      
+      res.json({ 
+        success: true, 
+        message: `Ticket statuses initialized for competition ${competitionId}`,
+        competitionTitle: competition.title
+      });
+    } catch (error: any) {
+      console.error(`Error initializing ticket statuses: ${error}`);
+      res.status(500).json({ 
+        success: false, 
+        message: `Error initializing ticket statuses: ${error.message}` 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
