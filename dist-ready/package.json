@@ -1,0 +1,21 @@
+{
+  "name": "blue-whale-competitions",
+  "version": "1.0.0",
+  "main": "server-docker.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server-docker.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "connect-pg-simple": "^10.0.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.15.0",
+    "cors": "^2.8.5",
+    "cloudinary": "^2.6.0",
+    "multer": "^1.4.5-lts.2",
+    "stripe": "^18.1.0"
+  }
+}
