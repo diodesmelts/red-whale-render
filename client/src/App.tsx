@@ -91,6 +91,7 @@ function Router() {
               <ProtectedRoute path="/admin/settings" component={AdminSettings} adminRequired={true} />
               <ProtectedRoute path="/admin/site-config" component={SiteConfigPage} adminRequired={true} />
               <ProtectedRoute path="/admin/dev-tools" component={DevTools} adminRequired={true} />
+              <ProtectedRoute path="/admin/competitions/:competitionId/ticket-lookup" component={TicketLookupPage} adminRequired={true} />
               
               {/* Fallback to 404 */}
               <Route component={NotFound} />

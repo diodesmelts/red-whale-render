@@ -507,6 +507,11 @@ export default function CompetitionsManager() {
                                         <Edit className="mr-2 h-4 w-4" />
                                         <span>Edit</span>
                                     </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => navigate(`/admin/competitions/${competition.id}/ticket-lookup`)}>
+                                        <TicketIcon className="mr-2 h-4 w-4" />
+                                        <span>Ticket Lookup</span>
+                                    </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={() => handleDeleteCompetition(competition.id)} className="text-red-600">
                                       <Trash className="mr-2 h-4 w-4" />
